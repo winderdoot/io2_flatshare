@@ -35,27 +35,25 @@
 * Pełna obsługa cyklu życia ogłoszenia: przejścia między stanami `ACTIVE`, `HIDDEN`, `ARCHIVED`.
 * Wdrożenie encji `Unavailability` do zarządzania okresami niedostępności pokoju (np. na czas remontu).
 * Podstawowy endpoint pobierający dopasowane da lokatora mieszkania z użyciem stronicowania (`page`, `size`).
-
-## Sprint 4: Komunikacja i Inicjacja Wynajmu (Booking)
-**Cel:** Rozwinięcie wyszukiwania i rozpoczęcie interakcji wynajmu.
-
 * Implementacja algorytmu wyliczającego `matchScore` na podstawie preferencji.
+
+## Sprint 4: Rezerwacja i płatność
+**Cel:** Rozwinięcie wyszukiwania i rozpoczęcie interakcji wynajmu.
 * Stworzenie obiektu `Booking` i endpointu inicjującego rezerwację (status `PENDING_APPROVAL`).
-* Obsługa wariantu "Instant Book", omijającego akceptację i przechodzącego bezpośrednio do `PENDING_PAYMENT`.
-
-## Sprint 5: Zarządzanie Rezerwacją i Moderacja
-**Cel:** Domknięcie obsługi rezerwacji oraz budowa modułu moderacji dla administratorów.
-
 * Zarządzanie rezerwacją przez właściciela: endpointy do akceptacji (`/accept`) i odrzucania (`/reject`).
 * Anulowanie rezerwacji przez lokatora (`/cancel`) i obsługa konfliktów terminów (błąd `409 Conflict`).
-* Budowa obiektu `ViolationReport` dla zgłoszeń naruszeń (stany: `Open`, `UnderReview`, `ActionTaken`).
-* Realizacja blokady konta przez administratora (zmiana statusu na `BLOCKED` i ukrycie ogłoszeń).
-
-## Sprint 6: Integracje Zewnętrzne (Płatności, Powiadomienia) i Finalizacja
-**Cel:** Integracja bramek płatniczych, powiadomień oraz ostateczne szlify.
-
 * Stworzenie obiektu `Payment` i integracja z zewnętrznym systemem płatności (stany `Initiated`, `Redirected`, `Succeeded`/`Failed`).
 * Automatyczna zmiana statusu rezerwacji na `CONFIRMED` po pomyślnej płatności.
-* Wdrożenie serwisu powiadomień (interfejs `INotificationPort`) do wysyłania maili/pushy po ważnych zdarzeniach biznesowych.
+* Wdrożenie bramki płatności przy akceptacji rezerwacji przez właściciela
 * Automatyczne anulowanie opłaconych rezerwacji i inicjacja zwrotów w przypadku blokady konta właściciela przez admina.
-* Testy końcowe i przygotowanie środowiska pod wdrożenie.
+
+## Sprint 5: Moderacja i integracja z zewnętrznym API
+**Cel:** Domknięcie obsługi rezerwacji oraz budowa modułu moderacji dla administratorów.
+* Budowa obiektu `ViolationReport` dla zgłoszeń naruszeń (stany: `Open`, `UnderReview`, `ActionTaken`).
+* Realizacja blokady konta przez administratora (zmiana statusu na `BLOCKED` i ukrycie ogłoszeń).
+* Próba integracji z backendem przygotowanym przez naszych kolegów
+
+## Sprint 6: Powiadomienia i Finalizacja
+**Cel:** Integracja bramek płatniczych, powiadomień oraz ostateczne szlify.
+* Wdrożenie serwisu powiadomień (interfejs `INotificationPort`) do wysyłania maili/pushy po ważnych zdarzeniach biznesowych.
+* Testy końcowe i opcjonalne wdrożenie aplikacji.
