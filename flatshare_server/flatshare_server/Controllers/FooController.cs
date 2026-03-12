@@ -2,30 +2,29 @@ using flatshare_server.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using flatshare_server.Infrastructure.Model;
 
-namespace flatshare_server.Controllers
+namespace flatshare_server.Controllers;
+
+/* Test controller */
+
+[ApiController]
+[Route("[controller]")]
+public class FooController : ControllerBase
 {
-    /* Test controller */
+    private readonly ILogger<FooController> _logger;
 
-    [ApiController]
-    [Route("[controller]")]
-    public class FooController : ControllerBase
+    public FooController(ILogger<FooController> logger)
     {
-        private readonly ILogger<FooController> _logger;
+        _logger = logger;
+    }
 
-        public FooController(ILogger<FooController> logger)
-        {
-            _logger = logger;
-        }
+    [HttpGet("foo")]
+    public async Task<ActionResult<string>> Get(FlatshareDbContext dbcontext)
+    {
+        string bar = "Gugu gaga";
 
-        [HttpGet("foo")]
-        public async Task<ActionResult<string>> Get(FlatshareDbContext dbcontext)
-        {
-            string bar = "Gugu gaga";
+        dbcontext.Foos.Add(new Foo { Bar = bar });
+        await dbcontext.SaveChangesAsync();
 
-            dbcontext.Foos.Add(new Foo { Bar = bar });
-            await dbcontext.SaveChangesAsync();
-
-            return $"Successfuly added '{bar}' to the database!";
-        }
+        return $"Successfuly added '{bar}' to the database!";
     }
 }
