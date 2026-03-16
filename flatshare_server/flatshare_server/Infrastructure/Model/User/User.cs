@@ -61,7 +61,22 @@ public class User
             Status = new AccountStatus { },
             Role = null!
         };
-        user._role = new TenantRole { User = user, TenantPreferences = new TenantPreferences { } };
+        if (request.Role != null && request.Role.Equals("LANDLORD", StringComparison.OrdinalIgnoreCase))
+        {
+            user._role = new LandlordRole
+            {
+                User = user,
+                TenantCriteria = new TenantCriteria { }
+            };
+        }
+        else
+        {
+            user._role = new TenantRole
+            {
+                User = user,
+                TenantPreferences = new TenantPreferences { }
+            };
+        }
 
         return user;
     }

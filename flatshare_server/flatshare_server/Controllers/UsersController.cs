@@ -28,12 +28,15 @@ public class UsersController : Controller
                 value: responseBody
             );
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            /* TODO: Return proper errors */
-            return BadRequest(ex.Message);
-
-            throw new NotImplementedException("TODO: Use Problem Details standard to somehow implement the weird error messages we have to implement.");
+            var errorResponse = new ValidationErrorResponse(
+                Timestamp: DateTime.UtcNow,
+                Status: 400,
+                Error: "ValidationError",
+                FieldErrors: new[] { new FieldError("Request", ex.Message) }
+            );
+            return BadRequest(errorResponse);
         }
     }
 
