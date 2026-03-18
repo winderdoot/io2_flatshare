@@ -2,6 +2,7 @@
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Services;
 using flatshare_server.Infrastructure.Model.Requests;
+using flatshare_server.Infrastructure.Model.Exceptions;
 
 namespace flatshare_server.Controllers;
 
@@ -18,28 +19,23 @@ public class UsersController : Controller
     [HttpPost()]
     public async Task<IActionResult> RegisterNewUser([FromBody] CreateUserRequest request)
     {
-        try
-        {
-            UserDTO user = await _userService.Create(request);
-            var responseBody = new UserCreatedResponse("New user created", user);
-            return CreatedAtAction(
-                actionName: nameof(GetUser),
-                routeValues: new { user.Id },
-                value: responseBody
-            );
-        }
-        catch (Exception ex)
-        {
-            /* TODO: Return proper errors */
-            return BadRequest(ex.Message);
+        /* ServerResponseExceptions are caught automatically and need not be caught in the controllers. */
 
-            throw new NotImplementedException("TODO: Use Problem Details standard to somehow implement the weird error messages we have to implement.");
-        }
+        UserDTO user = await _userService.Create(request);
+        var responseBody = new UserCreatedResponse("New user created", user);
+
+        return CreatedAtAction(
+            actionName: nameof(GetById),
+            routeValues: new { user.Id },
+            value: responseBody
+        );
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetUser(Guid id)
+    public async Task<ActionResult<UserDTO>> GetById(Guid id)
     {
-        throw new NotImplementedException();
+        UserDTO user = await _userService.GetById(id);
+
+        return user;
     }
 }
