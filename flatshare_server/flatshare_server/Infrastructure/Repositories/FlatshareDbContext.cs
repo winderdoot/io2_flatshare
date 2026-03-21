@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using flatshare_server.Infrastructure.Model.User;
 using flatshare_server.Infrastructure.Model;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace flatshare_server.Infrastructure.Repositories;
 
 public class FlatshareDbContext : DbContext
 {
-    /* Test entity set */ 
+    /* Test entity set */
     public DbSet<Foo> Foos { get; set; }
     public DbSet<User> Users { get; set; }
 

@@ -97,7 +97,7 @@ namespace flatshare_server.Migrations
 
                     b.UseTphMappingStrategy();
                 });
-
+            
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.User.LandlordRole", b =>
                 {
                     b.HasBaseType("flatshare_server.Infrastructure.Model.User.UserRole");
