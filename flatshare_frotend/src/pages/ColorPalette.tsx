@@ -1,4 +1,3 @@
-// /pages/About.tsx
 export const ColorPalette = () => {
   return (
     <>
