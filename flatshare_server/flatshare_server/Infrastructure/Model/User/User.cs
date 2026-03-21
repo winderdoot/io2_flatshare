@@ -31,7 +31,7 @@ public class User
     public required UserRole Role 
     {
         get => _role;
-        init => _role = value; 
+        set => _role = value; 
     }
 
     /* Skąd wiemy czy jest tworzony tenant czy landlord? */
