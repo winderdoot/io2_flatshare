@@ -2,6 +2,7 @@
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Services;
 using flatshare_server.Infrastructure.Model.Requests;
+using flatshare_server.Infrastructure.Model.Exceptions;
 
 namespace flatshare_server.Controllers;
 
@@ -18,31 +19,23 @@ public class UsersController : Controller
     [HttpPost()]
     public async Task<IActionResult> RegisterNewUser([FromBody] CreateUserRequest request)
     {
-        try
-        {
-            UserDTO user = await _userService.Create(request);
-            var responseBody = new UserCreatedResponse("New user created", user);
-            return CreatedAtAction(
-                actionName: nameof(GetUser),
-                routeValues: new { user.Id },
-                value: responseBody
-            );
-        }
-        catch (ArgumentException ex)
-        {
-            var errorResponse = new ValidationErrorResponse(
-                Timestamp: DateTime.UtcNow,
-                Status: 400,
-                Error: "ValidationError",
-                FieldErrors: new[] { new FieldError("Request", ex.Message) }
-            );
-            return BadRequest(errorResponse);
-        }
+        /* ServerResponseExceptions are caught automatically and need not be caught in the controllers. */
+
+        UserDTO user = await _userService.Create(request);
+        var responseBody = new UserCreatedResponse("New user created", user);
+
+        return CreatedAtAction(
+            actionName: nameof(GetById),
+            routeValues: new { user.Id },
+            value: responseBody
+        );
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetUser(Guid id)
+    public async Task<ActionResult<UserDTO>> GetById(Guid id)
     {
-        throw new NotImplementedException();
+        UserDTO user = await _userService.GetById(id);
+
+        return user;
     }
 }

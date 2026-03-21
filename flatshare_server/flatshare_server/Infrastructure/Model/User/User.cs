@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.StaticAssets;
 using EmailValidation;
 using flatshare_server.Infrastructure.Utils;
+using flatshare_server.Infrastructure.Model.Exceptions;
+using flatshare_server.Infrastructure.Model.Responses;
+using Microsoft.AspNetCore.Http;
 
 namespace flatshare_server.Infrastructure.Model.User;
 
@@ -36,19 +39,31 @@ public class User
     {
         if (string.IsNullOrEmpty(request.FirstName) || request.FirstName.Length < 3)
         {
-            throw new ArgumentException("First name must be at least 3 characters long.");
+            throw ErrorResponse.Generate(
+                "Register Error",
+                fields: [new (nameof(request.FirstName), "First name must be at least 3 characters long.")]
+            );
         }
         else if (string.IsNullOrEmpty(request.LastName) || request.LastName.Length < 3)
         {
-            throw new ArgumentException("Last name must be at least 3 characters long.");
+            throw ErrorResponse.Generate(
+                "Register Error",
+                fields: [new (nameof(request.LastName), "Last name must be at least 3 characters long.")]
+            );
         }
         else if (string.IsNullOrEmpty(request.Email) || !EmailValidator.Validate(request.Email))
         {
-            throw new ArgumentException($"Invalid email address: {request.Email}");
+            throw ErrorResponse.Generate(
+                "Register Error",
+                fields: [new (nameof(request.Email), $"Invalid email address: {request.Email}")]
+            );
         }
         else if (string.IsNullOrEmpty(request.Password) || request.Password.Length < 8)
         {
-            throw new ArgumentException($"Password must be at least 8 characters long");
+            throw ErrorResponse.Generate(
+                "Register Error",
+                fields: [new (nameof(request.Password), $"Password must be at least 8 characters long")]
+            );
         }
 
         var user = new User
@@ -58,7 +73,7 @@ public class User
             LastName = request.LastName,
             Email = request.Email,
             PassHash = Crypto.Sha256String(request.Password),
-            Status = new AccountStatus { },
+            Status = new AccountStatus { }, /* TODO: This is only Tenant for now */
             Role = null!
         };
         if (request.Role != null && request.Role.Equals("LANDLORD", StringComparison.OrdinalIgnoreCase))

@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Infrastructure\Extensions\" />
     <Folder Include="Infrastructure\Services\" />
   </ItemGroup>
 
