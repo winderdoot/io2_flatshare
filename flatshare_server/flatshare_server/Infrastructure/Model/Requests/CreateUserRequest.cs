@@ -1,3 +1,10 @@
-﻿namespace flatshare_server.Infrastructure.Model.Requests;
+﻿using flatshare_server.Infrastructure.Model.User;
 
-public record CreateUserRequest(string FirstName, string LastName, string Email, string Password);
+namespace flatshare_server.Infrastructure.Model.Requests;
+
+public record class CreateUserRequest(string FirstName, string LastName, string Email, string Password, string Role)
+{
+    public const string Tenant = "TENANT";
+    public const string Landlord = "LANDLORD";
+}
+
