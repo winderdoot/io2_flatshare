@@ -24,6 +24,7 @@ builder.Services.AddDbContext<FlatshareDbContext>(options =>
 /* Add services */
 builder.Services.AddScoped<IUserRepository, DbUserRepository>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<AuthService>();
 
 /* Configure controllers */ 
 builder.Services

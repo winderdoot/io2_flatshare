@@ -65,14 +65,15 @@ public class User
             throw ErrorResponse.Generate("Register Error", StatusCodes.Status400BadRequest, errors);
         }
 
+        Guid guid = Guid.NewGuid();
         var user = new User
         {
-            Id = Guid.NewGuid(),
+            Id = guid,
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
-            PassHash = Crypto.Sha256String(request.Password),
-            Status = new AccountStatus { Value = AccountStatus.Type.Active }, /* TODO: This is only Tenant for now */
+            PassHash = PasswordEncoder.Encrypt(request.Password, guid),
+            Status = new AccountStatus { },
             Role = null!
         };
 
