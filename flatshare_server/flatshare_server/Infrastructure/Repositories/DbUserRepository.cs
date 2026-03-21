@@ -25,7 +25,10 @@ public class DbUserRepository : IUserRepository
     }
     public async Task<User> GetById(Guid id)
     {
-        var user = await _context.Users.FindAsync(id);
+        var user = await _context.Users
+            .Include(user => user.Role)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
         if (user is null)
         {
             throw ErrorResponse.Generate(
@@ -39,6 +42,8 @@ public class DbUserRepository : IUserRepository
 
     public async Task<User?> GetByEmail(string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        return await _context.Users
+            .Include(user => user.Role)
+            .FirstOrDefaultAsync(u => u.Email == email);
     }
 }
