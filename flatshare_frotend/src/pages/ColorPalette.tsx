@@ -1,7 +1,5 @@
-import { Fragment, useState } from 'react'
-import './App.css'
-
-function App() {
+// /pages/About.tsx
+export const ColorPalette = () => {
   return (
     <>
       <h1>Colors Palette</h1>
@@ -15,6 +13,4 @@ function App() {
       </section>
     </>
   )
-}
-
-export default App
+};
