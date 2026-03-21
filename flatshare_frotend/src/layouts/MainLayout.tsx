@@ -4,10 +4,8 @@ import Navbar from "../components/Navbar";
 const MainLayout = () => {
   return (
     <>
-      <Navbar />
-      <main style={{ padding: "20px" }}>
+        <Navbar />
         <Outlet />
-      </main>
     </>
   );
 };
