@@ -2,4 +2,4 @@
 
 public record UserDTO(Guid Id, string FirstName, string LastName, string Email);
 
-public record UserCreatedResponse(string Message, UserDTO user);
+public record UserCreatedResponse(string Message, UserDTO User);
