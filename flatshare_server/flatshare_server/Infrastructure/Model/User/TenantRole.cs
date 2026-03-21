@@ -8,4 +8,9 @@ public class TenantRole : UserRole
         get => _preferences;
         init => _preferences = value;
     }
+
+    protected override string GetStringRepresentation()
+    {
+        return "TENANT";
+    }
 }
