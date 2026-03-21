@@ -10,13 +10,13 @@ namespace flatshare_server.Controllers;
 [Route("api/v1/[controller]")]
 public class UsersController : Controller
 {
-    private UserService _userService;
+    private readonly UserService _userService;
     public UsersController(UserService userService)
     {
         _userService = userService;
     }
 
-    [HttpPost()]
+    [HttpPost]
     public async Task<IActionResult> RegisterNewUser([FromBody] CreateUserRequest request)
     {
         /* ServerResponseExceptions are caught automatically and need not be caught in the controllers. */
@@ -36,6 +36,6 @@ public class UsersController : Controller
     {
         UserDTO user = await _userService.GetById(id);
 
-        return user;
+        return Ok(user);
     }
 }

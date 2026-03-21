@@ -37,33 +37,32 @@ public class User
     /* Skąd wiemy czy jest tworzony tenant czy landlord? */
     public static User TryCreate(CreateUserRequest request)
     {
+        var errors = new List<FieldError>();
+
         if (string.IsNullOrEmpty(request.FirstName) || request.FirstName.Length < 3)
         {
-            throw ErrorResponse.Generate(
-                "Register Error",
-                fields: [new (nameof(request.FirstName), "First name must be at least 3 characters long.")]
-            );
+            errors.Add(new (nameof(request.FirstName), "First name must be at least 3 characters long."));
         }
-        else if (string.IsNullOrEmpty(request.LastName) || request.LastName.Length < 3)
+        if (string.IsNullOrEmpty(request.LastName) || request.LastName.Length < 3)
         {
-            throw ErrorResponse.Generate(
-                "Register Error",
-                fields: [new (nameof(request.LastName), "Last name must be at least 3 characters long.")]
-            );
+            errors.Add(new(nameof(request.LastName), "Last name must be at least 3 characters long."));
         }
-        else if (string.IsNullOrEmpty(request.Email) || !EmailValidator.Validate(request.Email))
+        if (string.IsNullOrEmpty(request.Email) || !EmailValidator.Validate(request.Email))
         {
-            throw ErrorResponse.Generate(
-                "Register Error",
-                fields: [new (nameof(request.Email), $"Invalid email address: {request.Email}")]
-            );
+            errors.Add(new (nameof(request.Email), $"Invalid email address: {request.Email}"));
         }
-        else if (string.IsNullOrEmpty(request.Password) || request.Password.Length < 8)
+        if (string.IsNullOrEmpty(request.Password) || request.Password.Length < 8)
         {
-            throw ErrorResponse.Generate(
-                "Register Error",
-                fields: [new (nameof(request.Password), $"Password must be at least 8 characters long")]
-            );
+            errors.Add(new (nameof(request.Password), $"Password must be at least 8 characters long"));
+        }
+        if (string.IsNullOrEmpty(request.Role) || (request.Role != CreateUserRequest.Tenant && request.Role != CreateUserRequest.Landlord))
+        {
+            errors.Add(new(nameof(request.Role), $"Role must be equal to {CreateUserRequest.Tenant} or {CreateUserRequest.Landlord}"));
+        }
+
+        if (errors.Any())
+        {
+            throw ErrorResponse.Generate("Register Error", StatusCodes.Status400BadRequest, errors);
         }
 
         var user = new User
@@ -73,10 +72,18 @@ public class User
             LastName = request.LastName,
             Email = request.Email,
             PassHash = Crypto.Sha256String(request.Password),
-            Status = new AccountStatus { }, /* TODO: This is only Tenant for now */
+            Status = new AccountStatus { Value = AccountStatus.Type.Active }, /* TODO: This is only Tenant for now */
             Role = null!
         };
-        user._role = new TenantRole { User = user, TenantPreferences = new TenantPreferences { } };
+
+        if (request.Role == CreateUserRequest.Tenant)
+        {
+            user._role = new TenantRole { User = user, TenantPreferences = new TenantPreferences { } };
+        }
+        else
+        {
+            user._role = new LandlordRole { User = user, TenantCriteria = new TenantCriteria { } };
+        }
 
         return user;
     }
