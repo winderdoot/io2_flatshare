@@ -11,44 +11,62 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
+using flatshare_server.Infrastructure.Model;
 
 namespace flatshare_server.Infrastructure.Services
 {
     public class AuthService
     {
         public const string SessionClaim = "session_id";
+        public const string RoleClaim = "role";
 
-        private IUserRepository _repo;
+        private IUserRepository _userRepo;
+        private ISessionRepository _sessionRepo;
         private JwtOptions _jwtOptions;
 
         public AuthService
         (
             IUserRepository userRepo,
+            ISessionRepository sessionRepo,
             IOptions<JwtOptions> jwtOptions
         )
         {
-            _repo = userRepo;
+            _userRepo = userRepo;
+            _sessionRepo = sessionRepo;
             _jwtOptions = jwtOptions.Value;
         }
-        private (string jwtToken, DateTime expiresAtUtc) GenerateJwtToken(User user)
+        private (string jwtToken, Guid sessionId, int expiresInSec, string role) GenerateJwtToken(User user)
         {
             var signingKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_jwtOptions.Secret));
 
             var credentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
             string jti_value = Guid.NewGuid().ToString();
-            string session_id = Guid.NewGuid().ToString();
-            List<Claim> claims =
-            [
+            Guid session_id = Guid.NewGuid();
+
+            string role;
+            try
+            {
+                role = user.Role.ToString();
+            }
+            catch
+            {
+                role = "EMPTY";
+            }
+
+            List<Claim> claims = new()
+            {
                 new Claim(JwtRegisteredClaimNames.Name, $"{user.FirstName} {user.LastName}"),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, jti_value),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(SessionClaim, session_id),
+                new Claim(SessionClaim, session_id.ToString()),
                 new Claim(ClaimTypes.NameIdentifier, $"{user.FirstName} {user.LastName}"),
-            ];
+                new Claim(RoleClaim, role)
+            };
 
             var expires = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpirationTimeInMinutes);
+            var expiresIn = _jwtOptions.ExpirationTimeInMinutes * 60;
 
             var token = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
@@ -60,12 +78,12 @@ namespace flatshare_server.Infrastructure.Services
 
             var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-            return (jwtToken, expires);
+            return (jwtToken, session_id, expiresIn, role);
         }
 
-        public async Task<string> Authenticate(string email, string password)
+        public async Task<(string, Guid, int, string)> Authenticate(string email, string password)
         {
-            User? user = await _repo.GetByEmail(email);
+            User? user = await _userRepo.GetByEmail(email);
 
             if (user is null)
                 throw ErrorResponse.Generate(
@@ -78,8 +96,25 @@ namespace flatshare_server.Infrastructure.Services
                     $"Wrong email or password",
                     StatusCodes.Status401Unauthorized
                     );
+            var resp = GenerateJwtToken(user);
 
-            throw new NotImplementedException();
+            await _sessionRepo.SaveNew(resp.sessionId, user.Id);
+            return resp;
+        }
+
+        public async Task<(string, Guid, int, string)> Refresh(Guid sessionId)
+        {
+            UserSession session = await _sessionRepo.GetBySessionId(sessionId);
+            User? user = await _userRepo.GetById(session.UserId);
+            var resp = GenerateJwtToken(user);
+
+            return resp;
+        }
+
+        public async Task<Guid> GetUserFromSession(Guid sessionId)
+        {
+            UserSession session = await _sessionRepo.GetBySessionId(sessionId);
+            return session.UserId;
         }
     }
 }

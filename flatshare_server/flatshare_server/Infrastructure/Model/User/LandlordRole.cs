@@ -8,4 +8,9 @@ public class LandlordRole : UserRole
         get => _tenantCriteria;
         init => _tenantCriteria = value;
     }
+
+    protected override string GetStringRepresentation()
+    {
+        return "LANDLORD";
+    }
 }

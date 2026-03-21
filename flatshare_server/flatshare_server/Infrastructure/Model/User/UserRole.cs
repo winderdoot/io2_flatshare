@@ -2,5 +2,11 @@
 
 public abstract class UserRole
 {
-    public User User { get; init; } = null!;
+    public User User { get; init; } = null!; 
+
+    public sealed override string ToString()
+    {
+        return GetStringRepresentation();
+    }
+    protected abstract string GetStringRepresentation();
 }

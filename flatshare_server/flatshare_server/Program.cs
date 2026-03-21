@@ -27,6 +27,7 @@ builder.Services.AddDbContext<FlatshareDbContext>(options =>
 
 /* Add services */
 builder.Services.AddScoped<IUserRepository, DbUserRepository>();
+builder.Services.AddScoped<ISessionRepository, DbSessionRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 
@@ -128,8 +129,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();
