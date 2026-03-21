@@ -1,12 +1,16 @@
+using flatshare_server.Infrastructure.Configuration;
 using flatshare_server.Infrastructure.Model.Exceptions;
+using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using System.Text.Json.Serialization;
-using flatshare_server.Infrastructure.Model.Responses;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Npgsql;
+using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +30,41 @@ builder.Services.AddScoped<IUserRepository, DbUserRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 
-/* Configure controllers */ 
+/* Setup JwtOptions */ 
+var jwtOptions = builder.Configuration
+    .GetSection(JwtOptions.OptionsKey)
+    .Get<JwtOptions>();
+
+if (jwtOptions == null || string.IsNullOrEmpty(jwtOptions.Secret))
+{
+    throw new InvalidOperationException("JWT configuration is missing from appsettings.json.");
+}
+
+builder.Services.Configure<JwtOptions>(
+    builder.Configuration.GetSection(JwtOptions.OptionsKey));
+
+/* Setup Jwt Auhtentication */
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = jwtOptions.Issuer,
+            ValidAudience = jwtOptions.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtOptions.Secret)
+            )
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+/* Configure controllers */
 builder.Services
     .AddControllers()
     .AddJsonOptions(options =>

@@ -2,13 +2,15 @@
 using flatshare_server.Infrastructure.Model.User;
 using flatshare_server.Infrastructure.Model;
 using Microsoft.EntityFrameworkCore.Internal;
+using flatshare_server.Controllers;
 
 namespace flatshare_server.Infrastructure.Repositories;
 
 public class FlatshareDbContext : DbContext
 {
     /* Test entity set */
-    public DbSet<Foo> Foos { get; set; }
+    public DbSet<UserSession> Sessions { get; set; }
+    public DbSet<Foo> Foos {  get; set; }
     public DbSet<User> Users { get; set; }
 
     public FlatshareDbContext(DbContextOptions<FlatshareDbContext> options)
@@ -24,8 +26,8 @@ public class FlatshareDbContext : DbContext
             .Entity<Foo>(entity =>
             {
                 entity
-                    .Property<int>("Id")
-                    .ValueGeneratedOnAdd();
+                      .Property<int>("Id")
+                      .ValueGeneratedOnAdd();
                 entity.HasKey("Id");
             })
             .Entity<UserRole>(entity =>
