@@ -11,7 +11,7 @@
 
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px,
-    rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+    rgba(0, 0, 0, 0.05) 0 0 8px -2px;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -88,4 +88,25 @@ h2 {
 }
 p {
   margin: 0;
+}
+
+label {
+  font-size: .9rem;
+}
+
+button {
+  cursor: pointer;
+  background-color: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  border-radius: .5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: .06rem;
+  padding: .5rem 1rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 90%, transparent 10%);
+  }
 }

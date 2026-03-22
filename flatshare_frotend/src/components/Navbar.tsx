@@ -5,6 +5,7 @@ const Navbar = () => {
     <nav style={{ display: "flex", gap: "16px", padding: "16px" }}>
       <Link to="/">Home</Link>
       <Link to="/color-palette">Colors</Link>
+      <Link to="/login">Login</Link>
     </nav>
   );
 };

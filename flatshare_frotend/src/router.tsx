@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import { Home } from "./pages/Home";
 import { ColorPalette } from "./pages/ColorPalette";
+import { Login } from "./pages/Login/Login";
 
 export const router = createBrowserRouter([
   {
@@ -14,6 +15,10 @@ export const router = createBrowserRouter([
       {
         path: "/color-palette",
         element: <ColorPalette />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
       },
     ],
   },
