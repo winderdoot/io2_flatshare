@@ -21,9 +21,12 @@ builder.Services.AddProblemDetails();
 /* Database setup */
 var connectionString = builder.Configuration.GetConnectionString("PostgreDB");
 
-builder.Services.AddDbContext<FlatshareDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreDB"))
-);
+if (builder.Environment.EnvironmentName != "Testing")
+{
+    builder.Services.AddDbContext<FlatshareDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreDB"))
+    );
+}
 
 /* Add services */
 builder.Services.AddScoped<IUserRepository, DbUserRepository>();
@@ -106,18 +109,21 @@ var app = builder.Build();
 app.UseExceptionHandler();
 
 /* Aplly migrations automatically */
-using (var scope = app.Services.CreateScope())
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var services = scope.ServiceProvider;
-    try
+    using (var scope = app.Services.CreateScope())
     {
-        var context = services.GetRequiredService<FlatshareDbContext>();
-        await context.Database.MigrateAsync();
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating the database.");
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<FlatshareDbContext>();
+            await context.Database.MigrateAsync();
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while migrating the database.");
+        }
     }
 }
 
@@ -134,3 +140,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.Run();
+
+public partial class Program { }
