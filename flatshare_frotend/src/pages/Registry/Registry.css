@@ -66,3 +66,10 @@ img {
     transform: scale(1.05);
     filter: blur(.5rem) brightness(1.1);
 }
+
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: .9rem;
+}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CustomTextInput } from "../../components/CustomTextInput/CustomTextInput";
 import "./Registry.css";
+import { Link } from "react-router-dom";
 
 export const Registry = () => {
     const [name, setName] = useState("");
@@ -59,7 +60,10 @@ export const Registry = () => {
                 </div>
             </div>
 
-            <button onClick={handleSubmit}>Create account</button>
+            <div className="buttons-container">
+                <button onClick={handleSubmit}>Create account</button>
+                <label>Already have an account? <Link to="/login">Login</Link></label>
+            </div>
             </div>
         </div>
         </>
