@@ -3,12 +3,12 @@ import { CustomTextInput } from "../../components/CustomTextInput/CustomTextInpu
 import "./Login.css";
 
 export const Login = () => {
-  const [name, setName] = useState("");
-
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = () => {
-    console.log(name, password);
+    // TODO call API
+    console.log(email, password);    
   };
 
   return (
@@ -18,9 +18,9 @@ export const Login = () => {
           <div className="fields-container">
             <CustomTextInput
               label="Name"
-              placeholder="Enter your name"
-              value={name}
-              onChange={setName}
+              placeholder="Enter your email"
+              value={email}
+              onChange={setEmail}
               />
 
             <CustomTextInput
