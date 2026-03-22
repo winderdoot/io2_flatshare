@@ -6,28 +6,32 @@
     width: 100%;
 }
 
-.login-form-container {
-    width: 90%;
-    max-width: 40rem;
-    background-color: var(--color-bg);
-    padding: 1rem 2rem;
-    border-radius: 1rem;
-    box-sizing: border-box;
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2rem;
-}
-
 .background {
     width: 100vw;
     height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
+    pointer-events: none;
 
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.login-form-container {
+    width: 90%;
+    max-width: 40rem;
+
+    background-color: var(--color-bg);
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    box-sizing: border-box;
+    pointer-events: all;
+
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2rem;
 }
