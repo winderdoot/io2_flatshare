@@ -4,9 +4,11 @@ import { Home } from "./pages/Home";
 import { ColorPalette } from "./pages/ColorPalette";
 import { Login } from "./pages/Login/Login";
 import { Registry } from "./pages/Registry/Registry";
+import AuthLayout from "./layouts/AuthLayout";
 
 export const router = createBrowserRouter([
   {
+    
     element: <MainLayout />,
     children: [
       {
@@ -17,6 +19,11 @@ export const router = createBrowserRouter([
         path: "/color-palette",
         element: <ColorPalette />,
       },
+    ],
+  },
+  {    
+    element: <AuthLayout />,
+    children: [
       {
         path: "/login",
         element: <Login />,
