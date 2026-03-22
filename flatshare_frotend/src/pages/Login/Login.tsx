@@ -4,18 +4,11 @@ import "./Login.css";
 
 export const Login = () => {
   const [name, setName] = useState("");
-  const [nameError, setError] = useState(false);
 
   const [password, setPassword] = useState("");
-  const [passwordError, _] = useState(false);
 
   const handleSubmit = () => {
-    if (name.length < 3) {
-      setError(true);
-    } else {
-      setError(false);
-      console.log(name);
-    }
+    console.log(name, password);
   };
 
   return (
@@ -28,8 +21,6 @@ export const Login = () => {
               placeholder="Enter your name"
               value={name}
               onChange={setName}
-              error={nameError}
-              errorMessage="Minimum 3 characters"
               />
 
             <CustomTextInput
@@ -37,8 +28,6 @@ export const Login = () => {
               placeholder="Enter your password"
               value={password}
               onChange={setPassword}
-              error={passwordError}
-              errorMessage="Minimum 3 characters"
               />
           </div>
 
