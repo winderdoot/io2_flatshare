@@ -16,6 +16,7 @@ export const Registry = () => {
     return (
         <>
         <div className="background">
+            <img src="src/assets/rent_house.png"/>
             <div className="registry-form-container">
             <div className="fields-container">
                 <div className="connected-fields">
