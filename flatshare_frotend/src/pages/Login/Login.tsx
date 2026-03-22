@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CustomTextInput } from "../../components/CustomTextInput/CustomTextInput";
 import "./Login.css";
+import { Link } from "react-router-dom";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,6 +15,7 @@ export const Login = () => {
   return (
     <>
       <div className="background">
+        <img src="src/assets/rent_house.png"/>
         <div className="login-form-container">
           <div className="fields-container">
             <CustomTextInput
@@ -31,7 +33,10 @@ export const Login = () => {
               />
           </div>
 
-          <button onClick={handleSubmit}>Submit</button>
+          <div className="buttons-container">
+            <button onClick={handleSubmit}>Submit</button>
+            <label>Don't have an account? <Link to="/create-account">Create account</Link></label>
+          </div>
         </div>
       </div>
     </>

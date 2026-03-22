@@ -31,7 +31,7 @@
     max-width: 40rem;
 
     background-color: var(--color-bg);
-    padding: 1rem 2rem;
+    padding: 1.5rem 2rem;
     border-radius: 1rem;
     box-sizing: border-box;
     pointer-events: all;
@@ -40,5 +40,25 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 2rem;
+    gap: 2.5rem;
+}
+
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: .9rem;
+}
+
+img {
+    width: 100%;
+    height: 100%;
+    z-index: -10;
+    object-fit: cover;
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    transform: scale(1.05);
+    filter: blur(.5rem) brightness(1.1);
 }
