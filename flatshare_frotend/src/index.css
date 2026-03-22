@@ -1,0 +1,115 @@
+:root {
+  --color-bg: #fff; 
+  --color-text-primary: #121923;
+  --color-text-secondary: #A9A8DC;
+
+  --color-primary: #544FCC;
+  --color-primary-soft: #F2EAE4;
+
+  --color-accent: #30DC7B;
+  --color-accent-strong: #FFBA3B;
+
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px,
+    rgba(0, 0, 0, 0.05) 0 0 8px -2px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  --navbar-height: 64px;
+  --max-width: 1126px;
+
+  font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #121923; 
+    --color-text-primary: #fff;
+    --color-text-secondary: #A9A8DC;
+
+    --color-primary: #544FCC;
+    --color-primary-soft: #F2EAE4;
+
+    --color-accent: #30DC7B;
+    --color-accent-strong: #FFBA3B;
+  }
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  width: var(--max-width);
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: left;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+h2 {
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+p {
+  margin: 0;
+}
+
+label {
+  font-size: .9rem;
+}
+
+button {
+  cursor: pointer;
+  background-color: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  border-radius: .5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: .06rem;
+  padding: .5rem 1rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 90%, transparent 10%);
+  }
+}
