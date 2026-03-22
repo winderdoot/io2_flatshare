@@ -35,7 +35,7 @@ namespace flatshare_server.Infrastructure.Services
             _sessionRepo = sessionRepo;
             _jwtOptions = jwtOptions.Value;
         }
-        private (string jwtToken, Guid sessionId, int expiresInSec, string role) GenerateJwtToken(User user)
+        private (string jwtToken, Guid sessionId, int expiresInSec, string role) MakeNewSession(User user)
         {
             var signingKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_jwtOptions.Secret));
@@ -96,7 +96,7 @@ namespace flatshare_server.Infrastructure.Services
                     $"Wrong email or password",
                     StatusCodes.Status401Unauthorized
                     );
-            var resp = GenerateJwtToken(user);
+            var resp = MakeNewSession(user);
 
             await _sessionRepo.SaveNew(resp.sessionId, user.Id);
             return resp;
@@ -106,7 +106,9 @@ namespace flatshare_server.Infrastructure.Services
         {
             UserSession session = await _sessionRepo.GetBySessionId(sessionId);
             User? user = await _userRepo.GetById(session.UserId);
-            var resp = GenerateJwtToken(user);
+            var resp = MakeNewSession(user);
+
+            await _sessionRepo.SaveNew(resp.sessionId, user.Id);
 
             return resp;
         }
