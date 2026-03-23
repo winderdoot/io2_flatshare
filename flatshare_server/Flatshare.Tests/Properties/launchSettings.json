@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Flatshare.Tests": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:53455;http://localhost:53456"
+    }
+  }
+}
