@@ -1,0 +1,31 @@
+﻿services:
+  # Service 1: Main PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: flatshare-db-ct
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: NieMaDowoduŻeWiedział
+      POSTGRES_DB: flatshare_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - flatshare_db:/var/lib/postgresql/data
+    restart: always
+
+  # Service 2: Flatshare server
+  flatshare-server:
+    build:
+      context: . # Where the docker-compose.yaml is
+      dockerfile: ./flatshare_server/Dockerfile
+    container_name: flatshare-server-ct
+    ports:
+      - "8080:8080"
+    environment:
+      # This overrides the connection string in your appsettings.json
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=flatshare_db;Username=postgres;Password=MyPassword
+    depends_on:
+      - db
+
+volumes:
+    flatshare_db:
