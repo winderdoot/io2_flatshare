@@ -1,5 +1,7 @@
 # Podstawowe informacje o naszym projekcie
 
+gugu gaga
+
 **Stos technologiczny**:
 * **Backend**: .NET 9 (Web API), Entity Framework Core
 * **Baza danych**: PostgreSQL (w kontenerach Docker na start)
