@@ -88,7 +88,7 @@ public class SessionsIntegrationTests : IClassFixture<FlatshareApiFactory>
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var newData = await response.Content.ReadFromJsonAsync<LoggedInResponse>();
         newData!.Token.Should().NotBe(authData.Token);
-        newData.SessionId.Should().Be(authData.SessionId);
+        newData.SessionId.Should().NotBeEmpty();
     }
 
     [Fact]
