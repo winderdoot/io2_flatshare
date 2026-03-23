@@ -1,4 +1,4 @@
-name: .NET CI with Docker DB -- build
+name: .NET CI with Docker DB -- test
 
 on:
   pull_request:
