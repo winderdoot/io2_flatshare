@@ -34,7 +34,6 @@ public class User
         init => _role = value; 
     }
 
-    /* Skąd wiemy czy jest tworzony tenant czy landlord? */
     public static User TryCreate(CreateUserRequest request)
     {
         var errors = new List<FieldError>();
