@@ -11,7 +11,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
-using flatshare_server.Infrastructure.Model;
 
 namespace flatshare_server.Infrastructure.Services
 {

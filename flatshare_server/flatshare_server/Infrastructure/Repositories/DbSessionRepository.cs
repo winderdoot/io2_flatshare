@@ -1,5 +1,5 @@
-﻿using flatshare_server.Infrastructure.Model;
-using flatshare_server.Infrastructure.Model.Responses;
+﻿using flatshare_server.Infrastructure.Model.Responses;
+using flatshare_server.Infrastructure.Model.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace flatshare_server.Infrastructure.Repositories;

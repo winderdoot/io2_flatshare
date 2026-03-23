@@ -3,6 +3,7 @@ using flatshare_server.Infrastructure.Model.User;
 using flatshare_server.Infrastructure.Model;
 using Microsoft.EntityFrameworkCore.Internal;
 using flatshare_server.Controllers;
+using flatshare_server.Infrastructure.Model.Listings;
 
 namespace flatshare_server.Infrastructure.Repositories;
 
@@ -12,6 +13,7 @@ public class FlatshareDbContext : DbContext
     public DbSet<UserSession> Sessions { get; set; }
     public DbSet<Foo> Foos {  get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Listing> Listings { get; set; }
 
     public FlatshareDbContext(DbContextOptions<FlatshareDbContext> options)
     : base(options)
@@ -71,6 +73,18 @@ public class FlatshareDbContext : DbContext
                     .Property(u => u.Email)
                     .HasMaxLength(255)
                     .IsRequired();
+            })
+            .Entity<Listing>(entity =>
+            {
+                /* Address as owned entity. Also add composite index for address searching. */ 
+                entity.OwnsOne(lis => lis.Address, addressBuilder =>
+                {
+                    addressBuilder
+                        .HasIndex(a => new { a.City, a.District, a.Street, a.AptNumber })
+                        .HasDatabaseName("IDX_Listing_Address");
+                });
+                entity.OwnsOne(lis => lis.Attributes);
+                entity.OwnsOne(lis => lis.Price);
             });
     }
 
