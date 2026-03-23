@@ -15,13 +15,13 @@ public class UserService
     public async Task<UserDTO> Create(CreateUserRequest request)
     {
         User user = User.TryCreate(request);
-        await _repo.SaveNew(user);
-        return new UserDTO(user.Id, user.FirstName, user.LastName, user.Email);
+        await _repo.SaveNew(user);   
+        return new UserDTO(user.Id, user.FirstName, user.LastName, user.Email, user.Role.ToString());
     }
     public async Task<UserDTO> GetById(Guid id)
     {
         User user = await _repo.GetById(id);
 
-        return new UserDTO(user.Id, user.FirstName, user.LastName, user.Email);
+        return new UserDTO(user.Id, user.FirstName, user.LastName, user.Email, user.Role.ToString());
     }
 }
