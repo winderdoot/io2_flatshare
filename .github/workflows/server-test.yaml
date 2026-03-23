@@ -1,8 +1,8 @@
 name: .NET CI with Docker DB -- build
 
 on:
-  push:
-    branches: [ "*" ]
+  pull_request:
+    branches: [ "main", "develop" ]
 
 jobs:
   build:
@@ -31,6 +31,10 @@ jobs:
 
     - name: Build
       run: dotnet build --no-restore --configuration Release
+      working-directory: ${{ env.DOTNET_SLN_DIR }}
+
+    - name: Test
+      run: dotnet test Flatshare.Tests/Flatshare.Tests.csproj
       working-directory: ${{ env.DOTNET_SLN_DIR }}
 
     - name: Stop Containers
