@@ -1,11 +1,11 @@
-name: .NET CI with Docker DB -- build
+name: .NET CI with Docker DB -- test
 
 on:
   pull_request:
     branches: [ "main", "develop" ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     
     env:
