@@ -5,6 +5,7 @@ import { ColorPalette } from "./pages/ColorPalette";
 import { Login } from "./pages/Login/Login";
 import { Registry } from "./pages/Registry/Registry";
 import AuthLayout from "./layouts/AuthLayout";
+import FlatOffers from "./pages/FlatOffers/FlatOffers";
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ export const router = createBrowserRouter([
       {
         path: "/color-palette",
         element: <ColorPalette />,
+      },
+      {
+        path: "/offer",
+        element: <FlatOffers />,
       },
     ],
   },
