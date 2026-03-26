@@ -15,6 +15,7 @@ const Navbar = () => {
           <Link to="/">{t("nav.home")}</Link>
           <Link to="/color-palette">{t("nav.colors")}</Link>
           <Link to="/login">{t("nav.account")}</Link>
+          <Link to="/offer">{t("nav.offer")}</Link>
         </div>
 
         <div className={styles.locale}>

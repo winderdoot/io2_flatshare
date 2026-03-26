@@ -2,7 +2,8 @@
   "nav": {
     "home": "Home",
     "colors": "Colors",
-    "account": "My account"
+    "account": "My account",
+    "offer": "Offers"
   },
   "locale": {
     "language": "Language",

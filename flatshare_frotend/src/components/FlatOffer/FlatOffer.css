@@ -1,0 +1,25 @@
+.offer-container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 2rem;
+    height: 10rem;
+    border-radius: 1rem;
+    border: 1px solid var(--color-primary-soft);
+    overflow: hidden;
+}
+
+.offer-container img {
+    aspect-ratio: 1;
+    object-fit: cover;
+    position: relative;
+}
+
+.offer-info {
+    padding: 1rem 2rem 1rem 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}

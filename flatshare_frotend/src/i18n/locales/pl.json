@@ -2,7 +2,8 @@
   "nav": {
     "home": "Strona główna",
     "colors": "Kolory",
-    "account": "Moje konto"
+    "account": "Moje konto",
+    "offer": "Oferty"
   },
   "locale": {
     "language": "Język",
