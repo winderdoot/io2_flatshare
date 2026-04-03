@@ -32,6 +32,23 @@ public class Listing
     public List<Guid> Photos { get; init; }
 
     /* Methods */
+    public ListingDTO IntoDTO()
+    {
+        return new ListingDTO
+        {
+            Area = AreaMeterSq,
+            Attributes = Attributes,
+            AvailableSince = AvailableSince,
+            AvailableUntil = AvailableUntil,
+            Currency = Price.CurrencyStr(),
+            Price = Price.Value,
+            Description = Description,
+            Id = Id,
+            Location = Address,
+            OwnerContact = OwnerContact,
+            Title = Title
+        };
+    }
     public static Listing TryCreate(CreateListingRequest request)
     {
         var errors = new List<FieldError>();
