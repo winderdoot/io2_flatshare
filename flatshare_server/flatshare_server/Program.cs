@@ -1,6 +1,7 @@
 using flatshare_server.Infrastructure.Configuration;
 using flatshare_server.Infrastructure.Model.Exceptions;
 using flatshare_server.Infrastructure.Model.Responses;
+using Azure.Storage.Blobs;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,15 +27,22 @@ if (builder.Environment.EnvironmentName != "Testing")
     builder.Services.AddDbContext<FlatshareDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreDB"))
     );
+    /* Blob connection */ 
+    var blobConnection = builder.Configuration.GetConnectionString("BlobStorage");
+    builder.Services.AddSingleton(x => new BlobServiceClient(blobConnection));
+    builder.Services.AddScoped<IStorageService, BlobStorageService>();
 }
+
 
 /* Add services */
 builder.Services.AddScoped<IUserRepository, DbUserRepository>();
 builder.Services.AddScoped<ISessionRepository, DbSessionRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ListingService>();
+builder.Services.AddScoped<ListingPhotoService>();
 
-/* Setup JwtOptions */ 
+/* Setup JwtOptions */
 var jwtOptions = builder.Configuration
     .GetSection(JwtOptions.OptionsKey)
     .Get<JwtOptions>();

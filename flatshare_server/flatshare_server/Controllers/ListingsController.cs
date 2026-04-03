@@ -2,6 +2,8 @@
 using flatshare_server.Infrastructure.Model.Responses;
 using Microsoft.AspNetCore.Mvc;
 using flatshare_server.Infrastructure.Model.Listings;
+using flatshare_server.Infrastructure.Services;
+using Azure.Storage.Blobs.Models;
 
 namespace flatshare_server.Controllers;
 
@@ -9,18 +11,30 @@ namespace flatshare_server.Controllers;
 [Route("api/v1/[controller]")]
 public class ListingsController : Controller
 {
-    public ListingsController() { }
+    private readonly ListingService _service;
+    public ListingsController
+    (
+        ListingService listingService
+    ) 
+    {
+        _service = listingService;
+    }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ListingDTO>> Get([FromRoute] Guid id)
     {
-        throw new NotImplementedException();
+        return Ok(await _service.GetByIdAsync(id));
     }
 
     [HttpPost]
     public async Task<ActionResult<ListingCreatedResponse>> CreateNew([FromBody] CreateListingRequest request)
     {
-        throw new NotImplementedException();
+        var listing = await _service.CreateNewAsync(request);
+        return CreatedAtAction(
+            actionName: nameof(Get),
+            routeValues: new { listing.ListingId },
+            value: listing
+        );
     }
 
     [HttpPatch("{id}")]
@@ -29,6 +43,7 @@ public class ListingsController : Controller
         throw new NotImplementedException();
     }
 
+    /* RPC like Actions */ 
     [HttpPost("{id}/submit")]
     public async Task<IActionResult> Submit([FromRoute] Guid id)
     {
