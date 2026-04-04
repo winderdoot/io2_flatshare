@@ -8,14 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace flatshare_server.Controllers;
 
 [ApiController]
-[Route("api/v1/users/{userId}/photos")]
-public class UserPhotosController : Controller
+[Route("api/v1/listings/{listingId}/photos")]
+public class ListingPhotosController : Controller
 {
     IStorageService _storage;
     ListingPhotoService _photos;
     ListingService _listings;
     FlatshareDbContext _dbContext;
-    public UserPhotosController
+    public ListingPhotosController
     (
         IStorageService storage,
         ListingService listings,
@@ -29,7 +29,7 @@ public class UserPhotosController : Controller
         _dbContext = dbContext;
     }
 
-    [HttpGet("/{id}")]
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] Guid listingId, [FromRoute] Guid id)
     {
         var (stream, contentType) = await _storage.GetFileAsync(id);
@@ -55,11 +55,11 @@ public class UserPhotosController : Controller
         return CreatedAtAction(
             actionName: nameof(GetById),
             routeValues: new { fileId },
-            value: new { fileId }
+            value: new { id = fileId }
         );
     }
 
-    [HttpDelete("/{id}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] Guid listingId, [FromRoute] Guid id)
     {
         var wasDeleted = await _photos.DeleteAsync(listingId, id);
