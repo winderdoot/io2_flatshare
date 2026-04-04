@@ -32,7 +32,7 @@ public class ListingsController : Controller
         var listing = await _service.CreateNewAsync(request);
         return CreatedAtAction(
             actionName: nameof(Get),
-            routeValues: new { listing.ListingId },
+            routeValues: new { id = listing.ListingId },
             value: listing
         );
     }

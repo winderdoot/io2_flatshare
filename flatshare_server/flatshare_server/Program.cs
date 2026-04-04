@@ -28,7 +28,7 @@ if (builder.Environment.EnvironmentName != "Testing")
         options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreDB"))
     );
     /* Blob connection */ 
-    var blobConnection = builder.Configuration.GetConnectionString("BlobStorage");
+    var blobConnection = builder.Configuration.GetConnectionString("AzureBlobStorage");
     builder.Services.AddSingleton(x => new BlobServiceClient(blobConnection));
     builder.Services.AddScoped<IStorageService, BlobStorageService>();
 }

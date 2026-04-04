@@ -27,7 +27,7 @@ public class ListingPhotoService
 
     public async Task<bool> DeleteAsync(Guid listingId, Guid id)
     {
-        var listing = await _context.Listings.FindAsync(id);
+        var listing = await _context.Listings.FindAsync(listingId);
         if (listing is null)
         {
             throw ErrorResponse.Generate("Listing not found", StatusCodes.Status404NotFound);
