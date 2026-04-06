@@ -19,20 +19,12 @@
   width: 100%;
   max-width: var(--max-width);
 
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  column-gap: 1rem;
 
   padding: 0 1rem;
-}
-
-.right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: flex-end;
 }
 
 .logo {
@@ -43,7 +35,16 @@
 
 .links {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
   gap: 1.3rem;
+  min-width: 0;
+}
+
+.locale {
+  flex-shrink: 0;
+  justify-self: end;
 }
 
 .links a {
