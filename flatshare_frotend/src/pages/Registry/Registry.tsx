@@ -1,71 +1,78 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CustomTextInput } from "../../components/CustomTextInput/CustomTextInput";
 import "./Registry.css";
 import { Link } from "react-router-dom";
 
 export const Registry = () => {
-    const [name, setName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+  const { t } = useTranslation();
+  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-    const handleSubmit = () => {
-        console.log(name, password);
-    };
+  const handleSubmit = () => {
+    console.log(name, password);
+  };
 
-    return (
-        <>
-        <div className="background">
-            <img src="src/assets/rent_house.png"/>
-            <div className="registry-form-container">
-            <div className="fields-container">
-                <div className="connected-fields">
-                    <CustomTextInput
-                    label="Name"
-                    placeholder="Enter your name"
-                    value={name}
-                    onChange={setName}
-                    />
+  return (
+    <>
+      <div className="background">
+        <img src="src/assets/rent_house.png" alt="" />
+        <div className="registry-form-container">
+          <div className="fields-container">
+            <div className="connected-fields">
+              <CustomTextInput
+                label={t("registry.nameLabel")}
+                placeholder={t("registry.namePlaceholder")}
+                value={name}
+                onChange={setName}
+              />
 
-                    <CustomTextInput
-                    label="Last Name"
-                    placeholder="Enter your last name"
-                    value={lastName}
-                    onChange={setLastName}
-                    />
-                </div>                
-
-                <CustomTextInput
-                label="Email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={setEmail}
-                />
-
-                <div className="connected-fields">                
-                    <CustomTextInput
-                    label="Password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={setPassword}
-                    />
-
-                    <CustomTextInput
-                    label="Confirm Password"
-                    placeholder="Confirm your password"
-                    value={confirmPassword}
-                    onChange={setConfirmPassword}
-                    />
-                </div>
+              <CustomTextInput
+                label={t("registry.lastNameLabel")}
+                placeholder={t("registry.lastNamePlaceholder")}
+                value={lastName}
+                onChange={setLastName}
+              />
             </div>
 
-            <div className="buttons-container">
-                <button onClick={handleSubmit}>Create account</button>
-                <label>Already have an account? <Link to="/login">Login</Link></label>
+            <CustomTextInput
+              label={t("registry.emailLabel")}
+              placeholder={t("registry.emailPlaceholder")}
+              value={email}
+              onChange={setEmail}
+            />
+
+            <div className="connected-fields">
+              <CustomTextInput
+                label={t("registry.passwordLabel")}
+                placeholder={t("registry.passwordPlaceholder")}
+                value={password}
+                onChange={setPassword}
+              />
+
+              <CustomTextInput
+                label={t("registry.confirmPasswordLabel")}
+                placeholder={t("registry.confirmPasswordPlaceholder")}
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+              />
             </div>
-            </div>
+          </div>
+
+          <div className="buttons-container">
+            <button type="button" onClick={handleSubmit}>
+              {t("registry.submit")}
+            </button>
+            <label>
+              {t("registry.hasAccount")}{" "}
+              <Link to="/login">{t("registry.loginLink")}</Link>
+            </label>
+          </div>
         </div>
-        </>
-    );
+      </div>
+    </>
+  );
 };

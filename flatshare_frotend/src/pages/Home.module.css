@@ -1,0 +1,36 @@
+.page {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.card {
+  border: 1px solid var(--color-primary-soft);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: var(--color-bg);
+  box-shadow: var(--shadow);
+}
+
+.card h2 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.price {
+  font-weight: 600;
+  color: var(--color-primary);
+}
