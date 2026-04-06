@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "Strona główna",
+    "colors": "Kolory",
+    "account": "Moje konto"
+  },
+  "locale": {
+    "language": "Język",
+    "currency": "Waluta",
+    "pl": "PL",
+    "en": "EN",
+    "pln": "PLN (zł)",
+    "usd": "USD ($)"
+  },
+  "home": {
+    "title": "Strona główna",
+    "subtitle": "Przykładowe ogłoszenia — czynsz jest w PLN i przeliczany przy wyświetlaniu.",
+    "listing1": "Pokój, Kraków — Kazimierz",
+    "listing2": "Kawalerka, Warszawa — Mokotów",
+    "listing3": "Mieszkanie współdzielone, Wrocław — centrum",
+    "perMonth": "/ miesiąc"
+  },
+  "colorPalette": {
+    "title": "Paleta kolorów"
+  },
+  "login": {
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "Wpisz adres e-mail",
+    "passwordLabel": "Hasło",
+    "passwordPlaceholder": "Wpisz hasło",
+    "submit": "Zaloguj się",
+    "noAccount": "Nie masz konta?",
+    "createLink": "Załóż konto"
+  },
+  "registry": {
+    "nameLabel": "Imię",
+    "namePlaceholder": "Wpisz imię",
+    "lastNameLabel": "Nazwisko",
+    "lastNamePlaceholder": "Wpisz nazwisko",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "Wpisz adres e-mail",
+    "passwordLabel": "Hasło",
+    "passwordPlaceholder": "Wpisz hasło",
+    "confirmPasswordLabel": "Potwierdź hasło",
+    "confirmPasswordPlaceholder": "Powtórz hasło",
+    "submit": "Utwórz konto",
+    "hasAccount": "Masz już konto?",
+    "loginLink": "Zaloguj się"
+  }
+}

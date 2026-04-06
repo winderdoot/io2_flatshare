@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "Home",
+    "colors": "Colors",
+    "account": "My account"
+  },
+  "locale": {
+    "language": "Language",
+    "currency": "Currency",
+    "pl": "PL",
+    "en": "EN",
+    "pln": "PLN (zł)",
+    "usd": "USD ($)"
+  },
+  "home": {
+    "title": "Home",
+    "subtitle": "Sample listings — rent is stored in PLN and converted for display.",
+    "listing1": "Room, Kraków — Kazimierz",
+    "listing2": "Studio, Warszawa — Mokotów",
+    "listing3": "Shared flat, Wrocław — center",
+    "perMonth": "/ month"
+  },
+  "colorPalette": {
+    "title": "Color palette"
+  },
+  "login": {
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "submit": "Sign in",
+    "noAccount": "Don't have an account?",
+    "createLink": "Create account"
+  },
+  "registry": {
+    "nameLabel": "First name",
+    "namePlaceholder": "Enter your first name",
+    "lastNameLabel": "Last name",
+    "lastNamePlaceholder": "Enter your last name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPasswordLabel": "Confirm password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "submit": "Create account",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign in"
+  }
+}
