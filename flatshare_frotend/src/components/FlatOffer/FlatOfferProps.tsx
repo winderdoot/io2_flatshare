@@ -7,6 +7,7 @@ export type FlatOfferProps = {
     phone: string;
     location: Location;
     price: number;
+    area: number;
     currency: string;
     image: string;
 };
