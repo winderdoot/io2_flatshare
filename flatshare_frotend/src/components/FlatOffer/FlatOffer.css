@@ -48,10 +48,21 @@
     font-size: 20px;
 }
 
+.offer-mini-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0rem;
+}
+
+.offer-area,
 .offer-location {
     font-size: 14px;
     color: var(--color-text-secondary);
     margin-bottom: 10px;
+}
+
+.offer-location {
+    margin-bottom: 0px;
 }
 
 .offer-description {
