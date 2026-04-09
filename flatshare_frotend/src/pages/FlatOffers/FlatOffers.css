@@ -4,3 +4,26 @@
     gap: 2rem;
     margin: 1rem;
 }
+
+.horizontally-scrollable-offers {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 1rem 1rem;
+    gap: 1rem;
+}
+
+.horizontally-scrollable-offers::-webkit-scrollbar {
+    color: black;
+    height: .7rem;
+    background-color: transparent;
+}
+
+.horizontally-scrollable-offers::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary);
+    border-radius: 1rem;
+}
+
+h1 {
+    margin-bottom: 0rem;
+}
