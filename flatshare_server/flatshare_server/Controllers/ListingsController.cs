@@ -32,7 +32,7 @@ public class ListingsController : Controller
     [HttpGet]
     public async Task<ActionResult<ListingDTO>> Get([FromQuery] ListingFilter filter)
     {
-        return Ok(_service.GetByFilterAsync(filter));
+        return Ok(await _service.GetByFilterAsync(filter));
     }
 
     [HttpPost]

@@ -1,7 +1,7 @@
+using Azure.Storage.Blobs;
 using flatshare_server.Infrastructure.Configuration;
 using flatshare_server.Infrastructure.Model.Exceptions;
 using flatshare_server.Infrastructure.Model.Responses;
-using Azure.Storage.Blobs;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -55,10 +56,16 @@ if (jwtOptions == null || string.IsNullOrEmpty(jwtOptions.Secret))
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection(JwtOptions.OptionsKey));
 
+/* Disable silly DOTNET token name mapping */ 
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
 /* Setup Jwt Auhtentication */
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        /* Disable it again :) */ 
+        options.MapInboundClaims = false;
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
