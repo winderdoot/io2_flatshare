@@ -86,6 +86,7 @@ public class FlatshareDbContext : DbContext
                 entity.OwnsOne(lis => lis.Attributes);
                 entity.OwnsOne(lis => lis.Price);
 
+                /* Configure Owner Relationship and make an index */ 
                 entity
                     .HasOne(l => l.Owner)
                     .WithMany()
@@ -93,6 +94,10 @@ public class FlatshareDbContext : DbContext
                     .IsRequired();
 
                 entity.Property<Guid>("OwnerId");
+
+                entity
+                    .HasIndex("OwnerId")
+                    .HasDatabaseName("IX_Listings_OwnerId");
             });
     }
 

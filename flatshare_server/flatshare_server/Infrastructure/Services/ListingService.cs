@@ -48,34 +48,34 @@ public class ListingService
 
     public async Task<List<ListingDTO>> GetByFilterAsync(ListingFilter filter)
     {
-        //var query = _context.Listings.AsQueryable();
+        var query = _context.Listings.AsQueryable();
 
-        //if (request.OwnerId.HasValue)
-        //{
-        //    query = query.Where(l => l.OwnerId == request.OwnerId.Value);
-        //}
+        if (filter.OwnerId.HasValue)
+        {
+            query = query.Where(l => EF.Property<Guid>(l, "OwnerId") == filter.OwnerId.Value);
+        }
 
-        //// 2. Filter by Address components (Owned Entities)
-        //// To utilize IDX_Listing_Address, provide these in order
-        //if (!string.IsNullOrWhiteSpace(request.City))
-        //{
-        //    query = query.Where(l => l.Address.City == request.City);
+        if (!string.IsNullOrWhiteSpace(filter.City))
+        {
+            query = query.Where(l => l.Address.City == filter.City);
 
-        //    if (!string.IsNullOrWhiteSpace(request.District))
-        //    {
-        //        query = query.Where(l => l.Address.District == request.District);
+            if (!string.IsNullOrWhiteSpace(filter.District))
+            {
+                query = query.Where(l => l.Address.District == filter.District);
 
-        //        if (!string.IsNullOrWhiteSpace(request.Street))
-        //        {
-        //            query = query.Where(l => l.Address.Street == request.Street);
+                if (!string.IsNullOrWhiteSpace(filter.Street))
+                {
+                    query = query.Where(l => l.Address.Street == filter.Street);
 
-        //            if (!string.IsNullOrWhiteSpace(request.AptNumber))
-        //            {
-        //                query = query.Where(l => l.Address.AptNumber == request.AptNumber);
-        //            }
-        //        }
-        //    }
-        //}
-        throw new NotImplementedException();
+                    if (!string.IsNullOrWhiteSpace(filter.AptNumber))
+                    {
+                        query = query.Where(l => l.Address.AptNumber == filter.AptNumber);
+                    }
+                }
+            }
+        }
+
+        var results = await query.ToListAsync();
+        return [.. results.Select(listing => listing.IntoDTO())];
     }
 }
