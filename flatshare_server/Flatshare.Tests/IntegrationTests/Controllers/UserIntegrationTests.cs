@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Responses;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using flatshare_server.Infrastructure.Repositories;
+using flatshare_server.Infrastructure.Model.Requests;
 
 namespace Flatshare.Tests.IntegrationTests.Controllers;
 
@@ -77,7 +77,7 @@ public class UsersIntegrationTests : IClassFixture<FlatshareApiFactory>
         {
             var db = scope.ServiceProvider.GetRequiredService<FlatshareDbContext>();
             var request = new CreateUserRequest("Anna", "Nowak", "anna@test.pl", "Pass123!", CreateUserRequest.Landlord);
-            var user = flatshare_server.Infrastructure.Model.User.User.TryCreate(request);
+            var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(request);
             userId = user.Id;
             db.Users.Add(user);
             await db.SaveChangesAsync();

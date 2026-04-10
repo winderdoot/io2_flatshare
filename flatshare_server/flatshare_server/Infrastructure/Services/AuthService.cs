@@ -2,7 +2,7 @@
 using flatshare_server.Infrastructure.Model.Exceptions;
 using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Responses;
-using flatshare_server.Infrastructure.Model.User;
+using flatshare_server.Infrastructure.Model.Users;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Utils;
 using Microsoft.Extensions.Options;
@@ -18,6 +18,11 @@ namespace flatshare_server.Infrastructure.Services
     {
         public const string SessionClaim = "session_id";
         public const string RoleClaim = "role";
+
+        public const string TenantRole = "TENANT";
+        public const string LandlordRole = "LANDLORD";
+
+        public const string LandlordPolicy = "LANDLORD_ONLY";
 
         private IUserRepository _userRepo;
         private ISessionRepository _sessionRepo;
@@ -116,6 +121,17 @@ namespace flatshare_server.Infrastructure.Services
         {
             UserSession session = await _sessionRepo.GetBySessionId(sessionId);
             return session.UserId;
+        }
+
+        public Guid GetUserId(ClaimsPrincipal? principal)
+        {
+            var claim = principal?.FindFirst(JwtRegisteredClaimNames.Sub);
+            if (claim is null)
+            {
+                throw ErrorResponse.Generate("Missing UserId Claim", StatusCodes.Status401Unauthorized);
+            }
+            Guid.TryParse(claim?.Value, out Guid id);
+            return id;
         }
     }
 }

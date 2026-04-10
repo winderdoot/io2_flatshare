@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Services;
-using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Exceptions;
+using flatshare_server.Infrastructure.Model.Requests;
 
 namespace flatshare_server.Controllers;
 
@@ -21,7 +21,7 @@ public class UsersController : Controller
     {
         /* ServerResponseExceptions are caught automatically and need not be caught in the controllers. */
 
-        UserDTO user = await _userService.Create(request);
+        UserDTO user = (await _userService.Create(request)).IntoDTO();
         var responseBody = new UserCreatedResponse("New user created", user);
 
         return CreatedAtAction(
@@ -34,7 +34,7 @@ public class UsersController : Controller
     [HttpGet("{id}")]
     public async Task<ActionResult<UserDTO>> GetById(Guid id)
     {
-        UserDTO user = await _userService.GetById(id);
+        UserDTO user = (await _userService.GetByIdAsync(id)).IntoDTO();
 
         return Ok(user);
     }

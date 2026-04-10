@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using flatshare_server.Infrastructure.Model.User;
-using flatshare_server.Infrastructure.Model.Requests;
+using flatshare_server.Infrastructure.Model.Users;
 using flatshare_server.Infrastructure.Model.Exceptions;
 using Microsoft.AspNetCore.Http;
+using flatshare_server.Infrastructure.Model.Requests;
 
 namespace Flatshare.Tests.Unit;
 

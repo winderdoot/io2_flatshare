@@ -1,6 +1,6 @@
 ﻿using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Responses;
-using flatshare_server.Infrastructure.Model.User;
+using flatshare_server.Infrastructure.Model.Users;
 using flatshare_server.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,5 +1,6 @@
-﻿using flatshare_server.Infrastructure.Model.Requests;
+﻿using flatshare_server.Infrastructure.Model.Requests.Listing;
 using flatshare_server.Infrastructure.Model.Responses;
+using flatshare_server.Infrastructure.Model.Users;
 
 namespace flatshare_server.Infrastructure.Model.Listings;
 
@@ -29,6 +30,8 @@ public class Listing
     public Address Address { get; private set; }
     public ListingAttributes Attributes { get; private set; }
 
+    public User? Owner { get; private set; }
+
     public List<Guid> Photos { get; init; }
 
     /* Methods */
@@ -49,7 +52,7 @@ public class Listing
             Title = Title
         };
     }
-    public static Listing TryCreate(CreateListingRequest request)
+    public static Listing TryCreate(CreateListingRequest request, User owner)
     {
         var errors = new List<FieldError>();
 
@@ -136,7 +139,8 @@ public class Listing
             AvailableUntil = request.AvailableUntil,
             OwnerContact = request.OwnerContact,
             AreaMeterSq = request.Area,
-            Photos = []
+            Photos = [],
+            Owner = owner
         };
 
         return listing;

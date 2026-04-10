@@ -1,9 +1,10 @@
-﻿using flatshare_server.Infrastructure.Model.Requests;
-using flatshare_server.Infrastructure.Model.Responses;
+﻿using flatshare_server.Infrastructure.Model.Responses;
 using Microsoft.AspNetCore.Mvc;
 using flatshare_server.Infrastructure.Model.Listings;
 using flatshare_server.Infrastructure.Services;
 using Azure.Storage.Blobs.Models;
+using flatshare_server.Infrastructure.Model.Requests.Listing;
+using Microsoft.AspNetCore.Authorization;
 
 namespace flatshare_server.Controllers;
 
@@ -12,12 +13,15 @@ namespace flatshare_server.Controllers;
 public class ListingsController : Controller
 {
     private readonly ListingService _service;
+    private readonly AuthService _auth;
     public ListingsController
     (
-        ListingService listingService
+        ListingService listingService,
+        AuthService authService
     ) 
     {
         _service = listingService;
+        _auth = authService;
     }
 
     [HttpGet("{id}")]
@@ -25,14 +29,22 @@ public class ListingsController : Controller
     {
         return Ok(await _service.GetByIdAsync(id));
     }
+    [HttpGet]
+    public async Task<ActionResult<ListingDTO>> Get([FromQuery] ListingFilter filter)
+    {
+        return Ok(_service.GetByFilterAsync(filter));
+    }
 
     [HttpPost]
+    [Authorize(Policy = AuthService.LandlordPolicy)]
     public async Task<ActionResult<ListingCreatedResponse>> CreateNew([FromBody] CreateListingRequest request)
     {
-        var listing = await _service.CreateNewAsync(request);
+        Guid ownerId = _auth.GetUserId(User);
+
+        var listing = await _service.CreateNewAsync(request, ownerId);
         return CreatedAtAction(
             actionName: nameof(Get),
-            routeValues: new { id = listing.ListingId },
+            routeValues: new { id = listing.Id },
             value: listing
         );
     }
