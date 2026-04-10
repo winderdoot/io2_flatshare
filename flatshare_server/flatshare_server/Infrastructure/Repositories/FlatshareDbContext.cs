@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using flatshare_server.Infrastructure.Model.User;
+using flatshare_server.Infrastructure.Model.Users;
 using flatshare_server.Infrastructure.Model;
 using Microsoft.EntityFrameworkCore.Internal;
 using flatshare_server.Controllers;
@@ -85,6 +85,14 @@ public class FlatshareDbContext : DbContext
                 });
                 entity.OwnsOne(lis => lis.Attributes);
                 entity.OwnsOne(lis => lis.Price);
+
+                entity
+                    .HasOne(l => l.Owner)
+                    .WithMany()
+                    .HasForeignKey("OwnerId")
+                    .IsRequired();
+
+                entity.Property<Guid>("OwnerId");
             });
     }
 

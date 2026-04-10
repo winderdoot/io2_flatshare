@@ -74,7 +74,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AuthService.LandlordPolicy, policy =>
+        policy.RequireClaim(AuthService.RoleClaim, AuthService.LandlordRole)
+    );
+});
 
 /* Configure controllers */
 builder.Services

@@ -1,12 +1,12 @@
-﻿using flatshare_server.Infrastructure.Model.Requests;
-using Microsoft.AspNetCore.StaticAssets;
+﻿using Microsoft.AspNetCore.StaticAssets;
 using EmailValidation;
 using flatshare_server.Infrastructure.Utils;
 using flatshare_server.Infrastructure.Model.Exceptions;
 using flatshare_server.Infrastructure.Model.Responses;
 using Microsoft.AspNetCore.Http;
+using flatshare_server.Infrastructure.Model.Requests;
 
-namespace flatshare_server.Infrastructure.Model.User;
+namespace flatshare_server.Infrastructure.Model.Users;
 
 public class User
 {
@@ -86,5 +86,9 @@ public class User
         }
 
         return user;
+    }
+    public UserDTO IntoDTO()
+    {
+        return new UserDTO(Id, FirstName, LastName, Email, Role.ToString());
     }
 }

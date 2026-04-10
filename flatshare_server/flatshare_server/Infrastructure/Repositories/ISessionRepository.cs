@@ -1,4 +1,4 @@
-﻿using flatshare_server.Infrastructure.Model.User;
+﻿using flatshare_server.Infrastructure.Model.Users;
 
 namespace flatshare_server.Infrastructure.Repositories;
 public interface ISessionRepository

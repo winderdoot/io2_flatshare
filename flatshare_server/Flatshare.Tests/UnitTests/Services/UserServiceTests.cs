@@ -1,6 +1,6 @@
 ﻿using flatshare_server.Infrastructure.Model.Exceptions;
 using flatshare_server.Infrastructure.Model.Requests;
-using flatshare_server.Infrastructure.Model.User;
+using flatshare_server.Infrastructure.Model.Users;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
 using FluentAssertions;
@@ -34,7 +34,7 @@ public class UserServiceTests
         );
 
         // Act
-        var result = await _userService.Create(request);
+        var result = (await _userService.Create(request)).IntoDTO();
 
         // Assert
         result.Should().NotBeNull();

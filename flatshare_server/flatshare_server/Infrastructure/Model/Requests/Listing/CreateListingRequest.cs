@@ -1,4 +1,4 @@
-﻿namespace flatshare_server.Infrastructure.Model.Requests;
+﻿namespace flatshare_server.Infrastructure.Model.Requests.Listing;
 using flatshare_server.Infrastructure.Model.Listings;
 
 public record class CreateListingRequest

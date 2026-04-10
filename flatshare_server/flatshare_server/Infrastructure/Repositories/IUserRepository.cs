@@ -1,5 +1,5 @@
 ﻿using flatshare_server.Infrastructure.Model.Requests;
-using flatshare_server.Infrastructure.Model.User;
+using flatshare_server.Infrastructure.Model.Users;
 
 namespace flatshare_server.Infrastructure.Repositories;
 

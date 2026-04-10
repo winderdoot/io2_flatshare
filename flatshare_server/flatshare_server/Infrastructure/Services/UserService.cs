@@ -1,6 +1,6 @@
 ﻿using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Responses;
-using flatshare_server.Infrastructure.Model.User;
+using flatshare_server.Infrastructure.Model.Users;
 using flatshare_server.Infrastructure.Repositories;
 
 namespace flatshare_server.Infrastructure.Services;
@@ -12,16 +12,14 @@ public class UserService
     {
         _repo = userRepo;
     }
-    public async Task<UserDTO> Create(CreateUserRequest request)
+    public async Task<User> Create(CreateUserRequest request)
     {
         User user = User.TryCreate(request);
         await _repo.SaveNew(user);   
-        return new UserDTO(user.Id, user.FirstName, user.LastName, user.Email, user.Role.ToString());
+        return user;
     }
-    public async Task<UserDTO> GetById(Guid id)
+    public async Task<User> GetByIdAsync(Guid id)
     {
-        User user = await _repo.GetById(id);
-
-        return new UserDTO(user.Id, user.FirstName, user.LastName, user.Email, user.Role.ToString());
+        return await _repo.GetById(id);
     }
 }

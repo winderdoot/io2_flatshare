@@ -1,4 +1,4 @@
-﻿namespace flatshare_server.Infrastructure.Model.User;
+﻿namespace flatshare_server.Infrastructure.Model.Users;
 
 public class UserSession
 {

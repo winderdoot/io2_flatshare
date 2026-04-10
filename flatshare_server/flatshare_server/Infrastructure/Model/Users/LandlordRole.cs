@@ -1,4 +1,6 @@
-﻿namespace flatshare_server.Infrastructure.Model.User;
+﻿using flatshare_server.Infrastructure.Services;
+
+namespace flatshare_server.Infrastructure.Model.Users;
 
 public class LandlordRole : UserRole
 {
@@ -11,6 +13,6 @@ public class LandlordRole : UserRole
 
     protected override string GetStringRepresentation()
     {
-        return "LANDLORD";
+        return AuthService.LandlordRole;
     }
 }

@@ -3,7 +3,7 @@ using FluentAssertions;
 using flatshare_server.Infrastructure.Services;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Configuration;
-using flatshare_server.Infrastructure.Model.User;
+using flatshare_server.Infrastructure.Model.Users;
 using flatshare_server.Infrastructure.Model;
 using flatshare_server.Infrastructure.Model.Exceptions;
 using Microsoft.Extensions.Options;
