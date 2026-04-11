@@ -4,7 +4,6 @@
     align-items: stretch;
     gap: 1rem;
     width: 100%;
-    max-height: 70vh;
     overflow-y: auto;
 
     &::-webkit-scrollbar {
@@ -50,6 +49,7 @@
 .registry-form-container {
     width: 90%;
     max-width: 60rem;
+    max-height: 70vh;
     background-color: var(--color-bg);
     padding: 1.5rem 2rem;
     border-radius: 1rem;
