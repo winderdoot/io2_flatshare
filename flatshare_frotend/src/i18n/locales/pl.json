@@ -31,6 +31,7 @@
     "passwordLabel": "Hasło",
     "passwordPlaceholder": "Wpisz hasło",
     "submit": "Zaloguj się",
+    "submitLoading": "Logowanie...",
     "noAccount": "Nie masz konta?",
     "createLink": "Załóż konto"
   },

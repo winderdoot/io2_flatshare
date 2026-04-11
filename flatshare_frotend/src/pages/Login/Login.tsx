@@ -1,6 +1,6 @@
 
 import { useTranslation } from "react-i18next";
-import { JSX, useState } from "react";
+import { useState } from "react";
 import { CustomTextInput } from "../../components/CustomTextInput/CustomTextInput";
 import "./Login.css";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
@@ -56,15 +56,15 @@ export const Login = () => {
       <div className="login-form-container">
         <div className="fields-container">
           <CustomTextInput
-            label="Email"
-            placeholder="Enter your email"
+            label={t("login.emailLabel")}
+            placeholder={t("login.emailPlaceholder")}
             value={email}
             onChange={setEmail}
           />
 
           <CustomTextInput
-            label="Password"
-            placeholder="Enter your password"
+            label={t("login.passwordLabel")}
+            placeholder={t("login.passwordPlaceholder")}
             value={password}
             onChange={setPassword}
           />
@@ -72,14 +72,14 @@ export const Login = () => {
 
         <div className="buttons-container">
           <button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
+            {loading ? t("login.submitLoading") : t("login.submit")}
           </button>
 
           {error && <p className="error-message">{error}</p>}
 
           <label>
-            Don't have an account?{" "}
-            <Link to="/create-account">Create account</Link>
+            {t("login.noAccount")}{" "}
+            <Link to="/create-account">{t("login.createLink")}</Link>
           </label>
         </div>
       </div>

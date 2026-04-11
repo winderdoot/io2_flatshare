@@ -31,6 +31,7 @@
     "passwordLabel": "Password",
     "passwordPlaceholder": "Enter your password",
     "submit": "Sign in",
+    "submitLoading": "Logging in...",
     "noAccount": "Don't have an account?",
     "createLink": "Create account"
   },
