@@ -52,5 +52,16 @@
     "loginLink": "Sign in",
     "registered": "Account registered",
     "registeredInfo": "Your account has been registered."
+  },
+  "resetPassword": {
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "submit": "Send reset code",
+    "submitLoading": "Sending...",
+    "emailSent": "Reset code sent to the specified email",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign in",
+    "problem": "Problem with password reset code",
+    "resent": "Resent code"
   }
 }

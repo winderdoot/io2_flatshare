@@ -12,7 +12,10 @@ export const RestartPassword = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async () => {
+  const handleSubmitCodeSent = async () => {
+    alert(t("resetPassword.emailSent"));
+
+    // TODO send email and code verification
     setLoading(true);
     setError(null);
     setLoading(false);
@@ -25,8 +28,8 @@ export const RestartPassword = () => {
       <div className="login-form-container">
         <div className="fields-container">
           <CustomTextInput
-            label={t("login.emailLabel")}
-            placeholder={t("login.emailPlaceholder")}
+            label={t("resetPassword.emailLabel")}
+            placeholder={t("resetPassword.emailPlaceholder")}
             value={email}
             onChange={setEmail}
           />
@@ -35,15 +38,15 @@ export const RestartPassword = () => {
         </div>
 
         <div className="buttons-container">
-          <button onClick={handleSubmit} disabled={loading}>
-            {loading ? t("login.submitLoading") : t("login.submit")}
+          <button onClick={handleSubmitCodeSent} disabled={loading}>
+            {loading ? t("resetPassword.submitLoading") : t("resetPassword.submit")}
           </button>
 
           {error && <p className="error-message">{error}</p>}
 
           <label>
-            {t("login.noAccount")}{" "}
-            <Link to="/create-account">{t("login.createLink")}</Link>
+            {t("resetPassword.hasAccount")}{" "}
+            <Link to="/login">{t("resetPassword.loginLink")}</Link>
           </label>
         </div>
       </div>
