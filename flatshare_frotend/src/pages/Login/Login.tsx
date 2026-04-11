@@ -36,10 +36,15 @@ export const Login = () => {
     try {
       const {token, loggedInUser} = await authService.login(email, password);
 
+      if (!token || !loggedInUser) {
+        setError("Invalid email or password");
+        return;
+      }
+
       login(token, loggedInUser);
 
       const from = location.state?.from?.pathname;
-;
+
       navigate(from || "/", { replace: true });
 
     } catch (err) {

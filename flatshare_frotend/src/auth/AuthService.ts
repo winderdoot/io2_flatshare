@@ -3,6 +3,7 @@ import { User } from "../models/user";
 
 export const authService = {
   login: async (email: string, password: string) => {
+    try {
     const createdSession = await fetch(`${API_URL}/api/v1/sessions`, {
       method: "POST",
       body: JSON.stringify({ email, password }),
@@ -46,5 +47,8 @@ export const authService = {
     };
 
     return {token, loggedInUser};
+  } catch (err) {
+    return {token: null, loggedInUser: null};
+  }
   },
 };
