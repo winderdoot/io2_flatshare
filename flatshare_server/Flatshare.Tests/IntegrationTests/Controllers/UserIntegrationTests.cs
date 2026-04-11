@@ -83,6 +83,10 @@ public class UsersIntegrationTests : IClassFixture<FlatshareApiFactory>
             await db.SaveChangesAsync();
         }
 
+        // Provide test auth header so the request is treated as authenticated
+        _client.DefaultRequestHeaders.Remove("X-Test-User-Id");
+        _client.DefaultRequestHeaders.Add("X-Test-User-Id", userId.ToString());
+
         // Act
         var response = await _client.GetAsync($"/api/v1/users/{userId}");
 
@@ -94,12 +98,20 @@ public class UsersIntegrationTests : IClassFixture<FlatshareApiFactory>
     }
 
     [Fact]
-    public async Task GetById_ShouldReturn404_WhenUserDoesNotExist()
+    public async Task GetById_ShouldReturn403_WhenUserAttemptsToAccessOtherUser()
     {
+        // Arrange
+        // Authenticate as one user but request data for a different user -> should be forbidden
+        var authenticatedUserId = Guid.NewGuid();
+        var targetUserId = Guid.NewGuid();
+
+        _client.DefaultRequestHeaders.Remove("X-Test-User-Id");
+        _client.DefaultRequestHeaders.Add("X-Test-User-Id", authenticatedUserId.ToString());
+
         // Act
-        var response = await _client.GetAsync($"/api/v1/users/{Guid.NewGuid()}");
+        var response = await _client.GetAsync($"/api/v1/users/{targetUserId}");
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }
