@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { JSX, useState } from "react";
 import { CustomTextInput } from "../../components/CustomTextInput/CustomTextInput";
 import "./Login.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../auth/AuthContext";
 
-export const Login = () => {
+export const Login = ({ children }: { children: JSX.Element | null }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const handleSubmit = () => {
-    // TODO call API
-    console.log(email, password);    
+    // fake API
+    const fakeToken = "abc123";
+
+    login(fakeToken);
+    if (children) return children;
+    navigate("/");   
   };
 
   return (
