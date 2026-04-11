@@ -2,7 +2,9 @@
   "nav": {
     "home": "Home",
     "colors": "Colors",
-    "account": "My account"
+    "account": "My account",
+    "offer": "Offers",
+    "log_out": "Log out"
   },
   "locale": {
     "language": "Language",
@@ -29,6 +31,7 @@
     "passwordLabel": "Password",
     "passwordPlaceholder": "Enter your password",
     "submit": "Sign in",
+    "submitLoading": "Logging in...",
     "noAccount": "Don't have an account?",
     "createLink": "Create account"
   },

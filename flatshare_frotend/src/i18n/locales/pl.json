@@ -2,7 +2,9 @@
   "nav": {
     "home": "Strona główna",
     "colors": "Kolory",
-    "account": "Moje konto"
+    "account": "Moje konto",
+    "offer": "Oferty",
+    "log_out": "Wyloguj"
   },
   "locale": {
     "language": "Język",
@@ -29,6 +31,7 @@
     "passwordLabel": "Hasło",
     "passwordPlaceholder": "Wpisz hasło",
     "submit": "Zaloguj się",
+    "submitLoading": "Logowanie...",
     "noAccount": "Nie masz konta?",
     "createLink": "Załóż konto"
   },

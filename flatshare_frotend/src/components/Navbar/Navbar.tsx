@@ -2,23 +2,31 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LocaleSwitcher } from "../LocaleSwitcher/LocaleSwitcher";
 import styles from "./Navbar.module.css";
+import { useAuth } from "../../auth/AuthContext";
 
 const Navbar = () => {
   const { t } = useTranslation();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <nav className={styles.navbar}>
       <div className={styles.inner}>
         <div className={styles.logo}>FlatShare</div>
 
-        <div className={styles.links}>
+        <div className={styles.links}>          
           <Link to="/">{t("nav.home")}</Link>
           <Link to="/color-palette">{t("nav.colors")}</Link>
-          <Link to="/login">{t("nav.account")}</Link>
+          <Link to="/offer">{t("nav.offer")}</Link>
+          { user && <Link to="/" onClick={handleLogout}>{t("nav.log_out")} {user}</Link>}
+          { !user && <Link to="/login">{t("nav.account")}</Link>}
         </div>
 
         <div className={styles.locale}>
-          <LocaleSwitcher />
+          <LocaleSwitcher />          
         </div>
       </div>
     </nav>
