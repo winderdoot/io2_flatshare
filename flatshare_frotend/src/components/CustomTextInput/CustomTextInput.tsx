@@ -3,6 +3,7 @@ import styles from "./CustomTextInput.module.css";
 
 export const CustomTextInput = ({
   label,
+  child,
   placeholder,
   value,
   onChange,
@@ -11,7 +12,10 @@ export const CustomTextInput = ({
 }: CustomTextInputProps) => {
   return (
     <div className={styles.wrapper}>
-      {label && <label className={styles.label}>{label}</label>}
+      <div className={styles.label}>
+        {label && <label className={styles.label}>{label}</label>}
+        {child}
+      </div>
 
       <input
         className={`${styles.input} ${error ? styles.inputError : ""}`}

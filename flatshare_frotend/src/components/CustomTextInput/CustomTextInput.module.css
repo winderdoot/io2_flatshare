@@ -36,3 +36,11 @@
   font-size: .8rem;
   color: red;
 }
+
+.label {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  gap: .4rem;
+}
