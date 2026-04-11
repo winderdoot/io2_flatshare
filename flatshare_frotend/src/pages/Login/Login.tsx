@@ -34,12 +34,12 @@ export const Login = () => {
     setError(null);
 
     try {
-      const token = await authService.login(email, password);
+      const {token, loggedInUser} = await authService.login(email, password);
 
-      login(token);
+      login(token, loggedInUser);
 
       const from = location.state?.from?.pathname;
-      console.log(from);
+;
       navigate(from || "/", { replace: true });
 
     } catch (err) {
