@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Model.Users;
+using flatshare_server.Infrastructure.Model;
 using flatshare_server.Infrastructure.Repositories;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -116,5 +117,65 @@ public class SessionsIntegrationTests : IClassFixture<FlatshareApiFactory>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task GetById_ShouldReturnForbidden_WhenUserRequestsOtherUsersSession()
+    {
+        // Arrange
+        await SeedUserAsync();
+
+        // Login as the seeded user to obtain a token (principal contains that user's id)
+        var loginResponse = await _client.PostAsJsonAsync("/api/v1/sessions", new LoginRequest(TestEmail, TestPassword));
+        var authData = await loginResponse.Content.ReadFromJsonAsync<LoggedInResponse>();
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authData!.Token);
+
+        // Create another user and a session that belongs to them
+        Guid otherSessionId;
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<FlatshareDbContext>();
+            var otherUser = User.TryCreate(new CreateUserRequest("Other", "User", "other@test.pl", "OtherPass123!", "TENANT"));
+            db.Users.Add(otherUser);
+            otherSessionId = Guid.NewGuid();
+            db.Sessions.Add(new UserSession { Id = otherSessionId, UserId = otherUser.Id });
+            await db.SaveChangesAsync();
+        }
+
+        // Act
+        var response = await _client.GetAsync($"/api/v1/sessions/{otherSessionId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task SessionRefresh_ShouldReturnForbidden_WhenUserAttemptsToRefreshOtherUsersSession()
+    {
+        // Arrange
+        await SeedUserAsync();
+
+        // Login as the seeded user to obtain a token (principal contains that user's id)
+        var loginResponse = await _client.PostAsJsonAsync("/api/v1/sessions", new LoginRequest(TestEmail, TestPassword));
+        var authData = await loginResponse.Content.ReadFromJsonAsync<LoggedInResponse>();
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authData!.Token);
+
+        // Create another user and a session that belongs to them
+        Guid otherSessionId;
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<FlatshareDbContext>();
+            var otherUser = User.TryCreate(new CreateUserRequest("Other2", "User", "other2@test.pl", "OtherPass123!", "TENANT"));
+            db.Users.Add(otherUser);
+            otherSessionId = Guid.NewGuid();
+            db.Sessions.Add(new UserSession { Id = otherSessionId, UserId = otherUser.Id });
+            await db.SaveChangesAsync();
+        }
+
+        // Act
+        var response = await _client.PatchAsync($"/api/v1/sessions/{otherSessionId}", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }
