@@ -17,8 +17,7 @@ const Navbar = () => {
       <div className={styles.inner}>
         <div className={styles.logo}>FlatShare</div>
 
-        <div className={styles.links}>
-
+        <div className={styles.links}>          
           <Link to="/">{t("nav.home")}</Link>
           <Link to="/color-palette">{t("nav.colors")}</Link>
           <Link to="/offer">{t("nav.offer")}</Link>
