@@ -10,6 +10,7 @@ namespace Flatshare.Tests;
 
 public class FlatshareApiFactory : WebApplicationFactory<Program>
 {
+    private readonly string _dbName = $"IntegrationTestsDb_{Guid.NewGuid()}";
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
@@ -44,8 +45,7 @@ public class FlatshareApiFactory : WebApplicationFactory<Program>
         {
             services.AddDbContext<FlatshareDbContext>(options =>
             {
-                // Preventing race condition
-                options.UseInMemoryDatabase($"IntegrationTestsDb_{Guid.NewGuid()}");
+                options.UseInMemoryDatabase(_dbName);
             });
 
             var sp = services.BuildServiceProvider();
