@@ -69,6 +69,7 @@ export const Login = () => {
 
           <CustomTextInput
             label={t("login.passwordLabel")}
+            child={<Link to="/forgot-password"><label style={{fontSize: ".8rem", cursor: "pointer"}}>{t("login.forgotPassword")}</label></Link>}
             placeholder={t("login.passwordPlaceholder")}
             value={password}
             onChange={setPassword}

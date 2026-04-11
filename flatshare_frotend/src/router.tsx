@@ -7,6 +7,7 @@ import { Registry } from "./pages/Registry/Registry";
 import AuthLayout from "./layouts/AuthLayout";
 import FlatOffers from "./pages/FlatOffers/FlatOffers";
 import { PrivateRoute } from "./auth/PrivateRoute";
+import { RestartPassword } from "./pages/RestartPassword/RestartPassword";
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
       {
         path: "/create-account",
         element: <Registry />,
+      },
+      {
+        path: "/forgot-password",
+        element: <RestartPassword />,
       },
     ],
   },

@@ -33,7 +33,8 @@
     "submit": "Zaloguj się",
     "submitLoading": "Logowanie...",
     "noAccount": "Nie masz konta?",
-    "createLink": "Załóż konto"
+    "createLink": "Załóż konto",
+    "forgotPassword": "Nie pamietasz hasła?"
   },
   "registry": {
     "nameLabel": "Imię",

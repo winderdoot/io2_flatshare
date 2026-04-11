@@ -33,7 +33,8 @@
     "submit": "Sign in",
     "submitLoading": "Logging in...",
     "noAccount": "Don't have an account?",
-    "createLink": "Create account"
+    "createLink": "Create account",
+    "forgotPassword": "Forgot password?"
   },
   "registry": {
     "nameLabel": "First name",
