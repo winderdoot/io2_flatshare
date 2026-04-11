@@ -48,6 +48,8 @@
     "confirmPasswordPlaceholder": "Confirm your password",
     "submit": "Create account",
     "hasAccount": "Already have an account?",
-    "loginLink": "Sign in"
+    "loginLink": "Sign in",
+    "registered": "Account registered",
+    "registeredInfo": "Your account has been registered."
   }
 }

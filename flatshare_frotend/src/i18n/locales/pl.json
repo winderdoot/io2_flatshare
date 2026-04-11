@@ -48,6 +48,8 @@
     "confirmPasswordPlaceholder": "Powtórz hasło",
     "submit": "Utwórz konto",
     "hasAccount": "Masz już konto?",
-    "loginLink": "Zaloguj się"
+    "loginLink": "Zaloguj się",
+    "registered": "Konto zarejestrowane",
+    "registeredInfo": "Twoje konto zostało zarejestrowane."
   }
 }
