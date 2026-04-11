@@ -106,10 +106,10 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-/* First silently handle ServerErrorResponse exceptions */
-app.UseDomainExceptionHandler();
-/* Then handle 500s */ 
+/* Handle 500s server errors */ 
 app.UseExceptionHandler();
+/* Silently handle domain errors */ 
+app.UseDomainExceptionHandler();
 
 /* Aplly migrations automatically */
 if (!app.Environment.IsEnvironment("Testing"))
