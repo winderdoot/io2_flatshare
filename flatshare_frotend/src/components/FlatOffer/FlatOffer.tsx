@@ -8,7 +8,7 @@ const FlatOffer = ({
     phone,
     location,
     price,
-    area, // TODO: add area info
+    area,
     currency,
     image
 }: FlatOfferProps) => {
