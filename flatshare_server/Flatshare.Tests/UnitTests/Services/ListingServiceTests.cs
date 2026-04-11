@@ -61,4 +61,97 @@ public class ListingServiceTests
         result.Id.Should().Be(listing.Id);
         result.Title.Should().Be(request.Title);
     }
+    [Fact]
+    public async Task GetByFilterAsync_ShouldReturnOnlyListingsFromSpecifiedCity()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+        var mockUserService = new Mock<UserService>(null!);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Test", "User", "test@test.pl", "Pass123!", CreateUserRequest.Landlord));
+
+        var baseRequest = GenerateValidRequest();
+
+        var krakowRequest1 = baseRequest with { Location = new Address("Kraków", "Kazimierz", "Szeroka", "1") };
+        var krakowRequest2 = baseRequest with { Location = new Address("Kraków", "Podgórze", "Lwowska", "2") };
+        var warsawRequest = baseRequest with { Location = new Address("Warszawa", "Wola", "Prosta", "5") };
+
+        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(krakowRequest1, user));
+        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(krakowRequest2, user));
+        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(warsawRequest, user));
+        await context.SaveChangesAsync();
+
+        var filter = new ListingFilter { City = "Kraków" };
+
+        // Act
+        var results = await service.GetByFilterAsync(filter);
+
+        // Assert
+        results.Should().NotBeNull();
+        results.Should().HaveCount(2);
+        results.All(r => r.Location.City == "Kraków").Should().BeTrue();
+    }
+    [Fact]
+    public async Task GetByFilterAsync_ShouldFilterByCityAndDistrict()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+        var mockUserService = new Mock<UserService>(null!);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Test", "User", "test@test.pl", "Pass123!", CreateUserRequest.Landlord));
+
+        var baseRequest = GenerateValidRequest();
+
+        var req1 = baseRequest with { Location = new Address("Kraków", "Stare Miasto", "Floriañska", "1") };
+        var req2 = baseRequest with { Location = new Address("Kraków", "Kazimierz", "Szeroka", "2") };
+        var req3 = baseRequest with { Location = new Address("Warszawa", "Œródmieœcie", "Z³ota", "44") };
+
+        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req1, user));
+        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req2, user));
+        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req3, user));
+        await context.SaveChangesAsync();
+
+        var filter = new ListingFilter { City = "Kraków", District = "Kazimierz" };
+
+        // Act
+        var results = await service.GetByFilterAsync(filter);
+
+        // Assert
+        results.Should().NotBeNull();
+        results.Should().HaveCount(1);
+        results.First().Location.District.Should().Be("Kazimierz");
+    }
+
+    [Fact]
+    public async Task GetByFilterAsync_ShouldIgnoreDistrict_WhenCityIsEmpty()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+        var mockUserService = new Mock<UserService>(null!);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Test", "User", "test@test.pl", "Pass123!", CreateUserRequest.Landlord));
+
+        var baseRequest = GenerateValidRequest();
+        var req1 = baseRequest with { Location = new Address("Kraków", "Kazimierz", "Szeroka", "2") };
+        var req2 = baseRequest with { Location = new Address("Warszawa", "Kazimierz", "InnaUlica", "5") };
+
+        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req1, user));
+        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req2, user));
+        await context.SaveChangesAsync();
+
+
+        var filter = new ListingFilter { District = "Kazimierz" };
+
+        // Act
+        var results = await service.GetByFilterAsync(filter);
+
+        // Assert
+        results.Should().HaveCount(2);
+    }
 }

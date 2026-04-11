@@ -82,4 +82,82 @@ public class ListingsIntegrationTests : IClassFixture<FlatshareApiFactory>
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
+    [Fact]
+    public async Task GetByFilter_ShouldReturnListingsFilteredByCity_AndReturn200()
+    {
+        // Arrange
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<FlatshareDbContext>();
+
+            var userReq = new CreateUserRequest("Piotr", "Kowalski", "piotr@test.pl", "Pass123!", CreateUserRequest.Landlord);
+            var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(userReq);
+            db.Users.Add(user);
+
+            var baseRequest = GenerateValidRequest();
+
+            var wroclawReq = baseRequest with { Location = new Address("Wroc³aw", "Krzyki", "Powstañców", "10") };
+            var gdanskReq = baseRequest with { Location = new Address("Gdañsk", "Oliwa", "Grunwaldzka", "15") };
+
+            db.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(wroclawReq, user));
+            db.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(wroclawReq, user));
+            db.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(gdanskReq, user));
+
+            await db.SaveChangesAsync();
+        }
+
+        // Act
+        var response = await _client.GetAsync("/api/v1/listings?City=Wroc³aw");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        jsonOptions.Converters.Add(new JsonStringEnumConverter());
+
+        var listings = await response.Content.ReadFromJsonAsync<List<ListingDTO>>(jsonOptions);
+
+        listings.Should().NotBeNull();
+        listings.Should().HaveCount(2);
+        listings!.All(l => l.Location.City == "Wroc³aw").Should().BeTrue();
+    }
+    [Fact]
+    public async Task GetByFilter_ShouldReturnListingsFilteredByMultipleParameters_AndReturn200()
+    {
+        // Arrange
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<FlatshareDbContext>();
+
+            var userReq = new CreateUserRequest("Jan", "Kowalski", "jan@test.pl", "Pass123!", CreateUserRequest.Landlord);
+            var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(userReq);
+            db.Users.Add(user);
+
+            var baseRequest = GenerateValidRequest();
+
+            var jezyceReq = baseRequest with { Location = new Address("Poznañ", "Je¿yce", "D¹browskiego", "10") };
+            var grunwaldReq = baseRequest with { Location = new Address("Poznañ", "Grunwald", "G³ogowska", "20") };
+
+            db.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(jezyceReq, user));
+            db.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(grunwaldReq, user));
+
+            await db.SaveChangesAsync();
+        }
+
+        // Act
+        var response = await _client.GetAsync("/api/v1/listings?City=Poznañ&District=Je¿yce");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        jsonOptions.Converters.Add(new JsonStringEnumConverter());
+
+        var listings = await response.Content.ReadFromJsonAsync<List<ListingDTO>>(jsonOptions);
+
+        listings.Should().NotBeNull();
+        listings.Should().HaveCount(1);
+        listings!.First().Location.City.Should().Be("Poznañ");
+        listings!.First().Location.District.Should().Be("Je¿yce");
+    }
 }
