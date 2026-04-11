@@ -11,26 +11,18 @@ public class GlobalExceptionHandler : IExceptionHandler
         CancellationToken cancellationToken
     )
     {
-        ErrorResponse errorResponse;
-
-        if (exception is ServerResponseException ex)
+        /* If we are here, it means it's a real 500 Internal Server Error. */
+        
+        httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        
+        var errorResponse = new ErrorResponse
         {
-            httpContext.Response.StatusCode = ex.Response.Status;
-            errorResponse = ex.Response;
-        }
-        else
-        {
-            /* Handle 500 Internal Server Error */
-            httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            errorResponse = new ErrorResponse
-            {
-                Status = 500,
-                Error = "An unexpected server error occurred."
-            };
-        }
+            Status = 500,
+            Error = "An unexpected server error occurred."
+        };
 
         await httpContext.Response.WriteAsJsonAsync(errorResponse, cancellationToken);
 
-        return true; /* The exception was handled */
+        return true; 
     }
 }
