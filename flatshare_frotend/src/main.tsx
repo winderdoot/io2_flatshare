@@ -1,14 +1,17 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
 import "./i18n";
-import "./index.css";
-import App from "./App";
 import { CurrencyProvider } from "./context/CurrencyContext";
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+import { AuthProvider } from './auth/AuthContext.js'
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <CurrencyProvider>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </CurrencyProvider>
   </StrictMode>
 );

@@ -3,7 +3,8 @@
     "home": "Home",
     "colors": "Colors",
     "account": "My account",
-    "offer": "Offers"
+    "offer": "Offers",
+    "log_out": "Log out"
   },
   "locale": {
     "language": "Language",
