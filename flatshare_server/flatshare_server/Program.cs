@@ -106,8 +106,10 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-/* This should go first I think */
-app.UseExceptionHandler(_ => { });
+/* First silently handle ServerErrorResponse exceptions */
+app.UseDomainExceptionHandler();
+/* Then handle 500s */ 
+app.UseExceptionHandler();
 
 /* Aplly migrations automatically */
 if (!app.Environment.IsEnvironment("Testing"))
