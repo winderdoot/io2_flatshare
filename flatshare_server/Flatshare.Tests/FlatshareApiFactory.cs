@@ -16,11 +16,10 @@ public class FlatshareApiFactory : WebApplicationFactory<Program>
 
         builder.ConfigureTestServices(services =>
         {
-            // Dodajemy nasz handler jako dodatkowy schemat
             services.AddAuthentication()
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                         TestAuthHandler.AuthenticationScheme, options => { })
-                    // Tworzymy inteligentny router (SmartScheme)
+                    // SmartScheme
                     .AddPolicyScheme("SmartScheme", "Bearer or Test", options =>
                     {
                         options.ForwardDefaultSelector = context =>
@@ -34,7 +33,6 @@ public class FlatshareApiFactory : WebApplicationFactory<Program>
                         };
                     });
 
-            // Ustawiamy nasz SmartScheme jako domyślny dla testów
             services.Configure<AuthenticationOptions>(options =>
             {
                 options.DefaultAuthenticateScheme = "SmartScheme";
@@ -46,7 +44,8 @@ public class FlatshareApiFactory : WebApplicationFactory<Program>
         {
             services.AddDbContext<FlatshareDbContext>(options =>
             {
-                options.UseInMemoryDatabase("IntegrationTestsDb");
+                // Preventing race condition
+                options.UseInMemoryDatabase($"IntegrationTestsDb_{Guid.NewGuid()}");
             });
 
             var sp = services.BuildServiceProvider();
