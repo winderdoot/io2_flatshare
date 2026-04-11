@@ -52,5 +52,16 @@
     "loginLink": "Zaloguj się",
     "registered": "Konto zarejestrowane",
     "registeredInfo": "Twoje konto zostało zarejestrowane."
+  },
+  "resetPassword": {
+    "emailLabel": "Email",
+    "emailPlaceholder": "Wpisz adres e-mail",
+    "submit": "Wyslij kod resetowania",
+    "submitLoading": "Wysyłanie...",
+    "emailSent": "Kod resetowania wysłany na wskazany adres e-mail",
+    "hasAccount": "Masz już konto?",
+    "loginLink": "Zaloguj się",
+    "problem": "Problem z kodem resetowania hasła",
+    "resent": "Wyślij ponownie"
   }
 }
