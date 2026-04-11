@@ -107,7 +107,7 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 
 /* This should go first I think */
-app.UseExceptionHandler();
+app.UseExceptionHandler(_ => { });
 
 /* Aplly migrations automatically */
 if (!app.Environment.IsEnvironment("Testing"))
