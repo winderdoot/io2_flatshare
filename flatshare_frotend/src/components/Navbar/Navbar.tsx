@@ -21,7 +21,7 @@ const Navbar = () => {
           <Link to="/">{t("nav.home")}</Link>
           <Link to="/color-palette">{t("nav.colors")}</Link>
           <Link to="/offer">{t("nav.offer")}</Link>
-          { user && <Link to="/" onClick={handleLogout}>{t("nav.log_out")} {user}</Link>}
+          { user && <Link to="/" onClick={handleLogout}>{t("nav.log_out")} {user.firstName}</Link>}
           { !user && <Link to="/login">{t("nav.account")}</Link>}
         </div>
 
