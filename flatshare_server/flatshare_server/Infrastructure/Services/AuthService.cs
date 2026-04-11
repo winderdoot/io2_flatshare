@@ -133,5 +133,14 @@ namespace flatshare_server.Infrastructure.Services
             Guid.TryParse(claim?.Value, out Guid id);
             return id;
         }
+
+        public void AssertUserIs(ClaimsPrincipal? principal, Guid userId)
+        {
+            var actualId = GetUserId(principal);
+            if (actualId != userId)
+            {
+                throw ErrorResponse.Generate("Forbidden", StatusCodes.Status403Forbidden);
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Services;
 using flatshare_server.Infrastructure.Model.Exceptions;
 using flatshare_server.Infrastructure.Model.Requests;
+using Microsoft.AspNetCore.Authorization;
 
 namespace flatshare_server.Controllers;
 
@@ -11,9 +12,11 @@ namespace flatshare_server.Controllers;
 public class UsersController : Controller
 {
     private readonly UserService _userService;
-    public UsersController(UserService userService)
+    private readonly AuthService _auth;
+    public UsersController(UserService userService, AuthService auth)
     {
         _userService = userService;
+        _auth = auth;
     }
 
     [HttpPost]
@@ -32,8 +35,10 @@ public class UsersController : Controller
     }
 
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<ActionResult<UserDTO>> GetById(Guid id)
     {
+        _auth.AssertUserIs(User, id);
         UserDTO user = (await _userService.GetByIdAsync(id)).IntoDTO();
 
         return Ok(user);
