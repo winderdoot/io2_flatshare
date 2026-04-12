@@ -334,6 +334,22 @@ namespace flatshare_server.Migrations
                             b1.Property<int>("TenantRoleId")
                                 .HasColumnType("integer");
 
+                            b1.Property<string>("Currency")
+                                .HasColumnType("text");
+
+                            b1.Property<decimal?>("MaxPrice")
+                                .HasColumnType("numeric");
+
+                            b1.Property<bool?>("PetsAllowed")
+                                .HasColumnType("boolean");
+
+                            b1.PrimitiveCollection<List<string>>("PreferredDistricts")
+                                .IsRequired()
+                                .HasColumnType("text[]");
+
+                            b1.Property<bool?>("SmokingAllowed")
+                                .HasColumnType("boolean");
+
                             b1.HasKey("TenantRoleId");
 
                             b1.ToTable("UserRole");
