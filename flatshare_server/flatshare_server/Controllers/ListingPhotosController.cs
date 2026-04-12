@@ -54,7 +54,8 @@ public class ListingPhotosController : Controller
 
         return CreatedAtAction(
             actionName: nameof(GetById),
-            routeValues: new { fileId },
+            // FIX: define both listingId and id
+            routeValues: new { listingId = listingId, id = fileId },
             value: new { id = fileId }
         );
     }
