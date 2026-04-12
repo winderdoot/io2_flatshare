@@ -14,8 +14,8 @@ export const RestartPassword = () => {
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
 
-  const [token, setToken] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [resetToken, setResetToken] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
 
   const handleSubmitCodeSent = async () => {   
@@ -31,6 +31,16 @@ export const RestartPassword = () => {
   };
 
   const handleSubmitNewPassword = async () => {
+    setLoading(true);
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    const res = await fetch(`${API_URL}/api/v1/auth/password-reset/confirm`,{method: "POST", body: JSON.stringify({resetToken, email, newPassword}), headers: {"Content-Type": "application/json", "Accept": "application/json",}});
+
+    setLoading(false);
     alert("password changed");
   };
 
@@ -51,14 +61,14 @@ export const RestartPassword = () => {
               <CustomTextInput
                 label={t("resetPassword.token")}
                 placeholder={t("resetPassword.tokenPlaceholder")}
-                value={token}
-                onChange={setToken}
+                value={resetToken}
+                onChange={setResetToken}
               />
               <CustomTextInput
                 label={t("resetPassword.passwordLabel")}
                 placeholder={t("resetPassword.passwordPlaceholder")}
-                value={password}
-                onChange={setPassword}
+                value={newPassword}
+                onChange={setNewPassword}
               />
               <CustomTextInput
                 label={t("resetPassword.confirmPasswordLabel")}
