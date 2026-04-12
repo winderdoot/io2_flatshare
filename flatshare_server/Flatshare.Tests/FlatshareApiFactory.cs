@@ -1,5 +1,6 @@
 ﻿using Flatshare.Tests.Utils;
 using flatshare_server.Infrastructure.Repositories;
+using flatshare_server.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -23,6 +24,12 @@ public class FlatshareApiFactory : WebApplicationFactory<Program>
 
         builder.ConfigureTestServices(services =>
         {
+            var storageDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IStorageService));
+            if (storageDescriptor != null)
+            {
+                services.Remove(storageDescriptor);
+            }
+            services.AddSingleton<IStorageService, FakeStorageService>();
             services.AddAuthentication()
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                         TestAuthHandler.AuthenticationScheme, options => { })
