@@ -13,7 +13,7 @@ export const Registry = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "LANDLORD",
+    role: "TENANT",
   });
   const [errors, setErrors] = useState({
     firstNameError: "",
