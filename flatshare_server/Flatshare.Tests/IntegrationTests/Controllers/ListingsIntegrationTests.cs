@@ -58,6 +58,7 @@ public class ListingsIntegrationTests : IClassFixture<FlatshareApiFactory>
         var request = GenerateValidRequest();
 
         _client.DefaultRequestHeaders.Add("X-Test-User-Id", landlordId.ToString());
+        _client.DefaultRequestHeaders.Add("X-Test-User-Role", CreateUserRequest.Landlord);
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/v1/listings", request);
