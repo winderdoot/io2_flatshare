@@ -13,8 +13,8 @@ using flatshare_server.Infrastructure.Repositories;
 namespace flatshare_server.Migrations
 {
     [DbContext(typeof(FlatshareDbContext))]
-    [Migration("20260412122230_AddPasswordResetEntry")]
-    partial class AddPasswordResetEntry
+    [Migration("20260412140637_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

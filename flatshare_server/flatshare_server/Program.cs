@@ -99,7 +99,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             OnTokenValidated = async context =>
             {
-                var sessionIdClaim = context.Principal?.FindFirst("SessionId")?.Value;
+                var sessionIdClaim = context.Principal?.FindFirst(AuthService.SessionClaim)?.Value;
 
                 if (string.IsNullOrEmpty(sessionIdClaim) || !Guid.TryParse(sessionIdClaim, out var sessionId))
                 {

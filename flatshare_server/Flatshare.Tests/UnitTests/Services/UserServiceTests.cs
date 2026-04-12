@@ -11,12 +11,17 @@ namespace Flatshare.Tests.UnitTests.Services;
 public class UserServiceTests
 {
     private readonly Mock<IUserRepository> _userRepoMock;
+    private readonly Mock<IResetCodesRepository> _resetRepoMock;
+    private readonly Mock<ISessionRepository> _sessionRepoMock;
     private readonly UserService _userService;
 
     public UserServiceTests()
     {
         _userRepoMock = new Mock<IUserRepository>();
-        _userService = new UserService(_userRepoMock.Object);
+        _resetRepoMock = new Mock<IResetCodesRepository>();
+        _sessionRepoMock = new Mock<ISessionRepository>();
+
+        _userService = new UserService(_userRepoMock.Object, _resetRepoMock.Object, _sessionRepoMock.Object);
     }
 
     [Theory]
