@@ -1,7 +1,8 @@
-﻿namespace flatshare_server.Infrastructure.Model.Users;
+namespace flatshare_server.Infrastructure.Model.Users;
 
 public class UserSession
 {
     public required Guid Id { get; init; }
     public required Guid UserId { get; init; }
+    public bool IsValid { get; set; } = true;
 }

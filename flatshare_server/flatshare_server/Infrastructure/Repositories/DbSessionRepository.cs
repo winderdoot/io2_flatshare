@@ -1,4 +1,4 @@
-﻿using flatshare_server.Infrastructure.Model.Responses;
+using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Model.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,7 +26,7 @@ public class DbSessionRepository : ISessionRepository
     public async Task<UserSession> GetBySessionId(Guid sessionId)
     {
         var session = await _context.Sessions.FindAsync(sessionId);
-        if (session is null)
+        if (session is null || !session.IsValid)
         {
             throw ErrorResponse.Generate(
                 $"Session with Id: '{sessionId}' doesn't exist",
@@ -35,5 +35,24 @@ public class DbSessionRepository : ISessionRepository
         }
 
         return session;
+    }
+
+    public async Task InvalidateByUserId(Guid userId)
+    {
+        await _context.Sessions
+            .Where(s => s.UserId == userId)
+            .ExecuteUpdateAsync(set => set.SetProperty(s => s.IsValid, false));
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> IsSessionValid(Guid sessionId)
+    {
+        var sess = await _context.Sessions
+            .Where(s => s.Id == sessionId).FirstOrDefaultAsync();
+
+        if (sess is null || !sess.IsValid)
+            return false;
+        return true;
     }
 }
