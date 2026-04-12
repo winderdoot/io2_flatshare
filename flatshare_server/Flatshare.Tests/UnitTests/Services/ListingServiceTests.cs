@@ -41,7 +41,12 @@ public class ListingServiceTests
     {
         // Arrange
         var context = CreateInMemoryDbContext();
-        var mockUserService = new Mock<UserService>(null!);
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
         var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
@@ -66,7 +71,12 @@ public class ListingServiceTests
     {
         // Arrange
         var context = CreateInMemoryDbContext();
-        var mockUserService = new Mock<UserService>(null!);
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
         var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
@@ -98,7 +108,12 @@ public class ListingServiceTests
     {
         // Arrange
         var context = CreateInMemoryDbContext();
-        var mockUserService = new Mock<UserService>(null!);
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
         var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
@@ -131,7 +146,12 @@ public class ListingServiceTests
     {
         // Arrange
         var context = CreateInMemoryDbContext();
-        var mockUserService = new Mock<UserService>(null!);
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
         var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(

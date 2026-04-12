@@ -15,6 +15,12 @@ public class FlatshareApiFactory : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Testing");
 
+        builder.UseSetting("EmailOptions:AppName", "Flatshare-Test");
+        builder.UseSetting("EmailOptions:Host", "smtp.gmail.com");
+        builder.UseSetting("EmailOptions:Port", "587");
+        builder.UseSetting("EmailOptions:EmailAddress", "test@test.com");
+        builder.UseSetting("EmailOptions:AppPassword", "test-password");
+
         builder.ConfigureTestServices(services =>
         {
             services.AddAuthentication()
