@@ -22,29 +22,58 @@ export const RestartPassword = () => {
 
   const handleSubmitCodeSent = async () => {   
     setSent(false);
+    setError(null);  
 
-    setLoading(true);
-    const  res = await fetch(`${API_URL}/api/v1/auth/password-reset/request`,{method: "POST", body: JSON.stringify({email}), headers: {"Content-Type": "application/json", "Accept": "application/json",}});   
-    console.log(res);
-    setLoading(false);
+    try {
+      setLoading(true);
 
-    setSent(true);
-    alert(t("resetPassword.emailSent"));
+      const  res = await fetch(`${API_URL}/api/v1/auth/password-reset/request`,{method: "POST", body: JSON.stringify({email}), headers: {"Content-Type": "application/json", "Accept": "application/json",}});   
+    
+      if (!res.ok) {
+        setError("Server error");
+        return;
+      }
+
+      setSent(true);
+      alert(t("resetPassword.emailSent"));
+    } catch (e) {
+      setError("Network error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmitNewPassword = async () => {
-    setLoading(true);
-
+    setError(null);
+    
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+    
+    if (newPassword.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return;
+    }
+    
+    setLoading(true);
+    try {      
+      const res = await fetch(`${API_URL}/api/v1/auth/password-reset/confirm`,{method: "POST", body: JSON.stringify({resetToken, email, newPassword}), headers: {"Content-Type": "application/json", "Accept": "application/json",}});
+    
+      if (!res.ok) {
+        setError("Invalid token, must be requested again");
+        return;
+      }
+      
+      setRegistered(true);
+    }
+    catch (e) {
+      setError("Network error");
+    }
+    finally {
+      setLoading(false);
+    }
 
-    const res = await fetch(`${API_URL}/api/v1/auth/password-reset/confirm`,{method: "POST", body: JSON.stringify({resetToken, email, newPassword}), headers: {"Content-Type": "application/json", "Accept": "application/json",}});
-
-    setLoading(false);
-    setRegistered(true);
-    alert("password changed");
   };
 
   return (
@@ -88,6 +117,8 @@ export const RestartPassword = () => {
           <button onClick={handleSubmitCodeSent} disabled={loading}>
             {loading ? t("resetPassword.submitLoading") : t("resetPassword.submit")}
           </button>         
+
+          {error && <p className="error-message">{error}</p>}
 
           <label>
             {t("resetPassword.hasAccount")}{" "}
