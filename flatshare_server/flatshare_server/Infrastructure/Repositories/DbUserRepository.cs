@@ -32,7 +32,7 @@ public class DbUserRepository : IUserRepository
         if (user is null)
         {
             throw ErrorResponse.Generate(
-                $"User with Id: '{id}' doesn't exist",
+                $"User with Id: \"{id}\"' doesn't exist",
                 StatusCodes.Status404NotFound
             );
         }
@@ -49,6 +49,23 @@ public class DbUserRepository : IUserRepository
     public async Task Update(User user)
     {
         _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdatePassword(Guid userId, string password)
+    {
+        var user = await _context.Users
+            .Include(u => u.Role)
+            .Where(u => u.Id == userId)
+            .FirstOrDefaultAsync();
+
+        if (user is null)
+        {
+            throw ErrorResponse.Generate($"User with Id: \"{userId}\" doesn't exists");
+        }
+
+        user.UpdatePassword(password);
+
         await _context.SaveChangesAsync();
     }
 }

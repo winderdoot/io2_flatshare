@@ -38,10 +38,25 @@ if (builder.Environment.EnvironmentName != "Testing")
 /* Add services */
 builder.Services.AddScoped<IUserRepository, DbUserRepository>();
 builder.Services.AddScoped<ISessionRepository, DbSessionRepository>();
+builder.Services.AddScoped<IResetCodesRepository, DbResetCodesRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ListingService>();
 builder.Services.AddScoped<ListingPhotoService>();
+builder.Services.AddScoped<EmailService>();
+
+/* setup email options */
+var emailOptions = builder.Configuration
+    .GetSection(EmailOptions.OptionsKey)
+    .Get<EmailOptions>();
+
+if (emailOptions == null)
+{
+    throw new InvalidOperationException("Email configuration is missing from appsettings.json.");
+}
+
+builder.Services.Configure<EmailOptions>(
+    builder.Configuration.GetSection(EmailOptions.OptionsKey));
 
 /* Setup JwtOptions */
 var jwtOptions = builder.Configuration
@@ -55,6 +70,7 @@ if (jwtOptions == null || string.IsNullOrEmpty(jwtOptions.Secret))
 
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection(JwtOptions.OptionsKey));
+
 
 /* Disable silly DOTNET token name mapping */ 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -79,6 +95,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(jwtOptions.Secret)
             )
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var sessionIdClaim = context.Principal?.FindFirst("SessionId")?.Value;
+
+                if (string.IsNullOrEmpty(sessionIdClaim) || !Guid.TryParse(sessionIdClaim, out var sessionId))
+                {
+                    context.Fail("Unauthorized: Session claim is missing.");
+                    return;
+                }
+
+                var sessionRepo = context.HttpContext.RequestServices.GetRequiredService<ISessionRepository>();
+
+                var valid = await sessionRepo.IsSessionValid(sessionId);
+                if (!valid)
+                    context.Fail("Unauthorized: Session is invalid or has been revoked.");
+            }
+        };
     });
 
 builder.Services.AddAuthorization(options =>
@@ -101,7 +136,7 @@ builder.Services
         {
             var fieldErrors = context.ModelState
                 .Where(e => e.Value?.Errors.Count > 0)
-                .Select(e => 
+                .Select(e =>
                     new FieldError(
                         e.Key,
                         e.Value!.Errors.First().ErrorMessage

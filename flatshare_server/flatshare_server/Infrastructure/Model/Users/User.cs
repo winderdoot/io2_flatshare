@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.StaticAssets;
+using Microsoft.AspNetCore.StaticAssets;
 using EmailValidation;
 using flatshare_server.Infrastructure.Utils;
 using flatshare_server.Infrastructure.Model.Exceptions;
+using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Responses;
 using Microsoft.AspNetCore.Http;
-using flatshare_server.Infrastructure.Model.Requests;
+using Org.BouncyCastle.Asn1.Ocsp;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace flatshare_server.Infrastructure.Model.Users;
 
@@ -40,7 +42,7 @@ public class User
 
         if (string.IsNullOrEmpty(request.FirstName) || request.FirstName.Length < 3)
         {
-            errors.Add(new (nameof(request.FirstName), "First name must be at least 3 characters long."));
+            errors.Add(new(nameof(request.FirstName), "First name must be at least 3 characters long."));
         }
         if (string.IsNullOrEmpty(request.LastName) || request.LastName.Length < 3)
         {
@@ -48,11 +50,11 @@ public class User
         }
         if (string.IsNullOrEmpty(request.Email) || !EmailValidator.Validate(request.Email))
         {
-            errors.Add(new (nameof(request.Email), $"Invalid email address: {request.Email}"));
+            errors.Add(new(nameof(request.Email), $"Invalid email address: {request.Email}"));
         }
         if (string.IsNullOrEmpty(request.Password) || request.Password.Length < 8)
         {
-            errors.Add(new (nameof(request.Password), $"Password must be at least 8 characters long"));
+            errors.Add(new(nameof(request.Password), $"Password must be at least 8 characters long"));
         }
         if (string.IsNullOrEmpty(request.Role) || (request.Role != CreateUserRequest.Tenant && request.Role != CreateUserRequest.Landlord))
         {
@@ -87,8 +89,26 @@ public class User
 
         return user;
     }
+
     public UserDTO IntoDTO()
     {
         return new UserDTO(Id, FirstName, LastName, Email, Role.ToString());
+    }
+
+    public void UpdatePassword(string password)
+    {
+        var errors = new List<FieldError>();
+
+        if (string.IsNullOrEmpty(password) || password.Length < 8)
+        {
+            errors.Add(new(nameof(password), $"Password must be at least 8 characters long"));
+        }
+
+        if (errors.Any())
+        {
+            throw ErrorResponse.Generate("Password Update Error", StatusCodes.Status400BadRequest, errors);
+        }
+
+        _passHash = PasswordEncoder.Encrypt(password, Id);
     }
 }

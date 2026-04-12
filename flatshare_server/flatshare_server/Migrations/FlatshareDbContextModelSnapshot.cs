@@ -88,6 +88,39 @@ namespace flatshare_server.Migrations
                     b.ToTable("Listings");
                 });
 
+            modelBuilder.Entity("flatshare_server.Infrastructure.Model.PasswordResetEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsValid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("ResetCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "ResetCode");
+
+                    b.ToTable("PasswordResetEntries");
+                });
+
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -153,10 +186,17 @@ namespace flatshare_server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("IsValid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Sessions");
                 });
@@ -271,6 +311,15 @@ namespace flatshare_server.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("flatshare_server.Infrastructure.Model.PasswordResetEntry", b =>
+                {
+                    b.HasOne("flatshare_server.Infrastructure.Model.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.Users.User", b =>
                 {
                     b.OwnsOne("flatshare_server.Infrastructure.Model.AccountStatus", "Status", b1 =>
@@ -306,6 +355,15 @@ namespace flatshare_server.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("flatshare_server.Infrastructure.Model.Users.UserSession", b =>
+                {
+                    b.HasOne("flatshare_server.Infrastructure.Model.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.Users.LandlordRole", b =>

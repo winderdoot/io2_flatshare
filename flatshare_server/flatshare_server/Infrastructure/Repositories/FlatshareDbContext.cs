@@ -14,6 +14,7 @@ public class FlatshareDbContext : DbContext
     public DbSet<Foo> Foos {  get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Listing> Listings { get; set; }
+    public DbSet<PasswordResetEntry> PasswordResetEntries { get; set; }
 
     public FlatshareDbContext(DbContextOptions<FlatshareDbContext> options)
     : base(options)
@@ -98,6 +99,45 @@ public class FlatshareDbContext : DbContext
                 entity
                     .HasIndex("OwnerId")
                     .HasDatabaseName("IX_Listings_OwnerId");
+            })
+            .Entity<UserSession>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity
+                    .HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity
+                    .Property(e => e.IsValid)
+                    .HasDefaultValue(true);
+            })
+            .Entity<PasswordResetEntry>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity
+                    .Property<int>("Id")
+                    .ValueGeneratedOnAdd();
+
+                entity
+                    .Property(e => e.ResetCode)
+                    .IsRequired();
+
+                entity
+                    .HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity
+                    .HasIndex(e => new { e.UserId, e.ResetCode });
+
+                entity
+                    .Property(e => e.IsValid)
+                    .HasDefaultValue(true);
             });
     }
 

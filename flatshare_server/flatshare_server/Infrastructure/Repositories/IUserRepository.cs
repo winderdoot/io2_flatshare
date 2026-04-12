@@ -9,4 +9,5 @@ public interface IUserRepository
     public Task<User> GetById(Guid id); 
     public Task<User?> GetByEmail(string email);
     public Task Update(User user);
+    public Task UpdatePassword(Guid userId, string passwordHash);
 }
