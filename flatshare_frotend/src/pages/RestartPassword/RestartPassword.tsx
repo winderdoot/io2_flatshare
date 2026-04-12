@@ -30,14 +30,14 @@ export const RestartPassword = () => {
       const  res = await fetch(`${API_URL}/api/v1/auth/password-reset/request`,{method: "POST", body: JSON.stringify({email}), headers: {"Content-Type": "application/json", "Accept": "application/json",}});   
     
       if (!res.ok) {
-        setError("Server error");
+        setError(t("resetPassword.serverError"));
         return;
       }
 
       setSent(true);
       alert(t("resetPassword.emailSent"));
     } catch (e) {
-      setError("Network error");
+      setError(t("resetPassword.networkError"));
     } finally {
       setLoading(false);
     }
@@ -47,12 +47,12 @@ export const RestartPassword = () => {
     setError(null);
     
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("resetPassword.passwordsDoNotMatch"));
       return;
     }
     
     if (newPassword.length < 8) {
-      setError("Password must be at least 8 characters long");
+      setError(t("resetPassword.passwordTooShort"));
       return;
     }
     
@@ -61,14 +61,14 @@ export const RestartPassword = () => {
       const res = await fetch(`${API_URL}/api/v1/auth/password-reset/confirm`,{method: "POST", body: JSON.stringify({resetToken, email, newPassword}), headers: {"Content-Type": "application/json", "Accept": "application/json",}});
     
       if (!res.ok) {
-        setError("Invalid token, must be requested again");
+        setError(t("resetPassword.invalidToken"));
         return;
       }
       
       setRegistered(true);
     }
     catch (e) {
-      setError("Network error");
+      setError(t("resetPassword.networkError"));
     }
     finally {
       setLoading(false);
