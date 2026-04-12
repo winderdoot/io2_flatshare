@@ -69,6 +69,8 @@
     "passwordPlaceholder": "Enter your password",
     "confirmPasswordLabel": "Confirm password",
     "confirmPasswordPlaceholder": "Confirm your password",
-    "submitReset": "Reset password"
+    "submitReset": "Reset password",
+    "passwordChanged": "Password changed",
+    "passwordChangedInfo": "Your password has been changed."
   }
 }
