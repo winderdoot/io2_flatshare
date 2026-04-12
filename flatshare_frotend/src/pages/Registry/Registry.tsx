@@ -4,6 +4,7 @@ import { CustomTextInput } from "../../components/CustomTextInput/CustomTextInpu
 import "./Registry.css";
 import { Link } from "react-router-dom";
 import { registryService } from "./RegistryService";
+import SuccessDialog from "../../components/SuccessDialog/SuccessDialog";
 
 export const Registry = () => {
   const { t } = useTranslation();
@@ -208,16 +209,12 @@ export const Registry = () => {
         </div>}
 
         {registered &&
-          <div className="registry-form-container" style={{width: "fit-content"}}>
-            <h2 style={{fontSize: "1.7rem"}}>{t("registry.registered")}</h2>
-
-            <span className="ok-icon">&#10004;</span>
-
+          <SuccessDialog title={t("registry.registered")} message={
             <label>
               {t("registry.registeredInfo")}{" "}
               <Link to="/login">{t("registry.loginLink")}</Link>
-            </label>
-          </div>}
+            </label>} />
+          }
       </div>
     </>
   );
