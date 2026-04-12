@@ -22,11 +22,16 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
     {
         if (Context.Request.Headers.TryGetValue("X-Test-User-Id", out var userId))
         {
+            var role = Context.Request.Headers.TryGetValue("X-Test-User-Role", out var reqRole)
+                ? reqRole.ToString()
+                : AuthService.TenantRole;
+
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-                new Claim(AuthService.RoleClaim, AuthService.LandlordRole)
-            };
+            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
+            new Claim(AuthService.RoleClaim, role),
+            new Claim(ClaimTypes.Role, role)
+        };
 
             var identity = new ClaimsIdentity(claims, AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
