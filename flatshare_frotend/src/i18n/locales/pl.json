@@ -70,6 +70,8 @@
     "confirmPasswordLabel": "Potwierdź hasło",
     "confirmPasswordPlaceholder": "Powtórz hasło",
     "submitPassword": "Zmień hasło",
-    "submitPasswordLoading": "Zmiana hasła..."
+    "submitPasswordLoading": "Zmiana hasła...",
+    "passwordChanged": "Hasło zmienione",
+    "passwordChangedInfo": "Twoje hasło zostało zmienione."
   }
 }

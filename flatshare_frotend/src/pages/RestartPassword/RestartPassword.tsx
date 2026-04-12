@@ -5,7 +5,7 @@ import { CustomTextInput } from "../../components/CustomTextInput/CustomTextInpu
 import "./RestartPassword.css";
 import { Link } from "react-router-dom";
 import { API_URL } from "../../config";
-
+import SuccessDialog from "../../components/SuccessDialog/SuccessDialog";
 
 export const RestartPassword = () => {      
   const { t } = useTranslation();
@@ -17,6 +17,8 @@ export const RestartPassword = () => {
   const [resetToken, setResetToken] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+
+  const [registered, setRegistered] = useState(false);
 
   const handleSubmitCodeSent = async () => {   
     setSent(false);
@@ -41,6 +43,7 @@ export const RestartPassword = () => {
     const res = await fetch(`${API_URL}/api/v1/auth/password-reset/confirm`,{method: "POST", body: JSON.stringify({resetToken, email, newPassword}), headers: {"Content-Type": "application/json", "Accept": "application/json",}});
 
     setLoading(false);
+    setRegistered(true);
     alert("password changed");
   };
 
@@ -48,7 +51,7 @@ export const RestartPassword = () => {
     <div className="background">
       <img src="src/assets/rent_house.png" alt="background" />
 
-      <div className="login-form-container">
+      {!registered && <div className="login-form-container">
         <div className="fields-container">
           <CustomTextInput
             label={t("resetPassword.emailLabel")}
@@ -107,7 +110,15 @@ export const RestartPassword = () => {
           </label>
         </div>}
 
-      </div>
+      </div>}
+
+      {registered &&
+          <SuccessDialog title={t("resetPassword.passwordChanged")} message={
+            <label>
+              {t("resetPassword.passwordChangedInfo")}{" "}
+              <Link to="/login">{t("resetPassword.loginLink")}</Link>
+            </label>} />
+          }
     </div>
   );
 };
