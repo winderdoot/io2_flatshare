@@ -29,6 +29,7 @@ public class FlatshareApiFactory : WebApplicationFactory<Program>
             {
                 services.Remove(storageDescriptor);
             }
+
             services.AddSingleton<IStorageService, FakeStorageService>();
             services.AddAuthentication()
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
