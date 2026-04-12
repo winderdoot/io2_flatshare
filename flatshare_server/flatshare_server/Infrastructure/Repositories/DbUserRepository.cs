@@ -46,4 +46,9 @@ public class DbUserRepository : IUserRepository
             .Include(user => user.Role)
             .FirstOrDefaultAsync(u => u.Email == email);
     }
+    public async Task Update(User user)
+    {
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+    }
 }

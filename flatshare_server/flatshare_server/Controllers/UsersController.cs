@@ -43,4 +43,22 @@ public class UsersController : Controller
 
         return Ok(user);
     }
+
+    [HttpGet("me/preferences")]
+    [Authorize(Roles = AuthService.TenantRole)]
+    public async Task<ActionResult<TenantPreferencesDTO>> GetMyPreferences()
+    {
+        Guid userId = _auth.GetUserId(User);
+        var preferences = await _userService.GetPreferencesAsync(userId);
+        return Ok(preferences);
+    }
+
+    [HttpPut("me/preferences")]
+    [Authorize(Roles = AuthService.TenantRole)]
+    public async Task<ActionResult<TenantPreferencesDTO>> UpdateMyPreferences([FromBody] TenantPreferencesDTO request)
+    {
+        Guid userId = _auth.GetUserId(User);
+        var updatedPreferences = await _userService.UpdatePreferencesAsync(userId, request);
+        return Ok(updatedPreferences);
+    }
 }
