@@ -72,6 +72,11 @@
     "submitPassword": "Zmień hasło",
     "submitPasswordLoading": "Zmiana hasła...",
     "passwordChanged": "Hasło zmienione",
-    "passwordChangedInfo": "Twoje hasło zostało zmienione."
+    "passwordChangedInfo": "Twoje hasło zostało zmienione.",
+    "serverError": "Bład serwera",
+    "invalidToken": "Nieprawidłowy kod resetowania, należy wygenerować ponownie",
+    "passwordTooShort": "Hasło musi zawierać co najmniej 8 znaków",
+    "passwordsDoNotMatch": "Hasła nie zgadzają się",
+    "networkError": "Błąd sieciowy"
   }
 }

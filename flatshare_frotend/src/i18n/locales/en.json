@@ -71,6 +71,11 @@
     "confirmPasswordPlaceholder": "Confirm your password",
     "submitReset": "Reset password",
     "passwordChanged": "Password changed",
-    "passwordChangedInfo": "Your password has been changed."
+    "passwordChangedInfo": "Your password has been changed.",
+    "serverError": "Server error",
+    "invalidToken": "Invalid token, must be requested again",
+    "passwordTooShort": "Password must be at least 8 characters long",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "networkError": "Network error"
   }
 }
