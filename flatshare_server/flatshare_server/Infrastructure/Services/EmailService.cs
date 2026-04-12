@@ -9,35 +9,25 @@ namespace flatshare_server.Infrastructure.Services
 {
     public class EmailService
     {
-        private readonly string _appName;
-        private readonly string _hostAddress;
-        private readonly int _port;
-        private readonly string _emailAddress;
-        private readonly string _password;
+        private readonly EmailOptions _options;
 
         public EmailService(IOptions<EmailOptions> options)
         {
-            var opt = options.Value;
-
-            _appName = opt.AppName;
-            _hostAddress = opt.Host;
-            _port = opt.Port;
-            _emailAddress = opt.EmailAddress;
-            _password = opt.AppPassword;
+            _options = options.Value;
         }
 
         public async Task SendEmailHtmlAsync(UserDTO user, string subject, string body)
         {
             var msg = new MimeMessage();
-            msg.From.Add(new MailboxAddress(_appName, _emailAddress));
+            msg.From.Add(new MailboxAddress(_options.AppName, _options.EmailAddress));
             msg.To.Add(new MailboxAddress($"{user.FirstName} {user.LastName}", user.Email));
             msg.Subject = subject;
             msg.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = body };
 
             using var smtp = new SmtpClient();
 
-            await smtp.ConnectAsync(_hostAddress, _port, SecureSocketOptions.StartTls);
-            await smtp.AuthenticateAsync(_emailAddress, _password);
+            await smtp.ConnectAsync(_options.Host, _options.Port, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_options.EmailAddress, _options.AppPassword);
 
             await smtp.SendAsync(msg);
             await smtp.DisconnectAsync(true);

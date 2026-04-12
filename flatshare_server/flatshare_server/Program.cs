@@ -45,76 +45,11 @@ builder.Services.AddScoped<ListingService>();
 builder.Services.AddScoped<ListingPhotoService>();
 builder.Services.AddScoped<EmailService>();
 
-/* setup email options */
-var emailOptions = builder.Configuration
-    .GetSection(EmailOptions.OptionsKey)
-    .Get<EmailOptions>();
+/* Add custom server options */
+builder.Services.AddAppOptions(builder.Configuration);
 
-if (emailOptions == null)
-{
-    throw new InvalidOperationException("Email configuration is missing from appsettings.json.");
-}
-
-builder.Services.Configure<EmailOptions>(
-    builder.Configuration.GetSection(EmailOptions.OptionsKey));
-
-/* Setup JwtOptions */
-var jwtOptions = builder.Configuration
-    .GetSection(JwtOptions.OptionsKey)
-    .Get<JwtOptions>();
-
-if (jwtOptions == null || string.IsNullOrEmpty(jwtOptions.Secret))
-{
-    throw new InvalidOperationException("JWT configuration is missing from appsettings.json.");
-}
-
-builder.Services.Configure<JwtOptions>(
-    builder.Configuration.GetSection(JwtOptions.OptionsKey));
-
-
-/* Disable silly DOTNET token name mapping */ 
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
-/* Setup Jwt Auhtentication */
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        /* Disable it again :) */ 
-        options.MapInboundClaims = false;
-
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-
-            ValidIssuer = jwtOptions.Issuer,
-            ValidAudience = jwtOptions.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtOptions.Secret)
-            )
-        };
-        options.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = async context =>
-            {
-                var sessionIdClaim = context.Principal?.FindFirst(AuthService.SessionClaim)?.Value;
-
-                if (string.IsNullOrEmpty(sessionIdClaim) || !Guid.TryParse(sessionIdClaim, out var sessionId))
-                {
-                    context.Fail("Unauthorized: Session claim is missing.");
-                    return;
-                }
-
-                var sessionRepo = context.HttpContext.RequestServices.GetRequiredService<ISessionRepository>();
-
-                var valid = await sessionRepo.IsSessionValid(sessionId);
-                if (!valid)
-                    context.Fail("Unauthorized: Session is invalid or has been revoked.");
-            }
-        };
-    });
+/* Add our custom Jwt authentication */
+builder.Services.AddAppJwtAuthentication(builder.Configuration);
 
 builder.Services.AddAuthorization(options =>
 {
