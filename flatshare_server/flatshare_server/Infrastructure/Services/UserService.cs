@@ -77,7 +77,7 @@ public class UserService
     }
     public async Task<TenantPreferencesDTO> GetPreferencesAsync(Guid userId)
     {
-        var user = await _repo.GetById(userId);
+        var user = await _userRepo.GetById(userId);
 
         if (user.Role is not TenantRole tenantRole)
         {
@@ -92,7 +92,7 @@ public class UserService
 
     public async Task<TenantPreferencesDTO> UpdatePreferencesAsync(Guid userId, TenantPreferencesDTO dto)
     {
-        var user = await _repo.GetById(userId);
+        var user = await _userRepo.GetById(userId);
 
         if (user.Role is not TenantRole tenantRole)
         {
@@ -103,7 +103,7 @@ public class UserService
         }
 
         tenantRole.TenantPreferences.UpdatePreferences(dto);
-        await _repo.Update(user);
+        await _userRepo.Update(user);
 
         return tenantRole.TenantPreferences.IntoDTO();
     }
