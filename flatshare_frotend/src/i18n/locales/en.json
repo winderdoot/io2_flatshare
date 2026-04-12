@@ -62,6 +62,13 @@
     "hasAccount": "Already have an account?",
     "loginLink": "Sign in",
     "problem": "Problem with password reset code",
-    "resent": "Resent code"
+    "resent": "Resent code",
+    "token": "Reset code",
+    "tokenPlaceholder": "Enter reset code",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPasswordLabel": "Confirm password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "submitReset": "Reset password"
   }
 }

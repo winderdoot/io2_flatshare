@@ -62,6 +62,14 @@
     "hasAccount": "Masz już konto?",
     "loginLink": "Zaloguj się",
     "problem": "Problem z kodem resetowania hasła",
-    "resent": "Wyślij ponownie"
+    "resent": "Wyślij ponownie",
+    "token": "Kod resetowania",
+    "tokenPlaceholder": "Wpisz kod resetowania",
+    "passwordLabel": "Hasło",
+    "passwordPlaceholder": "Wpisz hasło",
+    "confirmPasswordLabel": "Potwierdź hasło",
+    "confirmPasswordPlaceholder": "Powtórz hasło",
+    "submitPassword": "Zmień hasło",
+    "submitPasswordLoading": "Zmiana hasła..."
   }
 }
