@@ -60,13 +60,6 @@ public class UserService
         return true;
     }
 
-    public async Task<UserDTO> GetById(Guid id)
-    {
-        User user = await _userRepo.GetById(id);
-
-        return new UserDTO(user.Id, user.FirstName, user.LastName, user.Email, user.Role.ToString());
-    }
-
     public async Task<UserDTO?> GetByEmail(string email)
     {
         User? user = await _userRepo.GetByEmail(email);
@@ -75,6 +68,7 @@ public class UserService
 
         return new UserDTO(user.Id, user.FirstName, user.LastName, user.Email, user.Role.ToString());
     }
+
     public async Task<TenantPreferencesDTO> GetPreferencesAsync(Guid userId)
     {
         var user = await _userRepo.GetById(userId);

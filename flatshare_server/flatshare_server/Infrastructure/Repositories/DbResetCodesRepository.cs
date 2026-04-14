@@ -35,9 +35,9 @@ public class DbResetCodesRepository : IResetCodesRepository
 
     public async Task SaveNew(Guid userId, string code)
     {
-        var entry = new PasswordResetEntry { UserId = userId, ResetCode = code/*, CreatedAt = DateTime.UtcNow, ExpiresAt = DateTime.UtcNow.AddDays(1) */}; 
+        var entry = new PasswordResetEntry { UserId = userId, ResetCode = code };
         await _context.PasswordResetEntries.AddAsync(entry);
 
-        await _context.SaveChangesAsync();  
+        await _context.SaveChangesAsync();
     }
 }
