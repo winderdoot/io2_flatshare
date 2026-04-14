@@ -3,8 +3,11 @@ using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Users;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
+using flatshare_server.Infrastructure.Utils;
 using FluentAssertions;
 using Moq;
+using System;
+using System.Data;
 
 namespace Flatshare.Tests.UnitTests.Services;
 
@@ -22,6 +25,70 @@ public class UserServiceTests
         _sessionRepoMock = new Mock<ISessionRepository>();
 
         _userService = new UserService(_userRepoMock.Object, _resetRepoMock.Object, _sessionRepoMock.Object);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldReturnUser_WhenIdExists()
+    {
+        // Arrange
+        var fName = "Adam";
+        var lName = "Nowak";
+        var email = "adam@test.pl";
+        var role = CreateUserRequest.Landlord;
+        var landlordUser = User.TryCreate(new CreateUserRequest(fName, lName, email, "Pass123!", role));
+        var id = landlordUser.Id;
+
+        _userRepoMock.Setup(repo => repo.GetById(id)).ReturnsAsync(landlordUser);
+
+        // Act
+        var user = await _userService.GetByIdAsync(id);
+        
+        // Assert
+        _userRepoMock.Verify(repo => repo.GetById(id), Times.Once);
+        user.Id.Should().Be(landlordUser.Id);
+        user.Email.Should().Be(email);
+        user.FirstName.Should().Be(fName);
+        user.LastName.Should().Be(lName);
+        user.Role.ToString().Should().Be(role);
+    }
+
+    [Fact]
+    public async Task GetByEmail_ShouldReturnUser_WhenEmailExists()
+    {
+        // Arrange
+        var fName = "Adam";
+        var lName = "Nowak";
+        var email = "adam@test.pl";
+        var role = CreateUserRequest.Landlord;
+        var landlordUser = User.TryCreate(new CreateUserRequest(fName, lName, email, "Pass123!", role));
+
+        _userRepoMock.Setup(repo => repo.GetByEmail(email)).ReturnsAsync(landlordUser);
+
+        // Act
+        var user = await _userService.GetByEmail(email);
+
+        // Assert
+        _userRepoMock.Verify(repo => repo.GetByEmail(email), Times.Once);
+        user.Should().NotBeNull();
+        user.Id.Should().Be(landlordUser.Id);
+        user.Email.Should().Be(email);
+        user.FirstName.Should().Be(fName);
+        user.LastName.Should().Be(lName);
+        user.Role.Should().Be(role);
+    }
+
+    [Fact]
+    public async Task GetByEmail_ShouldReturnNull_WhenEmailDoesNotExists()
+    {
+        // Arrange
+        var email = "adam@test.pl";
+
+        // Act
+        var user = await _userService.GetByEmail(email);
+
+        // Assert
+        _userRepoMock.Verify(repo => repo.GetByEmail(email), Times.Once);
+        user.Should().BeNull();
     }
 
     [Theory]
@@ -61,8 +128,8 @@ public class UserServiceTests
     public async Task GetPreferencesAsync_ShouldReturnPreferences_WhenUserIsTenant()
     {
         // Arrange
-        var userId = Guid.NewGuid();
         var tenantUser = User.TryCreate(new CreateUserRequest("Jan", "Kowalski", "jan@test.pl", "Pass123!", CreateUserRequest.Tenant));
+        var userId = tenantUser.Id;
 
         _userRepoMock.Setup(repo => repo.GetById(userId)).ReturnsAsync(tenantUser);
 
@@ -77,8 +144,8 @@ public class UserServiceTests
     public async Task GetPreferencesAsync_ShouldThrowForbidden_WhenUserIsLandlord()
     {
         // Arrange
-        var userId = Guid.NewGuid();
         var landlordUser = User.TryCreate(new CreateUserRequest("Adam", "Nowak", "adam@test.pl", "Pass123!", CreateUserRequest.Landlord));
+        var userId = landlordUser.Id;
 
         _userRepoMock.Setup(repo => repo.GetById(userId)).ReturnsAsync(landlordUser);
 
@@ -94,8 +161,8 @@ public class UserServiceTests
     public async Task UpdatePreferencesAsync_ShouldUpdateAndSave_WhenUserIsTenant()
     {
         // Arrange
-        var userId = Guid.NewGuid();
         var tenantUser = User.TryCreate(new CreateUserRequest("Jan", "Kowalski", "jan@test.pl", "Pass123!", CreateUserRequest.Tenant));
+        var userId = tenantUser.Id;
 
         _userRepoMock.Setup(repo => repo.GetById(userId)).ReturnsAsync(tenantUser);
 
@@ -116,8 +183,8 @@ public class UserServiceTests
     public async Task UpdatePreferencesAsync_ShouldThrowForbidden_WhenUserIsLandlord()
     {
         // Arrange
-        var userId = Guid.NewGuid();
         var landlordUser = User.TryCreate(new CreateUserRequest("Adam", "Nowak", "adam@test.pl", "Pass123!", CreateUserRequest.Landlord));
+        var userId = landlordUser.Id;
 
         _userRepoMock.Setup(repo => repo.GetById(userId)).ReturnsAsync(landlordUser);
 
@@ -131,5 +198,81 @@ public class UserServiceTests
         exception.Which.Response.Status.Should().Be(StatusCodes.Status403Forbidden);
 
         _userRepoMock.Verify(repo => repo.Update(It.IsAny<User>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task CreatePasswordResetEntry_ShouldCreate_WhenUserExists()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var code = CodeGenerator.GenerateResetCode(10);
+
+        // Act
+        await _userService.CreatePasswordResetEntry(userId, code);
+
+        // Assert
+        _resetRepoMock.Verify(repo => repo.SaveNew(userId, code), Times.Once);
+    }
+
+    [Fact]
+    public async Task ResetPassword_ShouldReset_WhenValidCodeExists()
+    {
+        // Arrange
+        var email = "jan@test.pl";
+        var code = CodeGenerator.GenerateResetCode();
+        var newPassword = "NewSecurePassword123!";
+        var request = new ConfirmPasswordResetRequest(code, email, newPassword);
+
+        var user = User.TryCreate(new CreateUserRequest("Jan", "Kowalski", email, "OldPass123!", CreateUserRequest.Tenant));
+
+        _userRepoMock.Setup(repo => repo.GetByEmail(email)).ReturnsAsync(user);
+        _resetRepoMock.Setup(repo => repo.CheckValidity(user.Id, code)).ReturnsAsync(true);
+
+        // Act
+        var result = await _userService.ResetPassword(request);
+
+        // Assert
+        result.Should().BeTrue();
+        _userRepoMock.Verify(repo => repo.UpdatePassword(user.Id, newPassword), Times.Once);
+        _sessionRepoMock.Verify(repo => repo.InvalidateByUserId(user.Id), Times.Once);
+        _resetRepoMock.Verify(repo => repo.InvalidateCodes(user.Id), Times.Once);
+    }
+
+    [Fact]
+    public async Task ResetPassword_ShouldReturnFalse_WhenCodeIsInvalid()
+    {
+        // Arrange
+        var email = "jan@test.pl";
+        var invalidCode = CodeGenerator.GenerateResetCode();
+        var request = new ConfirmPasswordResetRequest(invalidCode, email, "NewPass123!");
+
+        var user = User.TryCreate(new CreateUserRequest("Jan", "Kowalski", email, "OldPass123!", CreateUserRequest.Tenant));
+
+        _userRepoMock.Setup(repo => repo.GetByEmail(email)).ReturnsAsync(user);
+        _resetRepoMock.Setup(repo => repo.CheckValidity(user.Id, invalidCode)).ReturnsAsync(false);
+
+        // Act
+        var result = await _userService.ResetPassword(request);
+
+        // Assert
+        result.Should().BeFalse();
+        _userRepoMock.Verify(repo => repo.UpdatePassword(It.IsAny<Guid>(), It.IsAny<string>()), Times.Never);
+        _sessionRepoMock.Verify(repo => repo.InvalidateByUserId(It.IsAny<Guid>()), Times.Never);
+        _resetRepoMock.Verify(repo => repo.InvalidateCodes(user.Id), Times.Once);
+    }
+
+    [Fact]
+    public async Task ResetPassword_ShouldReturnFalse_WhenUserDoesNotExist()
+    {
+        // Arrange
+        var request = new ConfirmPasswordResetRequest("123456", "nonexistent@test.pl", "NewPass123!");
+        _userRepoMock.Setup(repo => repo.GetByEmail(request.Email)).ReturnsAsync((User?)null);
+
+        // Act
+        var result = await _userService.ResetPassword(request);
+
+        // Assert
+        result.Should().BeFalse();
+        _resetRepoMock.Verify(repo => repo.CheckValidity(It.IsAny<Guid>(), It.IsAny<string>()), Times.Never);
     }
 }
