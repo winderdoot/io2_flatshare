@@ -1,6 +1,7 @@
 ﻿using flatshare_server.Infrastructure.Model.Requests.Listing;
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Model.Users;
+using System.Resources;
 
 namespace flatshare_server.Infrastructure.Model.Listings;
 
@@ -108,6 +109,11 @@ public class Listing
 
     public void ApplyUpdate(UpdateListingRequest request)
     {
+        if (Status != ListingStatus.Draft && Status != ListingStatus.Hidden)
+        {
+            throw ErrorResponse.Generate($"Only listings in '{nameof(ListingStatus.Draft)}' or '{nameof(ListingStatus.Hidden)}' status can be updated", StatusCodes.Status400BadRequest);
+        }
+
         var errors = new List<FieldError>();
 
         ValidateCurrency(request.Price, request.Currency, errors);
