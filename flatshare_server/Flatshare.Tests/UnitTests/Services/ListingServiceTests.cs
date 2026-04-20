@@ -3,9 +3,14 @@ using flatshare_server.Infrastructure.Services;
 using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Requests.Listing;
 using flatshare_server.Infrastructure.Model.Listings;
+using flatshare_server.Infrastructure.Model.Responses;
+using flatshare_server.Infrastructure.Model.Users;
+using flatshare_server.Infrastructure.Model;
+using flatshare_server.Infrastructure.Model.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using FluentAssertions;
 using Moq;
+using Microsoft.AspNetCore.Http;
 
 namespace Flatshare.Tests.UnitTests.Services;
 
@@ -59,7 +64,7 @@ public class ListingServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await service.GetByIdAsync(listing.Id);
+        var result = (await service.GetByIdAsync(listing.Id)).IntoDTO();
 
         // Assert
         result.Should().NotBeNull();
@@ -173,5 +178,224 @@ public class ListingServiceTests
 
         // Assert
         results.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldModifyFields_WhenRequestIsValid()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
+
+        var createReq = GenerateValidRequest();
+        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+
+        context.Listings.Add(listing);
+        await context.SaveChangesAsync();
+
+        var update = new UpdateListingRequest
+        {
+            Title = "Updated Title",
+            Description = "Updated Description",
+            Price = 2000m,
+            Currency = "EUR",
+            OwnerContact = "owner+updated@test.pl",
+            Area = 55.5f,
+            Attributes = new ListingAttributes { Profile = ListingAttributes.TenantProfile.Tourist, PetsAllowed = true },
+            Location = new Address("Wroclaw", "OldTown", "Main", "2")
+        };
+
+        // Act
+        var updated = await service.UpdateAsync(listing.Id, update);
+
+        // Assert
+        updated.Title.Should().Be(update.Title);
+        updated.Description.Should().Be(update.Description);
+        updated.Price.Value.Should().Be(update.Price!.Value);
+        updated.Price.CurrencyStr().Should().Be(update.Currency);
+        updated.OwnerContact.Should().Be(update.OwnerContact);
+        updated.AreaMeterSq.Should().Be(update.Area!.Value);
+        updated.Attributes.Profile.Should().Be(update.Attributes!.Profile);
+        updated.Attributes.PetsAllowed.Should().BeTrue();
+        updated.Address.City.Should().Be("Wroclaw");
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldThrow400_WhenPriceProvidedWithoutCurrency()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
+        var createReq = GenerateValidRequest();
+        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+
+        context.Listings.Add(listing);
+        await context.SaveChangesAsync();
+
+        var update = new UpdateListingRequest
+        {
+            Price = 999m,
+            Currency = null
+        };
+
+        // Act
+        var act = async () => await service.UpdateAsync(listing.Id, update);
+
+        // Assert
+        var exception = await act.Should().ThrowAsync<ServerResponseException>();
+        exception.Which.Response.Status.Should().Be(StatusCodes.Status400BadRequest);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldThrow400_WhenDatesInvalid()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
+        var createReq = GenerateValidRequest();
+        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+
+        context.Listings.Add(listing);
+        await context.SaveChangesAsync();
+
+        var since = DateOnly.FromDateTime(DateTime.Now.AddDays(10));
+        var until = DateOnly.FromDateTime(DateTime.Now.AddDays(5)); // invalid: until <= since
+
+        var update = new UpdateListingRequest
+        {
+            AvailableSince = since,
+            AvailableUntil = until
+        };
+
+        // Act
+        var act = async () => await service.UpdateAsync(listing.Id, update);
+
+        // Assert
+        var exception = await act.Should().ThrowAsync<ServerResponseException>();
+        exception.Which.Response.Status.Should().Be(StatusCodes.Status400BadRequest);
+    }
+
+    // ----------------------
+    // New tests: State transitions
+    // ----------------------
+
+    [Fact]
+    public async Task StateTransitions_ShouldFollowExpectedLifecycle()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
+        var createReq = GenerateValidRequest();
+        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+
+        context.Listings.Add(listing);
+        await context.SaveChangesAsync();
+
+        // Submit -> UnderReview
+        await service.SubmitAsync(listing.Id);
+        (await service.GetByIdAsync(listing.Id)).Status.Should().Be(Listing.ListingStatus.UnderReview);
+
+        // Approve -> Active
+        await service.ApproveAsync(listing.Id);
+        (await service.GetByIdAsync(listing.Id)).Status.Should().Be(Listing.ListingStatus.Active);
+
+        // Hide -> Hidden
+        await service.HideAsync(listing.Id);
+        (await service.GetByIdAsync(listing.Id)).Status.Should().Be(Listing.ListingStatus.Hidden);
+
+        // Publish -> Active
+        await service.PublishAsync(listing.Id);
+        (await service.GetByIdAsync(listing.Id)).Status.Should().Be(Listing.ListingStatus.Active);
+
+        // Archive -> Archived
+        await service.ArchiveAsync(listing.Id);
+        (await service.GetByIdAsync(listing.Id)).Status.Should().Be(Listing.ListingStatus.Archived);
+    }
+
+    [Fact]
+    public async Task RequestFixes_ShouldRevertToDraft_WhenUnderReview()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
+        var createReq = GenerateValidRequest();
+        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+
+        context.Listings.Add(listing);
+        await context.SaveChangesAsync();
+
+        await service.SubmitAsync(listing.Id);
+        (await service.GetByIdAsync(listing.Id)).Status.Should().Be(Listing.ListingStatus.UnderReview);
+
+        await service.RequestFixesAsync(listing.Id);
+        (await service.GetByIdAsync(listing.Id)).Status.Should().Be(Listing.ListingStatus.Draft);
+    }
+
+    [Fact]
+    public async Task ApproveAsync_ShouldThrow400_WhenNotUnderReview()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
+        var createReq = GenerateValidRequest();
+        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+
+        context.Listings.Add(listing);
+        await context.SaveChangesAsync();
+
+        // Act
+        var act = async () => await service.ApproveAsync(listing.Id);
+
+        // Assert
+        var exception = await act.Should().ThrowAsync<ServerResponseException>();
+        exception.Which.Response.Status.Should().Be(StatusCodes.Status400BadRequest);
     }
 }
