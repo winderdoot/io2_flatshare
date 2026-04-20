@@ -21,6 +21,7 @@ namespace flatshare_server.Infrastructure.Services
 
         public const string TenantRole = "TENANT";
         public const string LandlordRole = "LANDLORD";
+        public const string AdminRole = "ADMIN";
 
         public const string LandlordPolicy = "LANDLORD_ONLY";
 

@@ -56,9 +56,9 @@ public class User
         {
             errors.Add(new(nameof(request.Password), $"Password must be at least 8 characters long"));
         }
-        if (string.IsNullOrEmpty(request.Role) || (request.Role != CreateUserRequest.Tenant && request.Role != CreateUserRequest.Landlord))
+        if (string.IsNullOrEmpty(request.Role) || (request.Role != CreateUserRequest.Tenant && request.Role != CreateUserRequest.Landlord && request.Role != CreateUserRequest.Admin))
         {
-            errors.Add(new(nameof(request.Role), $"Role must be equal to {CreateUserRequest.Tenant} or {CreateUserRequest.Landlord}"));
+            errors.Add(new(nameof(request.Role), $"Role must be equal to {CreateUserRequest.Tenant} or {CreateUserRequest.Landlord} or {CreateUserRequest.Admin}"));
         }
 
         if (errors.Any())
@@ -82,7 +82,11 @@ public class User
         {
             user._role = new TenantRole { User = user, TenantPreferences = new TenantPreferences { } };
         }
-        else
+        else if (request.Role == CreateUserRequest.Admin)
+        {
+            user._role = new AdminRole { User = user };
+        }
+        else if (request.Role == CreateUserRequest.Landlord)
         {
             user._role = new LandlordRole { User = user, TenantCriteria = new TenantCriteria { } };
         }
