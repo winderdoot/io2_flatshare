@@ -6,5 +6,6 @@ public record class CreateUserRequest(string FirstName, string LastName, string 
 {
     public const string Tenant = "TENANT";
     public const string Landlord = "LANDLORD";
+    public const string Admin = "ADMIN";
 }
 
