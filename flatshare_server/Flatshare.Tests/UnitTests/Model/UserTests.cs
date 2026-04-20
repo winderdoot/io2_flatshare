@@ -41,7 +41,7 @@ public class UserTests
     [InlineData("Jan", "K", "test@pl.pl", "pass123", "TENANT", "LastName")]
     [InlineData("Jan", "Kowalski", "invalid-email", "pass123", "TENANT", "Email")]
     [InlineData("Jan", "Kowalski", "test@pl.pl", "123", "TENANT", "Password")]
-    [InlineData("Jan", "Kowalski", "test@pl.pl", "pass123", "ADMIN", "Role")]
+    [InlineData("Jan", "Kowalski", "test@pl.pl", "pass123", "INVALID_ROLE", "Role")]
     public void TryCreate_ShouldThrowBadRequest_WhenDataIsInvalid(
         string fName, string lName, string email, string pass, string role, string expectedErrorField)
     {
@@ -71,5 +71,20 @@ public class UserTests
         var role = user.Role as TenantRole;
         role.Should().NotBeNull();
         role!.TenantPreferences.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void TryCreate_ShouldCreateAdmin_WhenRoleIsAdmin()
+    {
+        // Arrange
+        var request = new CreateUserRequest("Alice", "Admin", "alice.admin@test.pl", "AdminPass123!", CreateUserRequest.Admin);
+
+        // Act
+        var user = User.TryCreate(request);
+
+        // Assert
+        user.Should().NotBeNull();
+        user.Role.Should().BeOfType<AdminRole>();
+        user.IntoDTO().Role.Should().Be(CreateUserRequest.Admin);
     }
 }
