@@ -52,67 +52,27 @@ public class Listing
             Title = Title
         };
     }
+
     public static Listing TryCreate(CreateListingRequest request, User owner)
     {
         var errors = new List<FieldError>();
 
-        if (string.IsNullOrEmpty(request.Title))
-        {
-            errors.Add(new FieldError(nameof(request.Title), $"'{request.Title}' must not be empty"));
-        }
-        if (string.IsNullOrEmpty(request.Description))
-        {
-            errors.Add(new FieldError(nameof(request.Description), $"'{request.Description}' must not be empty"));
-        }
-        if (string.IsNullOrEmpty(request.OwnerContact))
-        {
-            errors.Add(new FieldError(nameof(request.OwnerContact), $"'{request.OwnerContact}' must not be empty"));
-        }
+        // Required simple fields
+        ValidateRequiredString(request.Title, nameof(request.Title), errors);
+        ValidateRequiredString(request.Description, nameof(request.Description), errors);
+        ValidateRequiredString(request.OwnerContact, nameof(request.OwnerContact), errors);
 
-        Money? price = null;
-        var curr = Money.ParseCurrency(request.Currency);
-        if (curr is null)
-        {
-            errors.Add(new FieldError(nameof(request.Currency), $"Invalid currency string: {request.Currency}"));
-        }
-        else
-        {
-            price = new Money { Curr = curr.Value, Value = request.Price };
-        }
+        // Price / currency
+        var price = TryParsePrice(request.Price, request.Currency, errors);
 
-        if (request.AvailableUntil <= request.AvailableSince)
-        {
-            errors.Add(new (nameof(request.AvailableUntil), $"'{nameof(request.AvailableUntil)}' date must be later than '{nameof(request.AvailableSince)}'"));
-            errors.Add(new (nameof(request.AvailableSince), $"'{nameof(request.AvailableUntil)}' date must be later than '{nameof(request.AvailableSince)}'"));
-        }
+        // Dates
+        ValidateDateRange(request.AvailableSince, request.AvailableUntil, errors);
 
-        if (request.Area < 0 || request.Area > 300)
-        {
-            errors.Add(new(nameof(request.Area), $"'{nameof(request.Area)}' must be in range (0, 300)"));
-        }
+        // Area
+        ValidateArea(request.Area, errors);
 
-        /* Walidacja adresu */
-        if (string.IsNullOrEmpty(request.Location.City))
-        {
-            errors.Add(new (nameof(request.Location.City), $"'{nameof(request.AvailableUntil)}' date must be later than '{nameof(request.Location.City)}'"));
-        }
-
-        if (string.IsNullOrEmpty(request.Location.City))
-        {
-            errors.Add(new FieldError(nameof(request.Location.City), $"'{request.Location.City}' must not be empty"));
-        }
-        if (string.IsNullOrEmpty(request.Location.District))
-        {
-            errors.Add(new FieldError(nameof(request.Location.District), $"'{request.Location.District}' must not be empty"));
-        }
-        if (string.IsNullOrEmpty(request.Location.Street))
-        {
-            errors.Add(new FieldError(nameof(request.Location.Street), $"'{request.Location.Street}' must not be empty"));
-        }
-        if (string.IsNullOrEmpty(request.Location.AptNumber))
-        {
-            errors.Add(new FieldError(nameof(request.Location.AptNumber), $"'{request.Location.AptNumber}' must not be empty"));
-        }
+        // Location
+        ValidateLocation(request.Location, errors);
 
         if (errors.Any())
         {
@@ -144,5 +104,192 @@ public class Listing
         };
 
         return listing;
-     }
+    }
+
+    public void ApplyUpdate(UpdateListingRequest request)
+    {
+        var errors = new List<FieldError>();
+
+        ValidateCurrency(request.Price, request.Currency, errors);
+
+        if (request.AvailableSince.HasValue && request.AvailableUntil.HasValue)
+        {
+            ValidateDateRange(request.AvailableSince.Value, request.AvailableUntil.Value, errors);
+        }
+
+        if (request.Area.HasValue)
+        {
+            ValidateArea(request.Area.Value, errors);
+        }
+
+        if (request.Location is not null)
+        {
+            ValidateLocation(request.Location, errors);
+        }
+
+        if (errors.Any())
+        {
+            throw ErrorResponse.Generate("Listing Update Error", fields: errors);
+        }
+
+        if (request.Title is not null)
+            Title = request.Title;
+
+        if (request.Description is not null)
+            Description = request.Description;
+
+        if (request.Price.HasValue)
+        {
+            /* we've already validated currency presence / correctness above */
+            var curr = Money.ParseCurrency(request.Currency!)!.Value;
+            Price = new Money { Curr = curr, Value = request.Price.Value };
+        }
+
+        if (request.AvailableSince.HasValue)
+            AvailableSince = request.AvailableSince.Value;
+
+        if (request.AvailableUntil.HasValue)
+            AvailableUntil = request.AvailableUntil.Value;
+
+        if (request.OwnerContact is not null)
+            OwnerContact = request.OwnerContact;
+
+        if (request.Area.HasValue)
+            AreaMeterSq = request.Area.Value;
+
+        if (request.Location is not null)
+            Address = request.Location;
+
+        if (request.Attributes is not null)
+            Attributes = request.Attributes;
+    }
+
+    /* Private validation helpers */
+    private static void ValidateRequiredString(string? value, string fieldName, List<FieldError> errors)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            errors.Add(new FieldError(fieldName, $"'{value}' must not be empty"));
+        }
+    }
+
+    private static Money? TryParsePrice(decimal priceValue, string currency, List<FieldError> errors)
+    {
+        var curr = Money.ParseCurrency(currency);
+        if (curr is null)
+        {
+            errors.Add(new FieldError("Currency", $"Invalid currency string: {currency}"));
+            return null;
+        }
+        return new Money { Curr = curr.Value, Value = priceValue };
+    }
+
+    private static void ValidateCurrency(decimal? price, string? currency, List<FieldError> errors)
+    {
+        if (price.HasValue && string.IsNullOrWhiteSpace(currency))
+        {
+            errors.Add(new FieldError("Currency", "Currency must be provided when updating price"));
+        }
+
+        if (!string.IsNullOrWhiteSpace(currency))
+        {
+            var parsed = Money.ParseCurrency(currency);
+            if (parsed is null)
+            {
+                errors.Add(new FieldError("Currency", $"Invalid currency string: {currency}"));
+            }
+        }
+    }
+
+    private static void ValidateDateRange(DateOnly since, DateOnly until, List<FieldError> errors)
+    {
+        if (until <= since)
+        {
+            errors.Add(new FieldError(nameof(AvailableUntil), $"'{nameof(AvailableUntil)}' date must be later than '{nameof(AvailableSince)}'"));
+            errors.Add(new FieldError(nameof(AvailableSince), $"'{nameof(AvailableUntil)}' date must be later than '{nameof(AvailableSince)}'"));
+        }
+    }
+
+    private static void ValidateArea(float area, List<FieldError> errors)
+    {
+        if (area < 0 || area > 300)
+        {
+            errors.Add(new FieldError(nameof(AreaMeterSq), $"'{nameof(AreaMeterSq)}' must be in range (0, 300)"));
+        }
+    }
+
+    private static void ValidateLocation(Address location, List<FieldError> errors)
+    {
+        if (location is null)
+        {
+            errors.Add(new FieldError(nameof(location), $"'{nameof(location)}' must not be empty"));
+            return;
+        }
+
+        ValidateRequiredString(location.City, nameof(Address.City), errors);
+        ValidateRequiredString(location.District, nameof(Address.District), errors);
+        ValidateRequiredString(location.Street, nameof(Address.Street), errors);
+        ValidateRequiredString(location.AptNumber, nameof(Address.AptNumber), errors);
+    }
+
+    /* State changes */ 
+    public void SubmitForReview()
+    {
+        if (Status != ListingStatus.Draft)
+        {
+            throw ErrorResponse.Generate($"Listing must be in '{nameof(ListingStatus.Draft)}' status to submit for review", StatusCodes.Status400BadRequest);
+        }
+        Status = ListingStatus.UnderReview;
+    }
+    public void RequestFixes()
+    {
+        if (Status != ListingStatus.UnderReview)
+        {
+            throw ErrorResponse.Generate($"Listing must be in '{nameof(ListingStatus.UnderReview)}' status to request fixes", StatusCodes.Status400BadRequest);
+        }
+        Status = ListingStatus.Draft;
+    }
+    public void Approve()
+    {
+        if (Status != ListingStatus.UnderReview)
+        {
+            throw ErrorResponse.Generate($"Listing must be in '{nameof(ListingStatus.UnderReview)}' status to approve", StatusCodes.Status400BadRequest);
+        }
+        Status = ListingStatus.Active;
+    }
+    public void Publish()
+    {
+        if (Status != ListingStatus.Hidden && Status != ListingStatus.Draft)
+        {
+            throw ErrorResponse.Generate($"Listing must be in '{nameof(ListingStatus.Draft)}' or '{nameof(ListingStatus.Hidden)}' status to publish", StatusCodes.Status400BadRequest);
+        }
+        Status = ListingStatus.Active;
+    }
+    public void HideByModeration()
+    {
+        if (Status != ListingStatus.Active)
+        {
+            throw ErrorResponse.Generate($"Listing must be in '{nameof(ListingStatus.Active)}' status to hide by moderation", StatusCodes.Status400BadRequest);
+        }
+        Status = ListingStatus.HiddenByModeration;
+    }
+    public void Hide()
+    {
+        if (Status != ListingStatus.Active)
+        {
+            throw ErrorResponse.Generate($"Listing must be in '{nameof(ListingStatus.Active)}' status to hide", StatusCodes.Status400BadRequest);
+        }
+        Status = ListingStatus.Hidden;
+    }
+    public void Archive()
+    {
+        if (Status != ListingStatus.Active && Status != ListingStatus.Hidden && Status != ListingStatus.HiddenByModeration)
+        {
+            throw ErrorResponse.Generate(
+                $"Listing must be in '{nameof(ListingStatus.Active)}' or '{nameof(ListingStatus.Hidden)}'" +
+                $" or '{nameof(ListingStatus.HiddenByModeration)}' status to archive", StatusCodes.Status400BadRequest
+            );
+        }
+        Status = ListingStatus.Archived;
+    }
 }
