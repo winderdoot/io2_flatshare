@@ -36,14 +36,15 @@ public class ListingService
         return new ListingCreatedResponse(listing.Id, listing.Status, listing.CreatedAt);
     }
 
-    public async Task<ListingDTO> GetByIdAsync(Guid id)
+    /* Method is meant to return model entity, not DTO */ 
+    public async Task<Listing> GetByIdAsync(Guid id)
     {
         var listing = await _context.Listings.FindAsync(id);
         if (listing is null)
         {
             throw ErrorResponse.Generate("Listing not found", StatusCodes.Status404NotFound);
         }
-        return listing.IntoDTO();
+        return listing;
     }
 
     public async Task<List<ListingDTO>> GetByFilterAsync(ListingFilter filter)
@@ -77,5 +78,57 @@ public class ListingService
 
         var results = await query.ToListAsync();
         return [.. results.Select(listing => listing.IntoDTO())];
+    }
+
+    public async Task<List<ListingDTO>> GetAllAsync()
+    {
+        var results = await _context.Listings.ToListAsync();
+        return [.. results.Select(l => l.IntoDTO())];
+    }
+
+    public async Task<Listing> UpdateAsync(Guid id, UpdateListingRequest request)
+    {
+        var listing = await GetByIdAsync(id);
+        listing.ApplyUpdate(request);
+
+        await _context.SaveChangesAsync();
+        return listing;
+    }
+
+    public async Task SubmitAsync(Guid id)
+    {
+        var listing = await GetByIdAsync(id);
+        listing.SubmitForReview();
+        await _context.SaveChangesAsync();
+    }
+    public async Task RequestFixesAsync(Guid id)
+    {
+        var listing = await GetByIdAsync(id);
+        listing.RequestFixes();
+        await _context.SaveChangesAsync();
+    }
+    public async Task ApproveAsync(Guid id)
+    {
+        var listing = await GetByIdAsync(id);
+        listing.Approve();
+        await _context.SaveChangesAsync();
+    }
+    public async Task HideAsync(Guid id)
+    {
+        var listing = await GetByIdAsync(id);
+        listing.Hide();
+        await _context.SaveChangesAsync();
+    }
+    public async Task PublishAsync(Guid id)
+    {
+        var listing = await GetByIdAsync(id);
+        listing.Publish();
+        await _context.SaveChangesAsync();
+    }
+    public async Task ArchiveAsync(Guid id)
+    {
+        var listing = await GetByIdAsync(id);
+        listing.Archive();
+        await _context.SaveChangesAsync();
     }
 }
