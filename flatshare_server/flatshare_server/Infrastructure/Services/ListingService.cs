@@ -80,12 +80,6 @@ public class ListingService
         return [.. results.Select(listing => listing.IntoDTO())];
     }
 
-    public async Task<List<ListingDTO>> GetAllAsync()
-    {
-        var results = await _context.Listings.ToListAsync();
-        return [.. results.Select(l => l.IntoDTO())];
-    }
-
     public async Task<Listing> UpdateAsync(Guid id, UpdateListingRequest request)
     {
         var listing = await GetByIdAsync(id);
