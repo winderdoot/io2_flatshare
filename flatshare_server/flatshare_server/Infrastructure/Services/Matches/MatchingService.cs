@@ -5,7 +5,6 @@ using flatshare_server.Infrastructure.Model.Requests.Matches;
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services.Listings;
-using flatshare_server.Infrastructure.Services.Matches;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
