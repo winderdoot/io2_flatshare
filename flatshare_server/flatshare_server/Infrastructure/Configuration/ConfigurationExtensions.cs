@@ -61,6 +61,7 @@ public static class ConfigurationExtensions
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
+                    RoleClaimType = AuthService.RoleClaim, /* Ensure that role claims aren't remapped by microslop :) */ 
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,

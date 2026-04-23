@@ -37,9 +37,19 @@ public class ListingService
     }
 
     /* Method is meant to return model entity, not DTO */ 
-    public async Task<Listing> GetByIdAsync(Guid id)
+    public async Task<Listing> GetByIdAsync(Guid id, bool attachOwner = false)
     {
-        var listing = await _context.Listings.FindAsync(id);
+        Listing? listing;
+        if (attachOwner)
+        {
+            listing = await _context.Listings
+                .Include(l => l.Owner)
+                .FirstOrDefaultAsync(l => l.Id == id);
+        }
+        else
+        {
+            listing = await _context.Listings.FindAsync(id);
+        }
         if (listing is null)
         {
             throw ErrorResponse.Generate("Listing not found", StatusCodes.Status404NotFound);

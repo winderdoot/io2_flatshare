@@ -4,10 +4,13 @@ using flatshare_server.Infrastructure.Model.Exceptions;
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
+using flatshare_server.Infrastructure.Services.Listings;
+using flatshare_server.Infrastructure.Services.Matches;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using System.IdentityModel.Tokens.Jwt;
@@ -47,6 +50,7 @@ if (builder.Environment.EnvironmentName != "Testing")
 
 
 /* Add services */
+builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IUserRepository, DbUserRepository>();
 builder.Services.AddScoped<ISessionRepository, DbSessionRepository>();
 builder.Services.AddScoped<IResetCodesRepository, DbResetCodesRepository>();
@@ -55,6 +59,9 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ListingService>();
 builder.Services.AddScoped<ListingPhotoService>();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<MatchingService>();
+builder.Services.AddScoped<MatchCacheService>();
+builder.Services.AddScoped<IMatchScoreCalculator, MatchScoreCalculatorV1>();
 
 /* Add custom server options */
 builder.Services.AddAppOptions(builder.Configuration);
