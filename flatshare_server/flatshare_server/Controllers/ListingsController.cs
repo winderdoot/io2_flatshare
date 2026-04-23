@@ -71,12 +71,6 @@ public class ListingsController : Controller
         );
     }
 
-    [HttpGet("all")]
-    public async Task<ActionResult<List<ListingDTO>>> GetAll()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
-
     [HttpPatch("{id}")]
     [Authorize(Roles = AuthService.LandlordRole)]
     public async Task<ActionResult<ListingDTO>> Update([FromRoute] Guid id, [FromBody] UpdateListingRequest request)
