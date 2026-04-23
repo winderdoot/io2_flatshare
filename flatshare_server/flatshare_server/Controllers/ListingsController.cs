@@ -30,7 +30,7 @@ public class ListingsController : Controller
 
     private async Task AssertListingOwner(Guid listingId)
     {
-        var listing = await _service.GetByIdAsync(listingId);
+        var listing = await _service.GetByIdAsync(listingId, attachOwner: true);
         if (listing is null)
         {
             throw ErrorResponse.Generate("Listing not found", StatusCodes.Status404NotFound);
