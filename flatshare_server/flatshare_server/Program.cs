@@ -5,7 +5,6 @@ using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
 using flatshare_server.Infrastructure.Services.Listings;
-using flatshare_server.Infrastructure.Services.Matches;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -60,7 +59,6 @@ builder.Services.AddScoped<ListingService>();
 builder.Services.AddScoped<ListingPhotoService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<MatchingService>();
-builder.Services.AddScoped<MatchCacheService>();
 builder.Services.AddScoped<IMatchScoreCalculator, MatchScoreCalculatorV1>();
 
 /* Add custom server options */
