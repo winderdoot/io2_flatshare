@@ -19,17 +19,14 @@ public static class ListingQueryExtensions
             query = query.Where(l => l.Address.District.ToLower() == filter.District.ToLower());
 
         /* Apply Price Filters
-         * Interpret price in native listing currency
-         * TODO: Add a source for the currency conversion rate */
+         * Interpret price in native listing currency */
         if (filter.MinPrice.HasValue)
         {
-            query = query.Where(l =>
-                (l.Price.Curr == Money.Currency.PLN ? l.Price.Value : l.Price.Value * 4.2m) >= filter.MinPrice.Value);
+            query = query.Where(l => l.Price.Value >= filter.MinPrice.Value);
         }
         if (filter.MaxPrice.HasValue)
         {
-            query = query.Where(l =>
-                (l.Price.Curr == Money.Currency.PLN ? l.Price.Value : l.Price.Value * 4.2m) <= filter.MaxPrice.Value);
+            query = query.Where(l => l.Price.Value <= filter.MaxPrice.Value);
         }
 
         /* 4. Apply Area Filters */
