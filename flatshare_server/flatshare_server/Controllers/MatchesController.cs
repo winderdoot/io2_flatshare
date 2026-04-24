@@ -20,7 +20,7 @@ public class MatchesController
     public async Task<ActionResult<PageResponse<MatchDTO>>> Get([FromQuery] MatchesFilter filter)
     {
         var userId = authService.GetUserId(User);
-        var result = await matchingService.GetMatchesAsync(userId, filter, filter.Page, filter.Size);
+        var result = await matchingService.GetMatchesAsync(userId, filter);
 
         return Ok(result);
     }
