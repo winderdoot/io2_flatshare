@@ -16,6 +16,7 @@ using flatshare_server.Infrastructure.Model.Users;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
 using flatshare_server.Infrastructure.Services.Listings;
+using Org.BouncyCastle.Bcpg;
 
 namespace Flatshare.Tests.UnitTests.Services
 {
@@ -52,11 +53,14 @@ namespace Flatshare.Tests.UnitTests.Services
             // Arrange
             using var context = CreateInMemoryDbContext();
 
-            var owner = User.TryCreate(new CreateUserRequest("Test", "Owner", "owner@test.pl", "Pass123!", CreateUserRequest.Tenant));
+            var owner = User.TryCreate(new CreateUserRequest("Test", "Owner", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
 
             var l1 = Listing.TryCreate(GenerateValidRequest(price: 1000m, city: "A", district: "d1"), owner);
+            l1.Publish();
             var l2 = Listing.TryCreate(GenerateValidRequest(price: 1500m, city: "A", district: "d1"), owner);
+            l2.Publish();
             var l3 = Listing.TryCreate(GenerateValidRequest(price: 800m, city: "A", district: "d1"), owner);
+            l3.Publish();
 
             context.Listings.AddRange(l1, l2, l3);
             await context.SaveChangesAsync();
@@ -72,7 +76,7 @@ namespace Flatshare.Tests.UnitTests.Services
             var service = new MatchingService(memoryCache, context, mockCalc.Object);
 
             // Act
-            var response = await service.GetMatchesAsync(owner.Id, new MatchesFilter(), page: 0, size: 10);
+            var response = await service.GetMatchesAsync(Guid.NewGuid(), new MatchesFilter(Page: 0, Size: 10));
 
             // Assert
             response.Should().NotBeNull();
@@ -91,9 +95,12 @@ namespace Flatshare.Tests.UnitTests.Services
             // Arrange
             using var context = CreateInMemoryDbContext();
 
-            var owner = User.TryCreate(new CreateUserRequest("Test", "Owner", "owner@test.pl", "Pass123!", CreateUserRequest.Tenant));
+            var owner = User.TryCreate(new CreateUserRequest("Test", "Owner", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
+
             var l1 = Listing.TryCreate(GenerateValidRequest(price: 900m), owner);
+            l1.Publish();
             var l2 = Listing.TryCreate(GenerateValidRequest(price: 1100m), owner);
+            l2.Publish();
 
             context.Listings.AddRange(l1, l2);
             await context.SaveChangesAsync();
@@ -111,11 +118,12 @@ namespace Flatshare.Tests.UnitTests.Services
             var filterPage0 = new MatchesFilter(Page: 0, Size: 10, City: "City");
             var filterPage1 = filterPage0 with { Page = 1, Size = 5 }; // only page/size differ
 
+            Guid userId = Guid.NewGuid();
             // Act - first call populates cache (Score called once per listing)
-            var first = await service.GetCachedListingsAsync(filterPage0, owner.Id);
+            var first = await service.GetCachedListingsAsync(filterPage0, userId);
 
             // second call with different Page/Size should use same cache key
-            var second = await service.GetCachedListingsAsync(filterPage1, owner.Id);
+            var second = await service.GetCachedListingsAsync(filterPage1, userId);
 
             // Assert
             first.Should().HaveCount(2);
@@ -131,10 +139,14 @@ namespace Flatshare.Tests.UnitTests.Services
             // Arrange
             using var context = CreateInMemoryDbContext();
 
-            var owner = User.TryCreate(new CreateUserRequest("P", "U", "p@u.test", "Pass123!", CreateUserRequest.Tenant));
+            var owner = User.TryCreate(new CreateUserRequest("Ksiądz", "Robak", "jacek.soplica@lubiepopic.pl", "Pass123!", CreateUserRequest.Landlord));
+
             var l1 = Listing.TryCreate(GenerateValidRequest(price: 100m), owner);
+            l1.Publish();
             var l2 = Listing.TryCreate(GenerateValidRequest(price: 200m), owner);
+            l2.Publish();
             var l3 = Listing.TryCreate(GenerateValidRequest(price: 300m), owner);
+            l3.Publish();
 
             context.Listings.AddRange(l1, l2, l3);
             await context.SaveChangesAsync();
@@ -147,10 +159,12 @@ namespace Flatshare.Tests.UnitTests.Services
             var service = new MatchingService(memoryCache, context, mockCalc.Object);
 
             // Use filter with some page/size, but call GetMatchesAsync with explicit page/size that should be used.
-            var filter = new MatchesFilter(Page: 0, Size: 1);
+            var filter = new MatchesFilter(Page: 1, Size: 1);
+
+            var userId = Guid.NewGuid();
 
             // Provide page=1,size=1 as explicit parameters -> content should be second item after ordering
-            var response = await service.GetMatchesAsync(owner.Id, filter, page: 1, size: 1);
+            var response = await service.GetMatchesAsync(userId, filter);
 
             // Assert: content is paged according to explicit page/size arguments
             response.Content.Should().HaveCount(1);

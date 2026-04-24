@@ -64,7 +64,7 @@ public class MatchingService
         return scoredListings;
     }
 
-    public async Task<PageResponse<MatchDTO>> GetMatchesAsync(Guid userId, MatchesFilter filter, int page, int size)
+    public async Task<PageResponse<MatchDTO>> GetMatchesAsync(Guid userId, MatchesFilter filter)
     {
         /* Acquire cached results - if not present, they're created */
         var scoredListings = await GetCachedListingsAsync(filter, userId);
@@ -84,10 +84,10 @@ public class MatchingService
             Content = pagedData,
             Page = new PageMetadata
             {
-                Size = size,
-                Number = page,
+                Size = filter.Size,
+                Number = filter.Page,
                 TotalElements = scoredListings.Count,
-                TotalPages = (int)Math.Ceiling(scoredListings.Count / (double)size)
+                TotalPages = (int)Math.Ceiling(scoredListings.Count / (double)filter.Size)
             }
         };
     }
