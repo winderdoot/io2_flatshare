@@ -1,41 +1,35 @@
 .container {
-  padding: 20px;
-  background: #f5f5f5;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .input,
 .select {
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  min-width: 140px;
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
 }
 
 .checkboxGroup {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.button {
-  padding: 10px 20px;
-  background: #1f2a44;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.button:hover {
-  background: #2c3a5e;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }

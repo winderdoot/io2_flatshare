@@ -1,6 +1,8 @@
 import { useState } from "react";
 import styles from "./SearchFilters.module.css";
 import { locationConfig } from "./locationConfig";
+import FormattedNumberInput from "../FormattedNumberInput/FormattedNumberInput";
+
 
 type Profile = "student" | "worker" | "family" | "";
 
@@ -77,7 +79,7 @@ export default function SearchFilters() {
           <option value="">Miasto</option>
           {Object.keys(locationConfig).map((city) => (
             <option key={city} value={city}>
-              {city}
+              {city.charAt(0).toUpperCase() + city.slice(1)}
             </option>
           ))}
         </select>
@@ -114,39 +116,49 @@ export default function SearchFilters() {
       </div>
 
       <div className={styles.row}>
-        <input
-          type="number"
-          name="minPrice"
-          placeholder="Cena od"
-          value={filters.minPrice}
-          onChange={handleChange}
-          className={styles.input}
-        />
-        <input
-          type="number"
-          name="maxPrice"
-          placeholder="Cena do"
-          value={filters.maxPrice}
-          onChange={handleChange}
-          className={styles.input}
-        />
+        <div className={styles.col}>
+          <label>Cena</label>
+          <div className={styles.row}>          
+            <FormattedNumberInput
+              value={filters.minPrice}
+              onChange={(val) =>
+                setFilters((prev) => ({ ...prev, minPrice: val }))
+              }
+              placeholder="Od"
+              suffix="zł"
+            />
+            <FormattedNumberInput
+              value={filters.maxPrice}
+              onChange={(val) =>
+                setFilters((prev) => ({ ...prev, maxPrice: val }))
+              }
+              placeholder="Do"
+              suffix="zł"
+            />
+          </div>
+        </div>
 
-        <input
-          type="number"
-          name="minArea"
-          placeholder="m² od"
-          value={filters.minArea}
-          onChange={handleChange}
-          className={styles.input}
-        />
-        <input
-          type="number"
-          name="maxArea"
-          placeholder="m² do"
-          value={filters.maxArea}
-          onChange={handleChange}
-          className={styles.input}
-        />
+        <div className={styles.col}>
+          <label>Powierzchnia</label>
+          <div className={styles.row}>
+            <FormattedNumberInput
+              value={filters.minArea}
+              onChange={(val) =>
+                setFilters((prev) => ({ ...prev, minArea: val }))
+              }
+              placeholder="Od"
+              suffix="m²"
+            />
+            <FormattedNumberInput
+              value={filters.maxArea}
+              onChange={(val) =>
+                setFilters((prev) => ({ ...prev, maxArea: val }))
+              }
+              placeholder="Do"
+              suffix="m²"
+            />
+          </div>
+        </div>
       </div>
 
       <div className={styles.row}>
