@@ -312,6 +312,51 @@
   min-height: 5.5rem;
 }
 
+.tenant-prefs-price-wrap {
+  display: flex;
+  gap: 0.35rem;
+  align-items: stretch;
+}
+
+.tenant-prefs-price-input {
+  flex: 1;
+  min-width: 0;
+  -moz-appearance: textfield;
+}
+
+.tenant-prefs-price-input::-webkit-outer-spin-button,
+.tenant-prefs-price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tenant-prefs-price-spin {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.tenant-prefs-price-step {
+  flex: 1;
+  min-height: 1.35rem;
+  margin: 0;
+  padding: 0 0.45rem;
+  font: inherit;
+  font-size: 0.65rem;
+  line-height: 1;
+  cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--color-text-secondary) 55%, transparent);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--color-primary-soft) 40%, var(--color-bg));
+  color: var(--color-text-primary);
+}
+
+.tenant-prefs-price-step:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 .tenant-prefs-hint {
   margin: 0;
   font-size: 0.82rem;

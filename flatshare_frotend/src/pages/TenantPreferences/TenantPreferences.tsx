@@ -8,6 +8,9 @@ import {
 } from "./TenantPreferencesService";
 import "./TenantPreferences.css";
 
+/** Step when using the adjacent ▲/▼ controls (free typing is still allowed). */
+const MAX_PRICE_STEP = 10;
+
 const parseDistrictsInput = (raw: string): string[] =>
   raw
     .split(/[,;\n]/)
@@ -183,6 +186,14 @@ export const TenantPreferences = () => {
     return t("tenantPreferences.notSet");
   };
 
+  const bumpMaxPrice = (delta: number) => {
+    const raw = maxPriceInput.trim().replace(",", ".");
+    const base = raw === "" ? 0 : Number(raw);
+    if (raw !== "" && Number.isNaN(base)) return;
+    const next = Math.max(0, base + delta);
+    setMaxPriceInput(String(next));
+  };
+
   return (
     <div className="tenant-prefs">
       <div className="tenant-prefs-inner">
@@ -290,15 +301,38 @@ export const TenantPreferences = () => {
                 <div className="tenant-prefs-form-grid">
                   <div className="tenant-prefs-field">
                     <label htmlFor="maxPrice">{t("tenantPreferences.maxPrice")}</label>
-                    <input
-                      id="maxPrice"
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      value={maxPriceInput}
-                      onChange={(e) => setMaxPriceInput(e.target.value)}
-                      placeholder={t("tenantPreferences.maxPricePlaceholder")}
-                    />
+                    <div className="tenant-prefs-price-wrap">
+                      <input
+                        id="maxPrice"
+                        className="tenant-prefs-price-input"
+                        type="number"
+                        min={0}
+                        step="any"
+                        inputMode="decimal"
+                        value={maxPriceInput}
+                        onChange={(e) => setMaxPriceInput(e.target.value)}
+                        placeholder={t("tenantPreferences.maxPricePlaceholder")}
+                      />
+                      <div className="tenant-prefs-price-spin">
+                        <button
+                          type="button"
+                          className="tenant-prefs-price-step"
+                          aria-label={t("tenantPreferences.priceStepUp")}
+                          onClick={() => bumpMaxPrice(MAX_PRICE_STEP)}
+                        >
+                          ▲
+                        </button>
+                        <button
+                          type="button"
+                          className="tenant-prefs-price-step"
+                          aria-label={t("tenantPreferences.priceStepDown")}
+                          onClick={() => bumpMaxPrice(-MAX_PRICE_STEP)}
+                        >
+                          ▼
+                        </button>
+                      </div>
+                    </div>
+                    <p className="tenant-prefs-hint">{t("tenantPreferences.priceStepHint")}</p>
                   </div>
 
                   <div className="tenant-prefs-field">
