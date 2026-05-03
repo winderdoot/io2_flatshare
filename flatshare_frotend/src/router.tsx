@@ -6,6 +6,7 @@ import { Login } from "./pages/Login/Login";
 import { Registry } from "./pages/Registry/Registry";
 import AuthLayout from "./layouts/AuthLayout";
 import FlatOffers from "./pages/FlatOffers/FlatOffers";
+import { ListingDetail } from "./pages/ListingDetail/ListingDetail";
 import { PrivateRoute } from "./auth/PrivateRoute";
 import { RestartPassword } from "./pages/RestartPassword/RestartPassword";
 import { TenantPreferences } from "./pages/TenantPreferences/TenantPreferences";
@@ -28,6 +29,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <FlatOffers />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/offer/:listingId",
+        element: (
+          <PrivateRoute>
+            <ListingDetail />
           </PrivateRoute>
         ),
       },
