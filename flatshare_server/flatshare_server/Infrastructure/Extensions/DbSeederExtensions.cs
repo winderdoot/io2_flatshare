@@ -38,11 +38,10 @@ public static class DbSeederExtensions
 
             var tenantUser = User.TryCreate(tenantReq);
 
-            // Set realistic tenant preferences before saving
             var tenantPrefDto = new TenantPreferencesDTO(
                 MaxPrice: 2500m,
                 Currency: "PLN",
-                SmokingAllowed: false,
+                SmokingAllowed: null,
                 PetsAllowed: true,
                 PreferredDistricts: new List<string> { "Wola", "Mokotów" }
             );
@@ -99,7 +98,7 @@ public static class DbSeederExtensions
                 OwnerContact = "marek.k@example.com",
                 Area = 55f,
                 Location = new Address("Warszawa", "Wola", "Górczewska", "12"),
-                Attributes = new ListingAttributes { Profile = ListingAttributes.TenantProfile.Student, PetsAllowed = false, NonSmokingOnly = true, CloseToShops = true }
+                Attributes = new ListingAttributes { Profile = ListingAttributes.TenantProfile.Student, PetsAllowed = true, NonSmokingOnly = true, CloseToShops = true }
             },
             new CreateListingRequest
             {
@@ -112,7 +111,7 @@ public static class DbSeederExtensions
                 OwnerContact = "marek.k@example.com",
                 Area = 28f,
                 Location = new Address("Kraków", "Stare Miasto", "Floriańska", "6"),
-                Attributes = new ListingAttributes { Profile = ListingAttributes.TenantProfile.Tourist, PetsAllowed = false, NonSmokingOnly = false, CloseToShops = true }
+                Attributes = new ListingAttributes { Profile = ListingAttributes.TenantProfile.Tourist, PetsAllowed = true, NonSmokingOnly = false, CloseToShops = true }
             },
             new CreateListingRequest
             {
@@ -139,6 +138,60 @@ public static class DbSeederExtensions
                 Area = 32f,
                 Location = new Address("Warszawa", "Śródmieście", "Marszałkowska", "45"),
                 Attributes = new ListingAttributes { Profile = ListingAttributes.TenantProfile.Student, PetsAllowed = false, NonSmokingOnly = false, CloseToShops = true }
+            },
+
+            // Additional student-oriented listings
+            new CreateListingRequest
+            {
+                Title = "Pokój dla studenta przy AGH",
+                Description = "Umeblowany pokój w mieszkaniu studenckim, szybki dojazd na AGH, internet w cenie.",
+                Price = 1200m,
+                Currency = "PLN",
+                AvailableSince = DateOnly.FromDateTime(DateTime.UtcNow),
+                AvailableUntil = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)),
+                OwnerContact = "marek.k@example.com",
+                Area = 14f,
+                Location = new Address("Kraków", "Dębniki", "Twardowskiego", "5"),
+                Attributes = new ListingAttributes { Profile = ListingAttributes.TenantProfile.Student, PetsAllowed = false, NonSmokingOnly = true, CloseToShops = true }
+            },
+            new CreateListingRequest
+            {
+                Title = "Pokój blisko UG i centrum Gdańska",
+                Description = "Jasny pokój w kameralnym mieszkaniu 3-pokojowym, blisko komunikacji i sklepów.",
+                Price = 1100m,
+                Currency = "PLN",
+                AvailableSince = DateOnly.FromDateTime(DateTime.UtcNow),
+                AvailableUntil = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(8)),
+                OwnerContact = "marek.k@example.com",
+                Area = 12f,
+                Location = new Address("Gdańsk", "Wrzeszcz", "Grunwaldzka", "120"),
+                Attributes = new ListingAttributes { Profile = ListingAttributes.TenantProfile.Student, PetsAllowed = true, NonSmokingOnly = false, CloseToShops = true }
+            },
+            new CreateListingRequest
+            {
+                Title = "Mały pokój w prywatnym mieszkaniu - Wrocław",
+                Description = "Ciche osiedle, szybki dojazd na uczelnię, idealne dla studenta.",
+                Price = 1000m,
+                Currency = "PLN",
+                AvailableSince = DateOnly.FromDateTime(DateTime.UtcNow),
+                AvailableUntil = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(6)),
+                OwnerContact = "marek.k@example.com",
+                Area = 11f,
+                Location = new Address("Wrocław", "Śródmieście", "Piłsudskiego", "28"),
+                Attributes = new ListingAttributes { Profile = ListingAttributes.TenantProfile.Student, PetsAllowed = false, NonSmokingOnly = true, CloseToShops = true }
+            },
+            new CreateListingRequest
+            {
+                Title = "Pokój na Jeżycach - Poznań",
+                Description = "Ładne mieszkanie, blisko uczelni i komunikacji, świetne dla studenta.",
+                Price = 1150m,
+                Currency = "PLN",
+                AvailableSince = DateOnly.FromDateTime(DateTime.UtcNow),
+                AvailableUntil = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(7)),
+                OwnerContact = "marek.k@example.com",
+                Area = 13f,
+                Location = new Address("Poznań", "Jeżyce", "Kościelna", "3"),
+                Attributes = new ListingAttributes { Profile = ListingAttributes.TenantProfile.Student, PetsAllowed = true, NonSmokingOnly = false, CloseToShops = true }
             }
         };
 
