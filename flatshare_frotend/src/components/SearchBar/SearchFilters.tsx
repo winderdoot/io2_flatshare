@@ -182,22 +182,29 @@ export default function SearchFilters() {
           Niepalący
         </label>
 
-        <input
-          type="number"
-          name="closeToShops"
-          placeholder="Sklepy (liczba)"
-          value={filters.closeToShops}
-          onChange={handleChange}
-          className={styles.input}
-        />
+        <div className={styles.col}>
+          <label>Liczba sklepów</label>
+          <FormattedNumberInput
+            value={filters.closeToShops}
+            onChange={(val) =>
+              setFilters((prev) => ({ ...prev, closeToShops: val }))
+            }
+            placeholder="Od"
+            suffix="sklepów"
+          >
+          </FormattedNumberInput>
+        </div>
 
-        <input
-          type="date"
-          name="startDate"
-          value={filters.startDate}
-          onChange={handleChange}
-          className={styles.input}
-        />
+        <div className={styles.col}>
+          <label>Od kiedy</label>
+          <input
+            type="date"
+            name="startDate"
+            value={filters.startDate}
+            onChange={handleChange}
+            className={styles.input}
+          />
+        </div>
       </div>
 
       <button className={styles.button} onClick={handleSubmit}>
