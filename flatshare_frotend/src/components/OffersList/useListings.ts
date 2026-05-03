@@ -35,11 +35,10 @@ const fetchListings = async (
   filters: Record<string, any>,
   page: number
 ): Promise<ListingsResponse> => {
-    console.log("poszło query");
-    console.log(filters);
   const query = buildQueryParams(filters, page);
-
-  const res = await fetch(`${API_URL}/v1/matches?${query}`, {
+  
+  console.log(query);
+  const res = await fetch(`${API_URL}/api/v1/matches?${query}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -47,6 +46,8 @@ const fetchListings = async (
         "Authorization": `Bearer ${localStorage.getItem("token")}`
       },
     })
+
+  console.log(res)
 
   if (!res.ok) {
     throw new Error("Błąd pobierania ogłoszeń");
