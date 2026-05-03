@@ -1,5 +1,6 @@
 using Azure.Storage.Blobs;
 using flatshare_server.Infrastructure.Configuration;
+using flatshare_server.Infrastructure.Extensions;
 using flatshare_server.Infrastructure.Model.Exceptions;
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Repositories;
@@ -116,7 +117,13 @@ app.UseExceptionHandler();
 /* Silently handle domain errors */ 
 app.UseDomainExceptionHandler();
 
-/* Aplly migrations automatically */
+/* Add stub data in develop */
+if (app.Environment.IsDevelopment())
+{
+    await app.Services.SeedStubDataAsync();
+}
+
+/* Apply migrations automatically */
 if (!app.Environment.IsEnvironment("Testing"))
 {
     using (var scope = app.Services.CreateScope())
