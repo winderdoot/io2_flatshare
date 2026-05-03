@@ -70,7 +70,9 @@ public static class ConfigurationExtensions
                     ValidAudience = jwtOptions.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtOptions.Secret)
-                    )
+                    ),
+                    /* JWT uses claim type "role" (AuthService.RoleClaim), not ClaimTypes.Role */
+                    RoleClaimType = AuthService.RoleClaim,
                 };
 
                 options.Events = new JwtBearerEvents
