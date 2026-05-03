@@ -24,6 +24,9 @@ const Navbar = () => {
           {user?.role === "TENANT" && (
             <Link to="/preferences">{t("nav.preferences")}</Link>
           )}
+          {user?.role === "LANDLORD" && (
+            <Link to="/my-listings">{t("nav.myListings")}</Link>
+          )}
           { user && <Link to="/" onClick={handleLogout}>{t("nav.log_out")} {user.firstName}</Link>}
           { !user && <Link to="/login">{t("nav.account")}</Link>}
         </div>

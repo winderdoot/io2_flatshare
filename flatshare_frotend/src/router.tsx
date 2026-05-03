@@ -10,6 +10,8 @@ import { ListingDetail } from "./pages/ListingDetail/ListingDetail";
 import { PrivateRoute } from "./auth/PrivateRoute";
 import { RestartPassword } from "./pages/RestartPassword/RestartPassword";
 import { TenantPreferences } from "./pages/TenantPreferences/TenantPreferences";
+import { LandlordListings } from "./pages/LandlordListings/LandlordListings";
+import { ListingEditor } from "./pages/LandlordListings/ListingEditor";
 
 export const router = createBrowserRouter([
   {
@@ -45,6 +47,30 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <TenantPreferences />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/my-listings",
+        element: (
+          <PrivateRoute>
+            <LandlordListings />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/my-listings/new",
+        element: (
+          <PrivateRoute>
+            <ListingEditor key="listing-new" />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/my-listings/:listingId/edit",
+        element: (
+          <PrivateRoute>
+            <ListingEditor />
           </PrivateRoute>
         ),
       },
