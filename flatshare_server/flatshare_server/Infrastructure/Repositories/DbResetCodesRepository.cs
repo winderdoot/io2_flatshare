@@ -26,9 +26,14 @@ public class DbResetCodesRepository : IResetCodesRepository
 
     public async Task InvalidateCodes(Guid userId)
     {
-        await _context.PasswordResetEntries
+        var entries = await _context.PasswordResetEntries
             .Where(e => e.UserId == userId && e.IsValid)
-            .ExecuteUpdateAsync(set => set.SetProperty(s => s.IsValid, false));
+            .ToListAsync();
+
+        foreach (var entry in entries)
+        {
+            entry.IsValid = false;
+        }
 
         await _context.SaveChangesAsync();
     }
