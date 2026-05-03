@@ -1,8 +1,10 @@
+import { Link } from "react-router-dom";
 import "./FlatOffer.css";
 import { FlatOfferProps } from "./FlatOfferProps";
 
 const FlatOffer = ({
     vertical = true,
+    listingId,
     title,
     description,
     phone,
@@ -38,7 +40,15 @@ const FlatOffer = ({
 
                 <div className="offer-footer">
                     <span className="offer-phone">📞 {phone}</span>
-                    <button className="contact-button">Więcej</button>
+                    {listingId ? (
+                        <Link className="contact-button" to={`/offer/${listingId}`}>
+                            Więcej
+                        </Link>
+                    ) : (
+                        <button type="button" className="contact-button">
+                            Więcej
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

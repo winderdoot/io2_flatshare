@@ -5,6 +5,7 @@ namespace flatshare_server.Infrastructure.Model.Responses;
 public class ListingDTO
 {
     public required Guid Id { get; set; }
+    public required Listing.ListingStatus Status { get; init; }
     public required string Title { get; init; }
     public required string Description { get; init; }
     public required decimal Price { get; init; }

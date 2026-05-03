@@ -1,0 +1,214 @@
+.landlord-listings {
+  width: 100%;
+  padding: 1.5rem 1.25rem 3.5rem;
+  box-sizing: border-box;
+}
+
+.landlord-listings-inner {
+  max-width: 58rem;
+  margin: 0 auto;
+}
+
+.landlord-listings-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.landlord-listings-title {
+  margin: 0 0 0.35rem 0;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--color-text-primary);
+}
+
+.landlord-listings-subtitle {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  max-width: 36rem;
+}
+
+.landlord-listings-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.landlord-listings-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.15rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.landlord-listings-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.landlord-listings-btn--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+}
+
+.landlord-listings-btn--primary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: none;
+}
+
+.landlord-listings-notice {
+  margin: 0 0 1.25rem 0;
+  padding: 1.25rem 1.35rem;
+  border-radius: 1rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-soft) 0%,
+    color-mix(in srgb, var(--color-primary-soft) 85%, var(--color-bg)) 100%
+  );
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+.landlord-listings-error {
+  margin: 0 0 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, #c62828 12%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, #c62828 28%, transparent);
+  color: var(--color-text-primary);
+}
+
+.landlord-listings-muted {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.landlord-listings-empty {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.landlord-listings-table-wrap {
+  overflow-x: auto;
+  border-radius: 1.15rem;
+  box-shadow: var(--shadow);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 12%, var(--color-text-secondary));
+  background: var(--color-bg);
+}
+
+.landlord-listings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.landlord-listings-table th,
+.landlord-listings-table td {
+  text-align: left;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text-secondary) 22%, transparent);
+  vertical-align: middle;
+}
+
+.landlord-listings-table th {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: color-mix(in srgb, var(--color-primary-soft) 25%, transparent);
+}
+
+.landlord-listings-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.landlord-listings-table tbody tr:hover {
+  background: color-mix(in srgb, var(--color-primary-soft) 35%, transparent);
+}
+
+.landlord-listings-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.landlord-listings-link:hover {
+  text-decoration: underline;
+}
+
+.landlord-listings-status {
+  display: inline-block;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.landlord-listings-status--draft {
+  background: color-mix(in srgb, var(--color-text-secondary) 20%, transparent);
+  color: var(--color-text-primary);
+}
+
+.landlord-listings-status--underReview {
+  background: color-mix(in srgb, #f9a825 38%, transparent);
+  color: var(--color-text-primary);
+}
+
+.landlord-listings-status--active {
+  background: color-mix(in srgb, #2e7d32 26%, transparent);
+  color: var(--color-text-primary);
+}
+
+.landlord-listings-status--hidden {
+  background: color-mix(in srgb, var(--color-text-secondary) 16%, transparent);
+  color: var(--color-text-secondary);
+}
+
+.landlord-listings-status--hiddenByModeration {
+  background: color-mix(in srgb, #c62828 22%, transparent);
+  color: var(--color-text-primary);
+}
+
+.landlord-listings-status--archived {
+  background: color-mix(in srgb, var(--color-text-secondary) 12%, transparent);
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 520px) {
+  .landlord-listings-head {
+    margin-bottom: 1.75rem;
+  }
+
+  .landlord-listings-actions {
+    width: 100%;
+  }
+
+  .landlord-listings-btn--primary {
+    width: 100%;
+    justify-content: center;
+  }
+}

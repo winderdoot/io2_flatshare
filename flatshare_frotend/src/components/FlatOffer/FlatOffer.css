@@ -87,6 +87,29 @@
     color: var(--color-text-primary);
 }
 
+.contact-button {
+    cursor: pointer;
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    letter-spacing: 0.06rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.contact-button:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 90%, transparent 10%);
+}
+
 .offer-card.horizontal {
     display: flex;
     width: 100%;
