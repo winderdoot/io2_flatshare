@@ -1,0 +1,273 @@
+.listing-editor {
+  width: 100%;
+  padding: 1.5rem 1.25rem 3.5rem;
+  box-sizing: border-box;
+}
+
+.listing-editor-inner {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.listing-editor-page-head {
+  margin-bottom: 2rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-text-secondary) 16%, transparent);
+}
+
+.listing-editor-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1.1rem;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.listing-editor-back:hover {
+  text-decoration: underline;
+}
+
+.listing-editor-title {
+  margin: 0 0 0.75rem 0;
+  font-size: clamp(1.65rem, 3.2vw, 2.05rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--color-text-primary);
+}
+
+.listing-editor-lead {
+  margin: 0;
+  max-width: 40rem;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+}
+
+.listing-editor-banner {
+  margin: 0 0 1.25rem 0;
+  padding: 1rem 1.2rem;
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, #f9a825 14%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, #f9a825 32%, transparent);
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.listing-editor-error {
+  margin: 0 0 1rem 0;
+  padding: 0.95rem 1.15rem;
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, #c62828 12%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, #c62828 28%, transparent);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.listing-editor-success {
+  margin: 0 0 1rem 0;
+  padding: 0.95rem 1.15rem;
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, #2e7d32 14%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, #2e7d32 28%, transparent);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.listing-editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  padding: 0;
+  border-radius: 1.1rem;
+  background: var(--color-bg);
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--color-text-primary) 6%, transparent),
+    0 4px 18px color-mix(in srgb, var(--color-text-primary) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-text-secondary) 14%, transparent);
+  overflow: hidden;
+}
+
+.listing-editor-panel {
+  padding: 1.5rem 1.5rem 1.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.05rem;
+}
+
+.listing-editor-panel + .listing-editor-panel {
+  border-top: 1px solid color-mix(in srgb, var(--color-text-secondary) 12%, transparent);
+}
+
+.listing-editor-panel-title {
+  margin: 0 0 0.15rem 0;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-secondary);
+}
+
+.listing-editor-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.05rem 1.15rem;
+}
+
+@media (max-width: 640px) {
+  .listing-editor-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.listing-editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.listing-editor-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.listing-editor-input,
+.listing-editor-select,
+.listing-editor-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--color-text-secondary) 28%, transparent);
+  background: color-mix(in srgb, var(--color-bg) 97%, var(--color-text-secondary));
+  color: var(--color-text-primary);
+  font-size: 0.96875rem;
+  font-family: inherit;
+  line-height: 1.4;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.listing-editor-input:focus,
+.listing-editor-select:focus,
+.listing-editor-textarea:focus {
+  outline: none;
+  background: var(--color-bg);
+  border-color: color-mix(in srgb, var(--color-primary) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+
+.listing-editor-input:disabled,
+.listing-editor-select:disabled,
+.listing-editor-textarea:disabled {
+  opacity: 0.72;
+  background: color-mix(in srgb, var(--color-bg) 88%, var(--color-text-secondary));
+  cursor: not-allowed;
+}
+
+.listing-editor-textarea {
+  min-height: 7.5rem;
+  resize: vertical;
+}
+
+.listing-editor-check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.65rem 1rem;
+  margin-top: 0.15rem;
+}
+
+.listing-editor-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--color-text-secondary) 16%, transparent);
+  background: color-mix(in srgb, var(--color-bg) 96%, var(--color-text-secondary));
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.listing-editor-check:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 22%, transparent);
+}
+
+.listing-editor-check:has(input:disabled) {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.listing-editor-check input {
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.12rem;
+  flex-shrink: 0;
+  accent-color: var(--color-primary);
+}
+
+.listing-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+  margin: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-text-secondary) 12%, transparent);
+  background: color-mix(in srgb, var(--color-primary-soft) 18%, var(--color-bg));
+}
+
+.listing-editor-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.78rem 1.5rem;
+  border-radius: 0.55rem;
+  border: none;
+  font-weight: 650;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  background: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+  transition: opacity 0.15s ease, transform 0.12s ease;
+}
+
+.listing-editor-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.listing-editor-submit:hover:not(:disabled) {
+  opacity: 0.94;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 520px) {
+  .listing-editor-page-head {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.35rem;
+  }
+
+  .listing-editor-panel {
+    padding: 1.25rem 1.15rem 1.2rem;
+  }
+
+  .listing-editor-actions {
+    padding: 1.1rem 1.15rem 1.35rem;
+  }
+
+  .listing-editor-submit {
+    width: 100%;
+    justify-content: center;
+  }
+}
