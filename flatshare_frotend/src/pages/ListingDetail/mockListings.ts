@@ -5,6 +5,7 @@ import coverImage from "../../assets/rent_house.png";
 export const MOCK_LISTINGS: ListingDTO[] = [
   {
     id: "550e8400-e29b-41d4-a716-446655440001",
+    status: "Active",
     title: "Jasny pokój w centrum — współdzielone mieszkanie",
     description:
       "Oferujemy przestronny, słoneczny pokój w trzypokojowym mieszkaniu po remoncie. " +
@@ -33,6 +34,7 @@ export const MOCK_LISTINGS: ListingDTO[] = [
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440002",
+    status: "Active",
     title: "Kameralny pokój — krótki pobyt",
     description:
       "Mniejszy pokój, świetny na kilka tygodni lub miesięcy. Cicha kamienica, " +

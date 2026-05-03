@@ -1,5 +1,14 @@
 import type { Location } from "./location";
 
+/** Wartości zgodne z serializacją enum `Listing.ListingStatus` (JsonStringEnumConverter). */
+export type ListingStatus =
+  | "Draft"
+  | "UnderReview"
+  | "Active"
+  | "Hidden"
+  | "HiddenByModeration"
+  | "Archived";
+
 /** Odpowiada `ListingAttributes.TenantProfile` z API. */
 export type ListingTenantProfile = "Student" | "Tourist";
 
@@ -21,6 +30,7 @@ export type ListingAttributes = {
  */
 export type ListingDTO = {
   id: string;
+  status: ListingStatus;
   title: string;
   description: string;
   price: number;
