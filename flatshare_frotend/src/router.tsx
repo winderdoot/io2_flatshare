@@ -8,6 +8,7 @@ import AuthLayout from "./layouts/AuthLayout";
 import FlatOffers from "./pages/FlatOffers/FlatOffers";
 import { PrivateRoute } from "./auth/PrivateRoute";
 import { RestartPassword } from "./pages/RestartPassword/RestartPassword";
+import { TenantPreferences } from "./pages/TenantPreferences/TenantPreferences";
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +28,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <FlatOffers />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/preferences",
+        element: (
+          <PrivateRoute>
+            <TenantPreferences />
           </PrivateRoute>
         ),
       },
