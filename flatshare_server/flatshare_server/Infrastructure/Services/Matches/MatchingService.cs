@@ -67,12 +67,14 @@ public class MatchingService
     }
     private MatchesFilter ApplyPreferences(TenantPreferencesDTO preferences, MatchesFilter filter)
     {
+
+
         return filter with
         {
             MaxPrice = preferences.MaxPrice ?? filter.MaxPrice,
             PetsAllowed = preferences.PetsAllowed ?? filter.PetsAllowed,
             /* The attributes NonSmokingOnly and SmokingAllowed don't mean the same thing so we approximate a translation */
-            NonSmokingOnly = (preferences.SmokingAllowed == true) ? false : filter.NonSmokingOnly
+            NonSmokingOnly = (preferences.SmokingAllowed == false) ? true : filter.NonSmokingOnly
         };
     }
     public async Task<PageResponse<MatchDTO>> GetMatchesAsync(Guid userId, MatchesFilter filter)
