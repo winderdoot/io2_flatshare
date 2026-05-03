@@ -1,0 +1,192 @@
+.listing-detail {
+  --detail-radius: 20px;
+  padding: 1rem 1rem 3rem;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.listing-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.listing-detail-back:hover {
+  color: var(--color-primary);
+}
+
+.listing-detail-hero {
+  position: relative;
+  border-radius: var(--detail-radius);
+  overflow: hidden;
+  aspect-ratio: 21 / 9;
+  min-height: 220px;
+  background: var(--color-primary-soft);
+  box-shadow: var(--shadow);
+}
+
+.listing-detail-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.listing-detail-price-pill {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: var(--color-primary);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 14px rgba(84, 79, 204, 0.35);
+}
+
+.listing-detail-head {
+  margin-top: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.listing-detail-head h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.listing-detail-address {
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.listing-detail-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .listing-detail-grid {
+    grid-template-columns: 1fr 280px;
+    align-items: start;
+  }
+}
+
+.listing-detail-panel {
+  background: var(--color-bg);
+  border-radius: var(--detail-radius);
+  padding: 1.25rem 1.35rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid color-mix(in srgb, var(--color-text-secondary) 18%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  .listing-detail-panel {
+    border-color: color-mix(in srgb, var(--color-text-secondary) 25%, transparent);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  }
+}
+
+.listing-detail-panel h2 {
+  margin: 0 0 1rem;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.listing-detail-description {
+  margin: 0;
+  color: var(--color-text-primary);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.listing-detail-facts {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.listing-detail-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.listing-detail-fact-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.listing-detail-fact-value {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.listing-detail-contact {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-text-secondary) 22%, transparent);
+}
+
+.listing-detail-contact a {
+  color: var(--color-primary);
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.listing-detail-contact a:hover {
+  text-decoration: underline;
+}
+
+.listing-detail-attributes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.listing-detail-chip {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.listing-detail-chip--accent {
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+.listing-detail-chip--warn {
+  background: color-mix(in srgb, var(--color-accent-strong) 28%, transparent);
+}
+
+.listing-detail-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-secondary);
+}
+
+.listing-detail-empty a {
+  color: var(--color-primary);
+}
