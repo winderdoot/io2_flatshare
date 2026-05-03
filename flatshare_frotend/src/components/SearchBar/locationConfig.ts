@@ -23,3 +23,5 @@ export const locationConfig = {
     "Stare Miasto"
   ]
 };
+
+export const cityOptions = {warszawa: "Warszawa", krakow: "Kraków", wroclaw: "Wrocław"};

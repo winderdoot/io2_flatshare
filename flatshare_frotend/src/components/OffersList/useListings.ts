@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useFiltersStore } from "../SearchBar/FiltersStore";
 import { API_URL } from "../../config";
+import { cityOptions } from "../SearchBar/locationConfig";
 
 export interface Listing {
   id: string;
@@ -16,7 +17,10 @@ const buildQueryParams = (filters: Record<string, any>, page: number) => {
 
   Object.entries(filters).forEach(([key, value]) => {
     if (value === "" || value === false) return;
-    params.append(key, String(value));
+    if (key === "city")
+      params.append("city", cityOptions[value as keyof typeof cityOptions]);
+    else
+      params.append(key, String(value));
   });
 
   params.append("page", String(page));
@@ -28,7 +32,7 @@ const fetchListings = async (
   filters: Record<string, any>,
   page: number
 ): Promise<any> => {
-  const query = buildQueryParams(filters, page);
+  const query = "size=3&" + buildQueryParams(filters, page);
   console.log(query);
   
   const res = await fetch(`${API_URL}/api/v1/matches?${query}`, {

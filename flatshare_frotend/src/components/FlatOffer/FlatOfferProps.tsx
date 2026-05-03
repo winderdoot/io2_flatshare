@@ -6,7 +6,7 @@ export type FlatOfferProps = {
     listingId?: string;
     title: string;
     description: string;
-    phone: string;
+    mail: string;
     location: Location;
     price: number;
     area: number;

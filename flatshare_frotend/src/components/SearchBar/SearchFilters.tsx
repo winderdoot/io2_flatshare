@@ -1,7 +1,7 @@
 
 import { useTranslation } from "react-i18next";
 import styles from "./SearchFilters.module.css";
-import { locationConfig } from "./locationConfig";
+import { cityOptions, locationConfig } from "./locationConfig";
 import FormattedNumberInput from "../FormattedNumberInput/FormattedNumberInput";
 import { City, Filters, Profile, useFiltersStore } from "./FiltersStore";
 import { profileConfig } from "./profileConfig";
@@ -48,7 +48,7 @@ export default function SearchFilters() {
           <option value="">{t("filters.city")}</option>
           {Object.keys(locationConfig).map((city) => (
             <option key={city} value={city}>
-              {city.charAt(0).toUpperCase() + city.slice(1)}
+              {cityOptions[city as keyof typeof cityOptions]}
             </option>
           ))}
         </select>

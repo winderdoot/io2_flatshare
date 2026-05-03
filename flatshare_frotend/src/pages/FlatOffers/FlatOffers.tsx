@@ -17,7 +17,9 @@ const FlatOffers = () => {
     }
 
     return <>
-        <div className="flat-offers-container">
+        <div className="flat-offers-container">            
+            <SearchFilters></SearchFilters>
+            <OffersList></OffersList>
             <h1 style={{marginBottom: "0rem"}}>Ciekawe oferty</h1>
             <div className="horizontally-scrollable-offers">
                 <FlatOffer listingId={MOCK_ID_WAW} title="Flat" area={15.5} description="Description bardzo długi opis oferty, który nie mieści się w jednej lini, żeby pokazać zawiajanie, jak się będzie wyświetlać, jeśli opis będzie naprawdę długi" phone="+48 123456789" location={location} currency="PLN" price={100} image={rentHouse}/>
@@ -28,9 +30,6 @@ const FlatOffers = () => {
                 <FlatOffer title="Flat"  area={15.5} description="Description bardzo długi opis oferty, który nie mieści się w jednej lini, żeby pokazać zawiajanie, jak się będzie wyświetlać, jeśli opis będzie naprawdę długi" phone="+48 123456789" location={location} currency="PLN" price={100} image={rentHouse}/>
                 <FlatOffer title="Flat"  area={15.5} description="Description bardzo długi opis oferty, który nie mieści się w jednej lini, żeby pokazać zawiajanie, jak się będzie wyświetlać, jeśli opis będzie naprawdę długi" phone="+48 123456789" location={location} currency="PLN" price={100} image={rentHouse}/>
             </div>
-            
-            <SearchFilters></SearchFilters>
-            <OffersList></OffersList>
         </div>
     </>
 }

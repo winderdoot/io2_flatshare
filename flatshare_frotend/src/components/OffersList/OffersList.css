@@ -1,0 +1,12 @@
+.offers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.pagination {
+    margin-top: 1.75rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}

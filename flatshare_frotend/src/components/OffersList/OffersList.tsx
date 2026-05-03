@@ -1,8 +1,8 @@
 import { useListings } from "./useListings";
 import rentHouse from "../../assets/rent_house.png"
 import FlatOffer from "../FlatOffer/FlatOffer";
-import { Location } from "../../models/location";
 import { useFiltersStore } from "../SearchBar/FiltersStore";
+import "./OffersList.css"
 
 export default function Listings() {
   const { data, isLoading, isError, isFetching } = useListings();
@@ -15,31 +15,24 @@ export default function Listings() {
 
   const prevPage = () => {
     if (page > 0) setPage(page - 1);
-  };
-
-  const location: Location = {
-          city: "City",
-          district: "District",
-          street: "Street",
-          aptNumber: "1"
-      }
-
-  console.log(data)
+  };  
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Błąd</div>;
 
   return (
     <div>
-      <FlatOffer vertical={false} title="Flat" area={15.5}  description="Description" phone="+48 123456789" location={location} currency="PLN" price={100} image={rentHouse}/>
       {isFetching && <div>Odświeżanie...</div>}
-      <button onClick={prevPage}>Prev</button>
-      <button onClick={() => nextPage(data.totalPages)}>Next</button>
+      <div className="offers-list">
+        {data?.content.map((item: any) => (
+          <FlatOffer key={item.listing.id} vertical={false} title={item.listing.title} area={item.listing.area}  description={item.listing.description} mail={item.listing.ownerContact} location={item.listing.location} currency={item.listing.currency} price={item.listing.price} image={rentHouse}/>
+        ))}
+      </div>
+
+      <div className="pagination">
+        <button onClick={prevPage}>Poprzednia</button>
+        <button onClick={() => nextPage(data.page.totalPages)}>Następna</button>
+      </div>
     </div>
   );
 }
-{/* {data?.items.map((item: any) => (
-  <div key={item.id}>
-    {item.title} - {item.price} zł
-  </div>
-))} */}

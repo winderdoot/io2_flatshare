@@ -7,7 +7,7 @@ const FlatOffer = ({
     listingId,
     title,
     description,
-    phone,
+    mail: mail,
     location,
     price,
     area,
@@ -39,7 +39,7 @@ const FlatOffer = ({
                 <p className="offer-description">{description}</p>
 
                 <div className="offer-footer">
-                    <span className="offer-phone">📞 {phone}</span>
+                    <span className="offer-phone">📧 {mail}</span>
                     {listingId ? (
                         <Link className="contact-button" to={`/offer/${listingId}`}>
                             Więcej
