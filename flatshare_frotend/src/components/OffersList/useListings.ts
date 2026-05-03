@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useFiltersStore } from "../SearchBar/FiltersStore";
+import { API_URL } from "../../config";
 
 export interface Listing {
   id: string;
@@ -38,7 +39,14 @@ const fetchListings = async (
     console.log(filters);
   const query = buildQueryParams(filters, page);
 
-  const res = await fetch(`/api/listings?${query}`);
+  const res = await fetch(`${API_URL}/v1/matches?${query}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      },
+    })
 
   if (!res.ok) {
     throw new Error("Błąd pobierania ogłoszeń");
