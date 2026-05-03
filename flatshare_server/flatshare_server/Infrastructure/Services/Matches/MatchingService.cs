@@ -1,5 +1,6 @@
 ﻿using flatshare_server.Infrastructure.Extensions;
 using flatshare_server.Infrastructure.Model.Listings;
+using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Requests.Listing;
 using flatshare_server.Infrastructure.Model.Requests.Matches;
 using flatshare_server.Infrastructure.Model.Responses;
@@ -20,6 +21,7 @@ public record ScoredListing(
 
 public class MatchingService
     (
+        UserService userService,
         IMemoryCache cache,
         FlatshareDbContext dbContext,
         IMatchScoreCalculator matchCalculator
@@ -63,9 +65,21 @@ public class MatchingService
 
         return scoredListings;
     }
-
+    private MatchesFilter ApplyPreferences(TenantPreferencesDTO preferences, MatchesFilter filter)
+    {
+        return filter with
+        {
+            MaxPrice = preferences.MaxPrice ?? filter.MaxPrice,
+            PetsAllowed = preferences.PetsAllowed ?? filter.PetsAllowed,
+            /* The attributes NonSmokingOnly and SmokingAllowed don't mean the same thing so we approximate a translation */
+            NonSmokingOnly = (preferences.SmokingAllowed == true) ? false : filter.NonSmokingOnly
+        };
+    }
     public async Task<PageResponse<MatchDTO>> GetMatchesAsync(Guid userId, MatchesFilter filter)
     {
+        var userPreferences = await userService.GetPreferencesAsync(userId);
+        filter = ApplyPreferences(userPreferences, filter);
+
         /* Acquire cached results - if not present, they're created */
         var scoredListings = await GetCachedListingsAsync(filter, userId);
 

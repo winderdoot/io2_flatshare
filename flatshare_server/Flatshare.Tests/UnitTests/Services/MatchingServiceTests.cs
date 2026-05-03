@@ -17,6 +17,7 @@ using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
 using flatshare_server.Infrastructure.Services.Listings;
 using Org.BouncyCastle.Bcpg;
+using flatshare_server.Infrastructure.Model;
 
 namespace Flatshare.Tests.UnitTests.Services
 {
@@ -73,7 +74,25 @@ namespace Flatshare.Tests.UnitTests.Services
                 .Setup(m => m.Score(It.IsAny<Listing>(), It.IsAny<MatchesFilter>()))
                 .Returns((Listing listing, MatchesFilter _) => (double)listing.Price.Value);
 
-            var service = new MatchingService(memoryCache, context, mockCalc.Object);
+            // Provide a UserService instance with mocked repositories and a tenant user returned for preferences
+            var mockUserRepo = new Mock<IUserRepository>();
+            var mockResetRepo = new Mock<IResetCodesRepository>();
+            var mockSessionRepo = new Mock<ISessionRepository>();
+
+            var tenantUser = new User
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Prefs",
+                LastName = "User",
+                Email = "prefs@test.pl",
+                PassHash = "hash",
+                Status = new AccountStatus { },
+                Role = new TenantRole { TenantPreferences = new TenantPreferences() }
+            };
+            mockUserRepo.Setup(r => r.GetById(It.IsAny<Guid>())).ReturnsAsync(tenantUser);
+
+            var userService = new UserService(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+            var service = new MatchingService(userService, memoryCache, context, mockCalc.Object);
 
             // Act
             var response = await service.GetMatchesAsync(Guid.NewGuid(), new MatchesFilter(Page: 0, Size: 10));
@@ -113,7 +132,25 @@ namespace Flatshare.Tests.UnitTests.Services
                 .Setup(m => m.Score(It.IsAny<Listing>(), It.IsAny<MatchesFilter>()))
                 .Returns(1.0);
 
-            var service = new MatchingService(memoryCache, context, mockCalc.Object);
+            // Provide a UserService instance with mocked repositories and a tenant user returned for preferences
+            var mockUserRepo = new Mock<IUserRepository>();
+            var mockResetRepo = new Mock<IResetCodesRepository>();
+            var mockSessionRepo = new Mock<ISessionRepository>();
+
+            var tenantUser = new User
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Prefs",
+                LastName = "User",
+                Email = "prefs@test.pl",
+                PassHash = "hash",
+                Status = new AccountStatus { },
+                Role = new TenantRole { TenantPreferences = new TenantPreferences() }
+            };
+            mockUserRepo.Setup(r => r.GetById(It.IsAny<Guid>())).ReturnsAsync(tenantUser);
+
+            var userService = new UserService(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+            var service = new MatchingService(userService, memoryCache, context, mockCalc.Object);
 
             var filterPage0 = new MatchesFilter(Page: 0, Size: 10, City: "City");
             var filterPage1 = filterPage0 with { Page = 1, Size = 5 }; // only page/size differ
@@ -156,7 +193,25 @@ namespace Flatshare.Tests.UnitTests.Services
             mockCalc.Setup(m => m.Score(It.IsAny<Listing>(), It.IsAny<MatchesFilter>()))
                 .Returns((Listing listing, MatchesFilter _) => (double)listing.Price.Value);
 
-            var service = new MatchingService(memoryCache, context, mockCalc.Object);
+            // Provide a UserService instance with mocked repositories and a tenant user returned for preferences
+            var mockUserRepo = new Mock<IUserRepository>();
+            var mockResetRepo = new Mock<IResetCodesRepository>();
+            var mockSessionRepo = new Mock<ISessionRepository>();
+
+            var tenantUser = new User
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Prefs",
+                LastName = "User",
+                Email = "prefs@test.pl",
+                PassHash = "hash",
+                Status = new AccountStatus { },
+                Role = new TenantRole { TenantPreferences = new TenantPreferences() }
+            };
+            mockUserRepo.Setup(r => r.GetById(It.IsAny<Guid>())).ReturnsAsync(tenantUser);
+
+            var userService = new UserService(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+            var service = new MatchingService(userService, memoryCache, context, mockCalc.Object);
 
             // Use filter with some page/size, but call GetMatchesAsync with explicit page/size that should be used.
             var filter = new MatchesFilter(Page: 1, Size: 1);
@@ -187,7 +242,26 @@ namespace Flatshare.Tests.UnitTests.Services
 
             var memoryCache = new MemoryCache(new MemoryCacheOptions());
             var mockCalc = new Mock<IMatchScoreCalculator>();
-            var service = new MatchingService(memoryCache, context, mockCalc.Object);
+
+            // Provide a UserService instance with mocked repositories and a tenant user returned for preferences
+            var mockUserRepo = new Mock<IUserRepository>();
+            var mockResetRepo = new Mock<IResetCodesRepository>();
+            var mockSessionRepo = new Mock<ISessionRepository>();
+
+            var tenantUser = new User
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Prefs",
+                LastName = "User",
+                Email = "prefs@test.pl",
+                PassHash = "hash",
+                Status = new AccountStatus { },
+                Role = new TenantRole { TenantPreferences = new TenantPreferences() }
+            };
+            mockUserRepo.Setup(r => r.GetById(It.IsAny<Guid>())).ReturnsAsync(tenantUser);
+
+            var userService = new UserService(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+            var service = new MatchingService(userService, memoryCache, context, mockCalc.Object);
 
             var userId = Guid.NewGuid();
 

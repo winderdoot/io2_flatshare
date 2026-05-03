@@ -28,7 +28,7 @@ public class MatchesIntegrationTests : IClassFixture<FlatshareApiFactory>
         _client = factory.CreateClient();
     }
 
-    private CreateListingRequest GenerateValidRequest(string city = "Warsaw", string district = "Wola", decimal price = 1500m)
+    private CreateListingRequest GenerateValidRequest(string city = "Warsaw", string district = "Wola", decimal price = 1500m, bool petsAllowed = false)
     {
         return new CreateListingRequest
         {
@@ -41,12 +41,18 @@ public class MatchesIntegrationTests : IClassFixture<FlatshareApiFactory>
             OwnerContact = "owner@test.local",
             Area = 45f,
             Location = new Address(city, district, "Main", "1"),
-            Attributes = new ListingAttributes { Profile = ListingAttributes.TenantProfile.Student }
+            Attributes = new ListingAttributes
+            {
+                Profile = ListingAttributes.TenantProfile.Student,
+                PetsAllowed = petsAllowed,
+                NonSmokingOnly = false,
+                CloseToShops = true
+            }
         };
     }
 
     // Helper: seed a landlord and a published listing, return listing id
-    private async Task<Guid> SeedPublishedListingAsync(string city = "Warsaw", string district = "Wola", decimal price = 1500m)
+    private async Task<Guid> SeedPublishedListingAsync(string city = "Warsaw", string district = "Wola", decimal price = 1500m, bool petsAllowed = false)
     {
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<FlatshareDbContext>();
@@ -64,7 +70,7 @@ public class MatchesIntegrationTests : IClassFixture<FlatshareApiFactory>
 
         db.Users.Add(owner);
 
-        var req = GenerateValidRequest(city, district, price);
+        var req = GenerateValidRequest(city, district, price, petsAllowed);
         var listing = Listing.TryCreate(req, owner);
 
         // Mark as published/active so ApplyMatchesFilter will include it
@@ -157,5 +163,62 @@ public class MatchesIntegrationTests : IClassFixture<FlatshareApiFactory>
         var returnedIds = page.Content.Select(c => c.Listing.Id).ToList();
         returnedIds.Should().Contain(krakowListing);
         returnedIds.Should().NotContain(warsawListing);
+    }
+
+    [Fact]
+    public async Task TenantPreferences_AreApplied_WhenFilterParametersAreNotProvided()
+    {
+        // Arrange
+        var listingId = await SeedPublishedListingAsync(city: "Warsaw", district: "Wola", price: 1300m, petsAllowed: true);
+        // seed another published listing
+        var listingId2 = await SeedPublishedListingAsync(city: "Warsaw", district: "Wola", price: 2500m, petsAllowed: false);
+
+        var expectedMatchingListingId = listingId;
+
+        // Register tenant via API
+        var tenantRequest = new CreateUserRequest("Ewa", "Nowak", $"ewa+{Guid.NewGuid()}@test.local", "Pass123!", CreateUserRequest.Tenant);
+        var registerResponse = await _client.PostAsJsonAsync("/api/v1/users", tenantRequest);
+        registerResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var created = await registerResponse.Content.ReadFromJsonAsync<UserCreatedResponse>();
+        created.Should().NotBeNull();
+        var tenantId = created!.User.Id;
+
+        // Authenticate subsequent requests as the tenant using TestAuthHandler
+        _client.DefaultRequestHeaders.Remove("X-Test-User-Id");
+        _client.DefaultRequestHeaders.Remove("X-Test-User-Role");
+        _client.DefaultRequestHeaders.Add("X-Test-User-Id", tenantId.ToString());
+        _client.DefaultRequestHeaders.Add("X-Test-User-Role", CreateUserRequest.Tenant);
+
+        // Update tenant preferences via API: MaxPrice = 2000, PetsAllowed = true
+        var prefDto = new TenantPreferencesDTO(
+            MaxPrice: 2000m,
+            Currency: "PLN",
+            SmokingAllowed: null,
+            PetsAllowed: true,
+            PreferredDistricts: new List<string> { "Wola" }
+        );
+
+        var prefUpdateResponse = await _client.PutAsJsonAsync("/api/v1/users/me/preferences", prefDto);
+        prefUpdateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        // Act: request matches WITHOUT supplying price/pets filters - preferences should be applied
+        var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        jsonOptions.Converters.Add(new JsonStringEnumConverter());
+
+        var response = await _client.GetAsync("/api/v1/matches");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var page = await response.Content.ReadFromJsonAsync<PageResponse<MatchDTO>>(jsonOptions);
+
+        // Assert: only the listing that matches both price == MaxPrice and pets allowed is returned
+        page.Should().NotBeNull();
+        page!.Content.Should().NotBeNull();
+        page.Content.Count.Should().Be(1);
+
+        var returned = page.Content.Single();
+        returned.Listing.Id.Should().Be(expectedMatchingListingId);
+        returned.Listing.Price.Should().Be(1300m);
+        returned.Listing.Attributes.PetsAllowed.Should().BeTrue();
     }
 }
