@@ -40,6 +40,7 @@ public class Listing
     {
         return new ListingDTO
         {
+            Status = Status,
             Area = AreaMeterSq,
             Attributes = Attributes,
             AvailableSince = AvailableSince,
