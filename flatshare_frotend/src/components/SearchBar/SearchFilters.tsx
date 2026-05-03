@@ -1,70 +1,46 @@
-import { useState } from "react";
+
+import { useTranslation } from "react-i18next";
 import styles from "./SearchFilters.module.css";
 import { locationConfig } from "./locationConfig";
 import FormattedNumberInput from "../FormattedNumberInput/FormattedNumberInput";
+import { City, Filters, Profile, useFiltersStore } from "./FiltersStore";
+import { profileConfig } from "./profileConfig";
 
+export default function SearchFilters() {  
+  const { t } = useTranslation();
 
-type Profile = "student" | "worker" | "family" | "";
-
-interface Filters {
-  city: City | "";
-  district: string;
-  minPrice: string;
-  maxPrice: string;
-  petsAllowed: boolean;
-  nonSmokingOnly: boolean;
-  closeToShops: string;
-  profile: Profile;
-  minArea: string;
-  maxArea: string;
-  startDate: string;
-}
-
-const profiles: Profile[] = ["student", "worker", "family"];
-
-type City = keyof typeof locationConfig;
-
-export default function SearchFilters() {
-  const [filters, setFilters] = useState<Filters>({
-    city: "",
-    district: "",
-    minPrice: "",
-    maxPrice: "",
-    petsAllowed: false,
-    nonSmokingOnly: false,
-    closeToShops: "",
-    profile: "",
-    minArea: "",
-    maxArea: "",
-    startDate: ""
-  });
+  const { filters, setFilter } = useFiltersStore();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
 
-    setFilters((prev) => ({
-      ...prev,
-      [name]:
-        type === "checkbox"
-          ? (e.target as HTMLInputElement).checked
-          : value
-    }));
+    if (name === "profile") {
+      setFilter("profile", value as Profile);
+      return;
+    }
+
+    setFilter(
+      name as keyof Filters,
+      type === "checkbox"
+        ? (e.target as HTMLInputElement).checked
+        : value
+    );
   };
 
   const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const city = e.target.value as City | "";
 
-    setFilters((prev) => ({
-      ...prev,
-      city,
-      district: ""
-    }));
+    setFilter("city", city);
+    setFilter("district", "");
   };
 
   const handleSubmit = () => {
-    console.log(filters);
+    setFilter("page", 1);
+    setFilter("size", 10);
+
+    // TODO: call api
   };
 
   return (
@@ -76,7 +52,7 @@ export default function SearchFilters() {
           onChange={handleCityChange}
           className={styles.select}
         >
-          <option value="">Miasto</option>
+          <option value="">{t("filters.city")}</option>
           {Object.keys(locationConfig).map((city) => (
             <option key={city} value={city}>
               {city.charAt(0).toUpperCase() + city.slice(1)}
@@ -91,7 +67,7 @@ export default function SearchFilters() {
           disabled={!filters.city}
           className={styles.select}
         >
-          <option value="">Dzielnica</option>
+          <option value="">{t("filters.district")}</option>
           {filters.city &&
             locationConfig[filters.city].map((d) => (
               <option key={d} value={d}>
@@ -106,10 +82,10 @@ export default function SearchFilters() {
           onChange={handleChange}
           className={styles.select}
         >
-          <option value="">Profil</option>
-          {profiles.map((p) => (
-            <option key={p} value={p}>
-              {p}
+          <option value="">{t("filters.profile")}</option>
+          {Object.entries(profileConfig).map(([value, label]) => (
+            <option key={value} value={value}>
+              {t(label)}
             </option>
           ))}
         </select>
@@ -117,44 +93,36 @@ export default function SearchFilters() {
 
       <div className={styles.row}>
         <div className={styles.col}>
-          <label>Cena</label>
-          <div className={styles.row}>          
+          <label>{t("filters.price")}</label>
+          <div className={styles.row}>     
             <FormattedNumberInput
-              value={filters.minPrice}
-              onChange={(val) =>
-                setFilters((prev) => ({ ...prev, minPrice: val }))
-              }
-              placeholder="Od"
-              suffix="zł"
-            />
+                value={filters.minPrice}
+                onChange={(val) => setFilter("minPrice", val)}
+                placeholder={t("filters.from")}
+                suffix="zł"
+              />
             <FormattedNumberInput
               value={filters.maxPrice}
-              onChange={(val) =>
-                setFilters((prev) => ({ ...prev, maxPrice: val }))
-              }
-              placeholder="Do"
+              onChange={(val) => setFilter("maxPrice", val)}
+              placeholder={t("filters.to")}
               suffix="zł"
             />
           </div>
         </div>
 
         <div className={styles.col}>
-          <label>Powierzchnia</label>
+          <label>{t("filters.area")}</label>
           <div className={styles.row}>
             <FormattedNumberInput
               value={filters.minArea}
-              onChange={(val) =>
-                setFilters((prev) => ({ ...prev, minArea: val }))
-              }
-              placeholder="Od"
+              onChange={(val) => setFilter("minArea", val)}
+              placeholder={t("filters.from")}
               suffix="m²"
             />
             <FormattedNumberInput
               value={filters.maxArea}
-              onChange={(val) =>
-                setFilters((prev) => ({ ...prev, maxArea: val }))
-              }
-              placeholder="Do"
+              onChange={(val) => setFilter("maxArea", val)}
+              placeholder={t("filters.to")}
               suffix="m²"
             />
           </div>
@@ -169,7 +137,7 @@ export default function SearchFilters() {
             checked={filters.petsAllowed}
             onChange={handleChange}
           />
-          Zwierzęta
+          {t("filters.petsAllowed")}
         </label>
 
         <label className={styles.checkboxGroup}>
@@ -179,24 +147,22 @@ export default function SearchFilters() {
             checked={filters.nonSmokingOnly}
             onChange={handleChange}
           />
-          Niepalący
+          {t("filters.nonSmoking")}
         </label>
 
         <div className={styles.col}>
-          <label>Liczba sklepów</label>
+          <label>{t("filters.shopsNumber")}</label>
           <FormattedNumberInput
             value={filters.closeToShops}
-            onChange={(val) =>
-              setFilters((prev) => ({ ...prev, closeToShops: val }))
-            }
-            placeholder="Od"
-            suffix="sklepów"
+            onChange={(val) => setFilter("closeToShops", val)}
+            placeholder={t("filters.from")}
+            suffix={t("filters.shops")}
           >
           </FormattedNumberInput>
         </div>
 
         <div className={styles.col}>
-          <label>Od kiedy</label>
+          <label>{t("filters.startDate")}</label>
           <input
             type="date"
             name="startDate"
@@ -208,7 +174,7 @@ export default function SearchFilters() {
       </div>
 
       <button className={styles.button} onClick={handleSubmit}>
-        Wyszukaj
+        {t("filters.search")}
       </button>
     </div>
   );

@@ -118,5 +118,25 @@
     "notSet": "nie ustawiono",
     "noneDistricts": "Brak wybranych dzielnic.",
     "invalidPrice": "Podaj poprawną liczbę jako maksymalną cenę."
+  },
+  "filters": {
+    "city": "Miasto",
+    "district": "Dzielnica",
+    "profile": "Profil",
+    "search": "Wyszukaj",
+    "area": "Powierzchnia",
+    "price": "Czynsz",
+    "startDate": "Od kiedy",
+    "shops": "sklepów",
+    "shopsNumber": "Liczba sklepów",
+    "from": "Od",
+    "to": "Do",
+    "nonSmoking": "Niepalący",
+    "petsAllowed": "Zwierzęta",
+    "profiles": {
+      "worker": "Pracujący",
+      "family": "Rodzina",
+      "student": "Student"
+    }
   }
 }
