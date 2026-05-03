@@ -50,7 +50,7 @@ interface FiltersState {
 export const useFiltersStore = create<FiltersState>((set) => ({
   filters: initialFilters,
   appliedFilters: initialFilters,
-  page: 1,
+  page: 0,
 
   setFilter: (key, value) =>
     set((state) => {
@@ -61,7 +61,7 @@ export const useFiltersStore = create<FiltersState>((set) => ({
 
       return {
         filters: newFilters,
-        page: 1
+        page: 0
       };
     }),
 
@@ -70,13 +70,13 @@ export const useFiltersStore = create<FiltersState>((set) => ({
   applyFilters: () =>
     set((state) => ({
       appliedFilters: state.filters,
-      page: 1
+      page: 0
     })),
 
   resetFilters: () =>
     set({
       filters: initialFilters,
       appliedFilters: initialFilters,
-      page: 1
+      page: 0
     })
 }));

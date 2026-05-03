@@ -11,13 +11,6 @@ export interface Listing {
   area: number;
 }
 
-export interface ListingsResponse {
-  items: Listing[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
 const buildQueryParams = (filters: Record<string, any>, page: number) => {
   const params = new URLSearchParams();
 
@@ -34,10 +27,10 @@ const buildQueryParams = (filters: Record<string, any>, page: number) => {
 const fetchListings = async (
   filters: Record<string, any>,
   page: number
-): Promise<ListingsResponse> => {
+): Promise<any> => {
   const query = buildQueryParams(filters, page);
-  
   console.log(query);
+  
   const res = await fetch(`${API_URL}/api/v1/matches?${query}`, {
       method: "GET",
       headers: {
@@ -47,12 +40,13 @@ const fetchListings = async (
       },
     })
 
-  console.log(res)
-
-  if (!res.ok) {
-    throw new Error("Błąd pobierania ogłoszeń");
-  }
-
+    
+    if (!res.ok) {
+      throw new Error("Błąd pobierania ogłoszeń");
+    }
+    
+  // const data = await res.json();
+  // console.log(data);
   return res.json();
 };
 
