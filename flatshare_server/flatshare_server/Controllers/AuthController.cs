@@ -4,6 +4,7 @@ using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Utils;
 using Org.BouncyCastle.Asn1.Cmp;
+using flatshare_server.Infrastructure.Services.Emails;
 
 namespace flatshare_server.Controllers;
 
@@ -13,9 +14,9 @@ public class AuthController : Controller
 {
 
     private UserService _userService;
-    private EmailService _emailService;
+    private IEmailService _emailService;
 
-    public AuthController(UserService userService, EmailService emailService)
+    public AuthController(UserService userService, IEmailService emailService)
     {
         _userService = userService;
         _emailService = emailService;

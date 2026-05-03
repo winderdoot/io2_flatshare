@@ -39,9 +39,14 @@ public class DbSessionRepository : ISessionRepository
 
     public async Task InvalidateByUserId(Guid userId)
     {
-        await _context.Sessions
+        var sessions = await _context.Sessions
             .Where(s => s.UserId == userId)
-            .ExecuteUpdateAsync(set => set.SetProperty(s => s.IsValid, false));
+            .ToListAsync();
+
+        foreach (var session in sessions)
+        {
+            session.IsValid = false;
+        }
 
         await _context.SaveChangesAsync();
     }

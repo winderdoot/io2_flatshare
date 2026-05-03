@@ -12,7 +12,7 @@ using flatshare_server.Infrastructure.Utils;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace Flatshare.Tests.Unit;
+namespace Flatshare.Tests.UnitTests.Services;
 
 public class AuthServiceTests
 {
