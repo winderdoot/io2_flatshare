@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useCurrency } from "../context/CurrencyContext";
 import styles from "./Home.module.css";
+import SearchFilters from "../components/SearchBar/SearchFilters";
+import OffersList from "../components/OffersList/OffersList";
 
 const SAMPLE_RENT_PLN = [
   { key: "listing1" as const, pln: 1200 },
@@ -15,6 +17,9 @@ export const Home = () => {
   return (
     <div className={styles.page}>
       <h1>{t("home.title")}</h1>
+      <SearchFilters></SearchFilters>
+      <OffersList></OffersList>
+      
       <p className={styles.subtitle}>{t("home.subtitle")}</p>
       <div className={styles.grid}>
         {SAMPLE_RENT_PLN.map(({ key, pln }) => (

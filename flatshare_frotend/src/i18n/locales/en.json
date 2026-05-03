@@ -119,6 +119,26 @@
     "noneDistricts": "No districts selected.",
     "invalidPrice": "Enter a valid number for maximum price."
   },
+  "filters": {
+    "city": "City",
+    "district": "District",
+    "profile": "Profile",
+    "search": "Search",
+    "area": "Area",
+    "price": "Price",
+    "startDate": "Start date",
+    "shops": "shops",
+    "shopsNumber": "Shops number",
+    "from": "From",
+    "to": "To",
+    "nonSmoking": "Non smoking",
+    "petsAllowed": "Pets allowed",
+    "profiles": {
+      "worker": "Worker",
+      "family": "Family",
+      "student": "Student"
+    }
+  },
   "landlordListings": {
     "title": "My listings",
     "subtitle": "Your offers with their current status. New listings are stored immediately as Draft.",
