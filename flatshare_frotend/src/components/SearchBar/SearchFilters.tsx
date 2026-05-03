@@ -9,7 +9,7 @@ import { profileConfig } from "./profileConfig";
 export default function SearchFilters() {  
   const { t } = useTranslation();
 
-  const { filters, setFilter } = useFiltersStore();
+  const { filters, setFilter, applyFilters } = useFiltersStore();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -34,13 +34,6 @@ export default function SearchFilters() {
 
     setFilter("city", city);
     setFilter("district", "");
-  };
-
-  const handleSubmit = () => {
-    setFilter("page", 1);
-    setFilter("size", 10);
-
-    // TODO: call api
   };
 
   return (
@@ -173,7 +166,7 @@ export default function SearchFilters() {
         </div>
       </div>
 
-      <button className={styles.button} onClick={handleSubmit}>
+      <button className={styles.button} onClick={applyFilters}>
         {t("filters.search")}
       </button>
     </div>

@@ -8,8 +8,6 @@ export type Profile = keyof typeof profileConfig;
 export type ProfileValue = Profile | "";
 
 export interface Filters {
-  page: number;
-  size: number;
   city: City | "";
   district: string;
   minPrice: string;
@@ -23,15 +21,7 @@ export interface Filters {
   startDate: string;
 }
 
-interface FiltersState {
-  filters: Filters;
-  setFilter: <K extends keyof Filters>(key: K, value: Filters[K]) => void;
-  resetFilters: () => void;
-}
-
 const initialFilters: Filters = {
-  page: 0,
-  size: 10,
   city: "",
   district: "",
   minPrice: "",
@@ -45,16 +35,48 @@ const initialFilters: Filters = {
   startDate: ""
 };
 
+interface FiltersState {
+  filters: Filters;
+  appliedFilters: Filters;
+
+  page: number;
+  setFilter: <K extends keyof Filters>(key: K, value: Filters[K]) => void;
+  setPage: (page: number) => void;
+
+  applyFilters: () => void;
+  resetFilters: () => void;
+}
+
 export const useFiltersStore = create<FiltersState>((set) => ({
   filters: initialFilters,
+  appliedFilters: initialFilters,
+  page: 1,
 
   setFilter: (key, value) =>
-    set((state) => ({
-      filters: {
+    set((state) => {
+      const newFilters = {
         ...state.filters,
         [key]: value
-      }
+      };
+
+      return {
+        filters: newFilters,
+        page: 1
+      };
+    }),
+
+  setPage: (page) => set({ page }),
+
+  applyFilters: () =>
+    set((state) => ({
+      appliedFilters: state.filters,
+      page: 1
     })),
 
-  resetFilters: () => set({ filters: initialFilters })
+  resetFilters: () =>
+    set({
+      filters: initialFilters,
+      appliedFilters: initialFilters,
+      page: 1
+    })
 }));
