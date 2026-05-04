@@ -1,11 +1,14 @@
 ﻿using Flatshare.Tests.Utils;
+using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
+using flatshare_server.Infrastructure.Services.Emails;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 
 namespace Flatshare.Tests;
 
@@ -53,6 +56,23 @@ public class FlatshareApiFactory : WebApplicationFactory<Program>
                 options.DefaultAuthenticateScheme = "SmartScheme";
                 options.DefaultChallengeScheme = "SmartScheme";
             });
+
+
+            // Fake SMTP Email Service
+            var emailDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(IEmailService));
+
+            if (emailDescriptor != null)
+            {
+                services.Remove(emailDescriptor);
+            }
+
+            var emailMock = new Mock<IEmailService>();
+
+            emailMock.Setup(x => x.SendEmailHtmlAsync(It.IsAny<UserDTO>(), It.IsAny<string>(), It.IsAny<string>()))
+                     .Returns(Task.CompletedTask);
+
+            services.AddSingleton<IEmailService>(emailMock.Object);
         });
 
         builder.ConfigureServices(services =>

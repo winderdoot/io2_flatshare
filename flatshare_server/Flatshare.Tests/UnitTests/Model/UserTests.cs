@@ -4,7 +4,7 @@ using flatshare_server.Infrastructure.Model.Exceptions;
 using Microsoft.AspNetCore.Http;
 using flatshare_server.Infrastructure.Model.Requests;
 
-namespace Flatshare.Tests.Unit;
+namespace Flatshare.Tests.UnitTests.Model;
 
 public class UserTests
 {
