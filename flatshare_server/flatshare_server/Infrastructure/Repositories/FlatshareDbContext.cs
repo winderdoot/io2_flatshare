@@ -4,6 +4,7 @@ using flatshare_server.Infrastructure.Model;
 using Microsoft.EntityFrameworkCore.Internal;
 using flatshare_server.Controllers;
 using flatshare_server.Infrastructure.Model.Listings;
+using flatshare_server.Infrastructure.Model.Bookings;
 
 namespace flatshare_server.Infrastructure.Repositories;
 
@@ -14,6 +15,7 @@ public class FlatshareDbContext : DbContext
     public DbSet<Foo> Foos {  get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Listing> Listings { get; set; }
+    public DbSet<Booking> Bookings { get; set; }
     public DbSet<PasswordResetEntry> PasswordResetEntries { get; set; }
 
     public FlatshareDbContext(DbContextOptions<FlatshareDbContext> options)
@@ -138,6 +140,12 @@ public class FlatshareDbContext : DbContext
                 entity
                     .Property(e => e.IsValid)
                     .HasDefaultValue(true);
+            })
+            .Entity<Booking>(entity =>
+            {
+                entity.OwnsOne(b => b.TotalPrice);
+                entity.HasIndex(b => b.ListingId).HasDatabaseName("IX_Bookings_ListingId");
+                entity.HasIndex(b => b.TenantId).HasDatabaseName("IX_Bookings_TenantId");
             });
     }
 

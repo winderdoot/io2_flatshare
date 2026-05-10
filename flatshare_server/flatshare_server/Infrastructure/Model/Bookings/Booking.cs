@@ -25,7 +25,40 @@ public class Booking
     public required DateOnly StartDate { get; init; }
     public required DateOnly EndDate { get; init; }
     public required Money TotalPrice { get; init; }
+
+    public required DateTime CreatedAt { get; init; }
+
     private Booking() { }
+
+    public static Booking TryCreate(CreateBookingRequest request, Guid tenantId, Money totalPrice)
+    {
+        var errors = new List<FieldError>();
+
+        if (request.EndDate <= request.StartDate)
+        {
+            errors.Add(new FieldError(nameof(request.EndDate), $"'{nameof(request.EndDate)}' date must be later than '{nameof(request.StartDate)}'"));
+            errors.Add(new FieldError(nameof(request.StartDate), $"'{nameof(request.StartDate)}' date must be earlier than '{nameof(request.EndDate)}'"));
+        }
+
+        if (errors.Any())
+        {
+            throw ErrorResponse.Generate("Booking Error", StatusCodes.Status400BadRequest, errors);
+        }
+
+        var booking = new Booking
+        {
+            BookingId = Guid.NewGuid(),
+            ListingId = request.ListingId,
+            TenantId = tenantId,
+            Status = BookingStatus.PendingApproval,
+            StartDate = request.StartDate,
+            EndDate = request.EndDate,
+            TotalPrice = totalPrice,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        return booking;
+    }
 
     public void TimeoutNoResponse()
     {

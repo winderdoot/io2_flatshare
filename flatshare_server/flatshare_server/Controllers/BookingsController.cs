@@ -11,7 +11,6 @@ namespace flatshare_server.Controllers;
 [Route("api/v1/[controller]")]
 public class BookingsController
 (
-    UserService userService,
     BookingService bookingService,
     AuthService authService
 ) : Controller
@@ -28,8 +27,8 @@ public class BookingsController
     [HttpPost("{bookingId}/accept")]
     public async Task<ActionResult<AcceptBookingResponse>> AcceptBooking([FromRoute] Guid bookingId)
     {
-        var userId = authService.GetUserId(User);
-        var resp = await bookingService.Accept(bookingId, userId);
+        var ownerId = authService.GetUserId(User);
+        var resp = await bookingService.Accept(bookingId, ownerId);
         return Ok(resp);
     }
 
@@ -51,7 +50,6 @@ public class BookingsController
         return Ok(resp);
     }
 
-    // Tenant initiates payment for booking
     [Authorize(Roles = AuthService.TenantRole)]
     [HttpPost("{bookingId:guid}/pay")]
     public async Task<ActionResult<PaymentInitiatedResponse>> PayBooking([FromRoute] Guid bookingId, [FromBody] PayBookingRequest request)
@@ -61,7 +59,6 @@ public class BookingsController
         return Ok(resp);
     }
 
-    // Get booking details
     [Authorize]
     [HttpGet("{bookingId}")]
     public async Task<ActionResult<BookingDTO>> GetBooking([FromRoute] Guid bookingId)
