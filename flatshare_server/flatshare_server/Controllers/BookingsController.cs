@@ -1,8 +1,9 @@
-﻿using flatshare_server.Infrastructure.Services;
-using Microsoft.AspNetCore.Mvc;
-using flatshare_server.Infrastructure.Model.Requests.Booking;
-using Microsoft.AspNetCore.Authorization;
+﻿using flatshare_server.Infrastructure.Model.Requests.Booking;
 using flatshare_server.Infrastructure.Model.Responses.Booking;
+using flatshare_server.Infrastructure.Services;
+using flatshare_server.Infrastructure.Services.Bookings;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 
 namespace flatshare_server.Controllers;
@@ -12,7 +13,8 @@ namespace flatshare_server.Controllers;
 public class BookingsController
 (
     BookingService bookingService,
-    AuthService authService
+    AuthService authService,
+    PaymentService paymentService
 ) : Controller
 {
     [Authorize(Roles = AuthService.TenantRole)]
@@ -66,5 +68,12 @@ public class BookingsController
         var userId = authService.GetUserId(User);
         var resp = await bookingService.GetById(bookingId, userId);
         return Ok(resp);
+    }
+
+    [Authorize]
+    [HttpGet("{bookingId}/pay")]
+    public async Task<ActionResult<PaymentInitiatedResponse>> StartPayment([FromRoute] Guid bookingId)
+    {
+        return Ok(await paymentService.InitiatePayment(bookingId));
     }
 }

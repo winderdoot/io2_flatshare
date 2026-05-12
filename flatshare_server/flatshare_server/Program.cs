@@ -1,10 +1,12 @@
 using Azure.Storage.Blobs;
 using flatshare_server.Infrastructure.Configuration;
 using flatshare_server.Infrastructure.Extensions;
+using flatshare_server.Infrastructure.Model.Bookings;
 using flatshare_server.Infrastructure.Model.Exceptions;
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
+using flatshare_server.Infrastructure.Services.Bookings;
 using flatshare_server.Infrastructure.Services.Emails;
 using flatshare_server.Infrastructure.Services.Listings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using Stripe.Checkout;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -63,6 +66,8 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<MatchingService>();
 builder.Services.AddScoped<IMatchScoreCalculator, MatchScoreCalculatorV1>();
 builder.Services.AddScoped<BookingService>();
+builder.Services.AddScoped<SessionService>();
+builder.Services.AddScoped<PaymentService>();
 
 /* Add custom server options */
 builder.Services.AddAppOptions(builder.Configuration);

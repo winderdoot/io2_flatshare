@@ -17,6 +17,7 @@ public class FlatshareDbContext : DbContext
     public DbSet<Listing> Listings { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<PasswordResetEntry> PasswordResetEntries { get; set; }
+    public DbSet<Payment> Payments { get; set; }
 
     public FlatshareDbContext(DbContextOptions<FlatshareDbContext> options)
     : base(options)
@@ -146,6 +147,11 @@ public class FlatshareDbContext : DbContext
                 entity.OwnsOne(b => b.TotalPrice);
                 entity.HasIndex(b => b.ListingId).HasDatabaseName("IX_Bookings_ListingId");
                 entity.HasIndex(b => b.TenantId).HasDatabaseName("IX_Bookings_TenantId");
+            })
+            .Entity<Payment>(entity =>
+            {
+                entity.HasKey(p => p.PaymentId);
+                entity.OwnsOne(p => p.Amount);
             });
     }
 
