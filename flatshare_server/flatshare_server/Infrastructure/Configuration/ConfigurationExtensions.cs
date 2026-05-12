@@ -33,6 +33,17 @@ public static class ConfigurationExtensions
 
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.OptionsKey));
 
+        var stripeOptions = configuration
+            .GetSection(StripeOptions.OptionsKey)
+            .Get<StripeOptions>();
+
+        if (stripeOptions is null)
+        {
+            throw new InvalidOperationException("Stripe configuration is missing from secrets.");
+        }
+
+        services.Configure<StripeOptions>(configuration.GetSection(StripeOptions.OptionsKey));
+
         return services;
     }
 
