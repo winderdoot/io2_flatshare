@@ -62,6 +62,7 @@ builder.Services.AddScoped<ListingPhotoService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<MatchingService>();
 builder.Services.AddScoped<IMatchScoreCalculator, MatchScoreCalculatorV1>();
+builder.Services.AddScoped<BookingService>();
 
 /* Add custom server options */
 builder.Services.AddAppOptions(builder.Configuration);
