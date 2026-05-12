@@ -17,6 +17,7 @@ using flatshare_server.Infrastructure.Model.Exceptions;
 using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Bookings;
 using flatshare_server.Infrastructure.Model.Requests.Booking;
+
 namespace Flatshare.Tests.UnitTests.Services;
 
 public class BookingServiceTests
@@ -257,61 +258,6 @@ public class BookingServiceTests
     }
 
     [Fact]
-    public async Task InitiatePayment_ShouldSucceed_WhenBookingPendingPayment()
-    {
-        var ctx = CreateInMemoryDbContext();
-
-        var mockUserRepo = new Mock<IUserRepository>();
-        var mockResetRepo = new Mock<IResetCodesRepository>();
-        var mockSessionRepo = new Mock<ISessionRepository>();
-        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
-
-        SeedListingWithOwner(ctx, out var owner, out var listing);
-
-        var listingService = new ListingService(ctx, mockUserService.Object);
-        var bookingService = new BookingService(ctx, listingService, mockUserService.Object);
-
-        var tenant = User.TryCreate(new CreateUserRequest("TenantEFirst", "TenantELast", "tenant6@test.local", "Pass123!", CreateUserRequest.Tenant));
-        var created = await bookingService.Create(new CreateBookingRequest(listing.Id, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(37))), tenant.Id);
-        var bookingId = Guid.Parse(created.BookingId);
-
-        // Accept booking to move it to PendingPayment
-        await bookingService.Accept(bookingId, owner.Id);
-
-        var payReq = new flatshare_server.Infrastructure.Model.Requests.Booking.PayBookingRequest("CARD", "https://r", "https://c");
-        var payResp = await bookingService.InitiatePayment(bookingId, tenant.Id, payReq);
-
-        payResp.Should().NotBeNull();
-        payResp.Status.Should().Be("INITIATED");
-        payResp.Amount.Should().BeGreaterThan(0);
-    }
-
-    [Fact]
-    public async Task InitiatePayment_ShouldThrow_WhenNotPendingPayment()
-    {
-        var ctx = CreateInMemoryDbContext();
-
-        var mockUserRepo = new Mock<IUserRepository>();
-        var mockResetRepo = new Mock<IResetCodesRepository>();
-        var mockSessionRepo = new Mock<ISessionRepository>();
-        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
-
-        SeedListingWithOwner(ctx, out var owner, out var listing);
-
-        var listingService = new ListingService(ctx, mockUserService.Object);
-        var bookingService = new BookingService(ctx, listingService, mockUserService.Object);
-
-        var tenant = User.TryCreate(new CreateUserRequest("TenantFFirst", "TenantFLast", "tenant7@test.local", "Pass123!", CreateUserRequest.Tenant));
-        var created = await bookingService.Create(new CreateBookingRequest(listing.Id, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7)), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(37))), tenant.Id);
-        var bookingId = Guid.Parse(created.BookingId);
-
-        var act = async () => await bookingService.InitiatePayment(bookingId, tenant.Id, new PayBookingRequest("CARD", "x", "y"));
-
-        var ex = await act.Should().ThrowAsync<ServerResponseException>();
-        ex.Which.Response.Status.Should().Be(StatusCodes.Status409Conflict);
-    }
-
-    [Fact]
     public async Task GetById_ShouldAllowOwnerOrTenant_AndDenyOthers()
     {
         var ctx = CreateInMemoryDbContext();
@@ -343,5 +289,72 @@ public class BookingServiceTests
         var act = async () => await bookingService.GetById(bookingId, other.Id);
         var ex = await act.Should().ThrowAsync<ServerResponseException>();
         ex.Which.Response.Status.Should().Be(StatusCodes.Status403Forbidden);
+    }
+
+    [Fact]
+    public async Task Get_ShouldFilterByTenantAndListing()
+    {
+        var ctx = CreateInMemoryDbContext();
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+
+        // Seed owner and first listing
+        SeedListingWithOwner(ctx, out var owner, out var listing1);
+
+        // Create a second listing owned by the same owner
+        var req2 = GenerateValidListingRequest();
+        var listing2 = Listing.TryCreate(req2, owner);
+        ctx.Listings.Add(listing2);
+        await ctx.SaveChangesAsync();
+
+        var listingService = new ListingService(ctx, mockUserService.Object);
+        var bookingService = new BookingService(ctx, listingService, mockUserService.Object);
+
+        var tenantA = User.TryCreate(new CreateUserRequest("TenantAlpha", "TenantAlphaLast", "ta@test.local", "Pass123!", CreateUserRequest.Tenant));
+        var tenantB = User.TryCreate(new CreateUserRequest("TenantBeta", "TenantBetaLast", "tb@test.local", "Pass123!", CreateUserRequest.Tenant));
+
+        var money = new Money { Curr = Money.Currency.PLN, Value = 1500m };
+
+        var start1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10));
+        var end1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20));
+
+        var start2 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(15));
+        var end2 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(25));
+
+        var start3 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30));
+        var end3 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(60));
+
+        var bA1 = Booking.TryCreate(new CreateBookingRequest(listing1.Id, start1, end1), tenantA.Id, money);
+        bA1.OwnerAccept();
+        var bB1 = Booking.TryCreate(new CreateBookingRequest(listing1.Id, start2, end2), tenantB.Id, money);
+        bB1.OwnerAccept();
+        var bA2 = Booking.TryCreate(new CreateBookingRequest(listing2.Id, start3, end3), tenantA.Id, money);
+        bA2.OwnerAccept();
+
+        ctx.Bookings.AddRange(bA1, bB1, bA2);
+        await ctx.SaveChangesAsync();
+
+        // Filter by tenantA
+        var resultTenantA = await bookingService.Get(tenantA.Id, null);
+        resultTenantA.Should().HaveCount(2);
+        resultTenantA.All(r => r.TenantId == tenantA.Id).Should().BeTrue();
+
+        // Filter by listing1
+        var resultListing1 = await bookingService.Get(null, listing1.Id);
+        resultListing1.Should().HaveCount(2);
+        resultListing1.All(r => r.ListingId == listing1.Id).Should().BeTrue();
+
+        // Filter by tenantA and listing1
+        var resultBoth = await bookingService.Get(tenantA.Id, listing1.Id);
+        resultBoth.Should().HaveCount(1);
+        resultBoth.First().TenantId.Should().Be(tenantA.Id);
+        resultBoth.First().ListingId.Should().Be(listing1.Id);
+
+        // No filters => all bookings
+        var resultAll = await bookingService.Get(null, null);
+        resultAll.Should().HaveCount(3);
     }
 }

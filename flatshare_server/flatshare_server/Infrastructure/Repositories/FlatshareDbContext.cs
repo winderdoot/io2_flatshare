@@ -152,6 +152,7 @@ public class FlatshareDbContext : DbContext
             {
                 entity.HasKey(p => p.PaymentId);
                 entity.OwnsOne(p => p.Amount);
+                entity.HasIndex(p => p.BookingId).HasDatabaseName("IX_Payments_BookingId");
             });
     }
 

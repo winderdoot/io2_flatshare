@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using Stripe;
 using Stripe.Checkout;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
@@ -66,11 +67,11 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<MatchingService>();
 builder.Services.AddScoped<IMatchScoreCalculator, MatchScoreCalculatorV1>();
 builder.Services.AddScoped<BookingService>();
-builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<PaymentService>();
 
 /* Add custom server options */
 builder.Services.AddAppOptions(builder.Configuration);
+builder.Services.AddStripeClient(builder.Configuration);
 
 /* Add our custom Jwt authentication */
 builder.Services.AddAppJwtAuthentication(builder.Configuration);

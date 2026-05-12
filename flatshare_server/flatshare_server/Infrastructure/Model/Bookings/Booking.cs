@@ -28,6 +28,8 @@ public class Booking
 
     public required DateTime CreatedAt { get; init; }
 
+    public bool IsPendingPayment => Status == BookingStatus.PendingPayment;
+
     private Booking() { }
 
     public static Booking TryCreate(CreateBookingRequest request, Guid tenantId, Money totalPrice)

@@ -158,32 +158,6 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
         );
     }
 
-    public async Task<PaymentInitiatedResponse> InitiatePayment(Guid bookingId, Guid userId, PayBookingRequest request)
-    {
-        var booking = await dbContext.Bookings.FindAsync(bookingId);
-        if (booking is null)
-            throw ErrorResponse.Generate("Booking not found", StatusCodes.Status404NotFound);
-
-        if (booking.TenantId != userId)
-            throw ErrorResponse.Generate("Forbidden", StatusCodes.Status403Forbidden);
-
-        if (booking.Status != Booking.BookingStatus.PendingPayment)
-            throw ErrorResponse.Generate("PaymentNotAvailable", StatusCodes.Status409Conflict);
-
-        /* Create a fake payment id and redirect URL for template purposes. */
-        var paymentId = $"pay-{Guid.NewGuid()}";
-        var redirectUrl = $"https::example_url/{Guid.NewGuid()}";
-
-        return new PaymentInitiatedResponse(
-            paymentId,
-            booking.BookingId.ToString(),
-            "INITIATED",
-            redirectUrl,
-            booking.TotalPrice.Value,
-            booking.TotalPrice.CurrencyStr()
-        );
-    }
-
     public async Task<BookingDTO> GetById(Guid bookingId, Guid userId)
     {
         var booking = await dbContext.Bookings.FindAsync(bookingId);
@@ -200,6 +174,21 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
         return booking.IntoDTO();
     }
 
-    /* Helpers */
-    
+    public async Task<List<BookingDTO>> Get(Guid? tenantId, Guid? listingId)
+    {
+        var query = dbContext.Bookings.AsQueryable().AsNoTracking();
+
+        if (tenantId.HasValue)
+        {
+            query = query.Where(b => b.TenantId == tenantId.Value);
+        }
+
+        if (listingId.HasValue)
+        {
+            query = query.Where(b => b.ListingId == listingId.Value);
+        }
+
+        var entities = await query.OrderByDescending(b => b.CreatedAt).ToListAsync();
+        return entities.Select(b => b.IntoDTO()).ToList();
+    }
 }

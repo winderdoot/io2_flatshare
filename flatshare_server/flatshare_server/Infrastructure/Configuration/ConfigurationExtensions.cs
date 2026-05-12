@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using flatshare_server.Infrastructure.Repositories;
+using flatshare_server.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Stripe;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using flatshare_server.Infrastructure.Services;
-using flatshare_server.Infrastructure.Repositories;
 
 namespace flatshare_server.Infrastructure.Configuration;
 
@@ -43,6 +44,22 @@ public static class ConfigurationExtensions
         }
 
         services.Configure<StripeOptions>(configuration.GetSection(StripeOptions.OptionsKey));
+
+        return services;
+    }
+
+    public static IServiceCollection AddStripeClient(this IServiceCollection services, IConfiguration configuration)
+    {
+        var stripeOptions = configuration
+            .GetSection(StripeOptions.OptionsKey)
+            .Get<StripeOptions>();
+
+        if (stripeOptions is null)
+        {
+            throw new InvalidOperationException("Stripe configuration is missing from secrets.");
+        }
+
+        services.AddSingleton<IStripeClient>(new StripeClient(stripeOptions.SecretKey));
 
         return services;
     }

@@ -1,5 +1,6 @@
 ﻿using flatshare_server.Infrastructure.Model.Requests.Booking;
 using flatshare_server.Infrastructure.Model.Responses.Booking;
+using flatshare_server.Infrastructure.Model.Users;
 using flatshare_server.Infrastructure.Services;
 using flatshare_server.Infrastructure.Services.Bookings;
 using Microsoft.AspNetCore.Authorization;
@@ -53,12 +54,10 @@ public class BookingsController
     }
 
     [Authorize(Roles = AuthService.TenantRole)]
-    [HttpPost("{bookingId:guid}/pay")]
+    [HttpPost("{bookingId}/pay")]
     public async Task<ActionResult<PaymentInitiatedResponse>> PayBooking([FromRoute] Guid bookingId, [FromBody] PayBookingRequest request)
     {
-        var userId = authService.GetUserId(User);
-        var resp = await bookingService.InitiatePayment(bookingId, userId, request);
-        return Ok(resp);
+        return Ok(await paymentService.InitiatePayment(bookingId, request));
     }
 
     [Authorize]
@@ -70,10 +69,10 @@ public class BookingsController
         return Ok(resp);
     }
 
-    [Authorize]
-    [HttpGet("{bookingId}/pay")]
-    public async Task<ActionResult<PaymentInitiatedResponse>> StartPayment([FromRoute] Guid bookingId)
+    [Authorize(Roles = AuthService.TenantRole)]
+    [HttpGet]
+    public async Task<ActionResult<List<BookingDTO>>> GetByQuery([FromQuery] Guid? tenantId, [FromQuery] Guid? listingId)
     {
-        return Ok(await paymentService.InitiatePayment(bookingId));
+        return Ok(await bookingService.Get(tenantId, listingId));
     }
 }
