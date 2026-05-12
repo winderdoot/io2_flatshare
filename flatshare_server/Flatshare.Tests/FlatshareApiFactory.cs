@@ -1,4 +1,5 @@
 ﻿using Flatshare.Tests.Utils;
+using flatshare_server.Infrastructure.Configuration;
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services;
@@ -24,6 +25,9 @@ public class FlatshareApiFactory : WebApplicationFactory<Program>
         builder.UseSetting("EmailOptions:Port", "587");
         builder.UseSetting("EmailOptions:EmailAddress", "test@test.com");
         builder.UseSetting("EmailOptions:AppPassword", "test-password");
+
+        builder.UseSetting($"{StripeOptions.OptionsKey}:SecretKey", "sk_test_51MockKey123");
+        builder.UseSetting($"{StripeOptions.OptionsKey}:PublishableKey", "pk_test_51MockKey123");
 
         builder.ConfigureTestServices(services =>
         {

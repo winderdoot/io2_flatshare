@@ -316,8 +316,6 @@ public class BookingServiceTests
         var tenantA = User.TryCreate(new CreateUserRequest("TenantAlpha", "TenantAlphaLast", "ta@test.local", "Pass123!", CreateUserRequest.Tenant));
         var tenantB = User.TryCreate(new CreateUserRequest("TenantBeta", "TenantBetaLast", "tb@test.local", "Pass123!", CreateUserRequest.Tenant));
 
-        var money = new Money { Curr = Money.Currency.PLN, Value = 1500m };
-
         var start1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10));
         var end1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20));
 
@@ -327,11 +325,11 @@ public class BookingServiceTests
         var start3 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30));
         var end3 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(60));
 
-        var bA1 = Booking.TryCreate(new CreateBookingRequest(listing1.Id, start1, end1), tenantA.Id, money);
+        var bA1 = Booking.TryCreate(new CreateBookingRequest(listing1.Id, start1, end1), tenantA.Id, new Money { Curr = Money.Currency.PLN, Value = 1500m });
         bA1.OwnerAccept();
-        var bB1 = Booking.TryCreate(new CreateBookingRequest(listing1.Id, start2, end2), tenantB.Id, money);
+        var bB1 = Booking.TryCreate(new CreateBookingRequest(listing1.Id, start2, end2), tenantB.Id, new Money { Curr = Money.Currency.PLN, Value = 1500m });
         bB1.OwnerAccept();
-        var bA2 = Booking.TryCreate(new CreateBookingRequest(listing2.Id, start3, end3), tenantA.Id, money);
+        var bA2 = Booking.TryCreate(new CreateBookingRequest(listing2.Id, start3, end3), tenantA.Id, new Money { Curr = Money.Currency.PLN, Value = 1500m });
         bA2.OwnerAccept();
 
         ctx.Bookings.AddRange(bA1, bB1, bA2);

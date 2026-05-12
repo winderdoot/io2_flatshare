@@ -143,10 +143,8 @@ public class PaymentServiceTests
         var tenantB = User.TryCreate(new CreateUserRequest("TenantBFirst", "TenantBLast", "tb@test.local", "Pass123!", CreateUserRequest.Tenant));
         ctx.Users.AddRange(tenantA, tenantB);
 
-        var money = new Money { Curr = Money.Currency.PLN, Value = 1200m };
-
-        var bA = Booking.TryCreate(new CreateBookingRequest(listing.Id, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20))), tenantA.Id, money);
-        var bB = Booking.TryCreate(new CreateBookingRequest(listing.Id, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30)), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(60))), tenantB.Id, money);
+        var bA = Booking.TryCreate(new CreateBookingRequest(listing.Id, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20))), tenantA.Id, new Money { Curr = Money.Currency.PLN, Value = 1200m });
+        var bB = Booking.TryCreate(new CreateBookingRequest(listing.Id, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30)), DateOnly.FromDateTime(DateTime.UtcNow.AddDays(60))), tenantB.Id, new Money { Curr = Money.Currency.PLN, Value = 1200m });
 
         ctx.Bookings.AddRange(bA, bB);
 
