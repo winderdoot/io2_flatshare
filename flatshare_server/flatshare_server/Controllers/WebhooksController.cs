@@ -11,7 +11,8 @@ using System.IO;
 [Route("api/v1/[controller]")]
 public class WebhooksController 
 (
-    WebhookService webhookService    
+    WebhookService webhookService,
+    StripeWebhookSecretProvider secretProvider
 )
     : ControllerBase
 {
@@ -31,55 +32,17 @@ public class WebhooksController
     [HttpPost]
     public async Task<IActionResult> HandleStripeWebhook()
     {
-        await Task.CompletedTask;
+        string? sigHeader = Request.Headers["Stripe-Signature"].FirstOrDefault();
+        if (sigHeader is null)
+        {
+            return BadRequest(new { Error = "Stripe-Signature header required" });
+        }
+
+        string payload = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+        await webhookService.HandleStripeWebhook(payload, sigHeader);
+
+        /* Always return 200 to acknowledge that we received the hook to stripe */
         return Ok();
-        //var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-
-        //try
-        //{
-        //    // This verifies the request actually came from Stripe
-        //    var stripeEvent = EventUtility.ConstructEvent(
-        //        json,
-        //        Request.Headers["Stripe-Signature"],
-        //        _webhookSecret
-        //    );
-
-        //    // Handle the successful payment
-        //    if (stripeEvent.Type == Events.CheckoutSessionCompleted)
-        //    {
-        //        var session = stripeEvent.Data.Object as Session;
-
-        //        // Retrieve the BookingId we attached earlier
-        //        var bookingId = Guid.Parse(session.ClientReferenceId);
-
-        //        // TODO: Fetch booking & payment from your Database
-        //        // var booking = db.Bookings.Find(bookingId);
-
-        //        // Execute your state machine logic!
-        //        // payment.GatewayConfirmed();
-        //        // booking.PaymentSuccess();
-        //        // await db.SaveChangesAsync();
-
-        //        Console.WriteLine($"Payment successful for Booking: {bookingId}");
-        //    }
-        //    // Handle expired/cancelled sessions
-        //    else if (stripeEvent.Type == Events.CheckoutSessionExpired)
-        //    {
-        //        var session = stripeEvent.Data.Object as Session;
-        //        var bookingId = Guid.Parse(session.ClientReferenceId);
-
-        //        // Execute your cancellation state machine logic
-        //        // payment.UserAborted();
-        //        // booking.PaymentTimeout();
-        //        Console.WriteLine($"Payment expired for Booking: {bookingId}");
-        //    }
-
-        //    // Always return a 200 OK to Stripe so they know you received it
-        //    return Ok();
-        //}
-        //catch (StripeException e)
-        //{
-        //    return BadRequest(new { Error = e.Message });
-        //}
     }
+
 }
