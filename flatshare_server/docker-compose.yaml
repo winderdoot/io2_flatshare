@@ -39,6 +39,46 @@
     depends_on:
       - db
 
+  # Service 3: stripe-cli to tunnel webhook events to local/dockerized server
+
+  # Keep trying to send the POST request until it succeeds (returns HTTP 200 OK)
+  # OLD
+  #  wget -q -O /dev/null --post-data=\"\\\"$$SECRET\\\"\" --header=\"Content-Type: application/json\" --header=\"X-Init-Key: $${APP_INIT_KEY}\" --no-check-certificate https://host.docker.internal:7047/api/v1/webhook/init-secret
+  # NEW
+  # wget --post-data="\"$$SECRET\"" --header="Content-Type: application/json" --header="X-Init-Key: $${APP_INIT_KEY}" --no-check-certificate https://host.docker.internal:7047/api/v1/webhook/init-secret
+
+  stripe-cli:
+    image: stripe/stripe-cli:latest
+    # Crazy custom setup to make running stripe-cli locally simple with docker
+
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo 'Starting Stripe CLI...';
+        touch /tmp/stripe.log;
+        
+        stripe listen --api-key $$STRIPE_SECRET_KEY --forward-to http://host.docker.internal:7047/api/v1/webhook --skip-verify > /tmp/stripe.log 2>&1 &
+        
+        while ! grep -q 'whsec_' /tmp/stripe.log; do sleep 1; done;
+        SECRET=$$(grep -o 'whsec_[a-zA-Z0-9]*' /tmp/stripe.log | head -n 1);
+        
+        echo 'Secret generated! Waiting for ASP.NET server to wake up...';
+        until wget -O /dev/null --post-data="{\"secret\": \"$$SECRET\"}" --header="Content-Type: application/json" --header="X-Init-Key: $$APP_INIT_KEY" --no-check-certificate https://host.docker.internal:7047/api/v1/webhooks/init-secret; do
+            echo 'ASP.NET app not ready yet. Retrying in 2 seconds...';
+            sleep 2;
+        done;
+        
+        echo 'Successfully configured flatshare server with dynamic webhook secret.';
+        tail -f /tmp/stripe.log
+
+    command: listen --api-key ${STRIPE_SECRET_KEY} --forward-to https://host.docker.internal:7047/api/v1/webhooks --skip-verify
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    restart: unless-stopped
+
 volumes:
     flatshare_db:
     flatshare_azurite:

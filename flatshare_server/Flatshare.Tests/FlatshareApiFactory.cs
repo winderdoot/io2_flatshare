@@ -28,6 +28,7 @@ public class FlatshareApiFactory : WebApplicationFactory<Program>
 
         builder.UseSetting($"{StripeOptions.OptionsKey}:SecretKey", "sk_test_51MockKey123");
         builder.UseSetting($"{StripeOptions.OptionsKey}:PublishableKey", "pk_test_51MockKey123");
+        builder.UseSetting($"{StripeOptions.OptionsKey}:WebhookSecretInitKey", "random_stuff_idc");
 
         builder.ConfigureTestServices(services =>
         {

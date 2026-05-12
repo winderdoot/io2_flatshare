@@ -65,7 +65,13 @@ public class PaymentService
                 },
             },
             Mode = "payment",
-            ClientReferenceId = booking.BookingId.ToString()
+            ClientReferenceId = booking.BookingId.ToString(),
+
+            // TODO: Add shit here
+            Metadata = new Dictionary<string, string>
+            {
+                { "TenantId", booking.TenantId.ToString() }
+            },
         };
 
         var service = new SessionService(stripeClient);
