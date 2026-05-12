@@ -58,7 +58,7 @@
         echo 'Starting Stripe CLI...';
         touch /tmp/stripe.log;
         
-        stripe listen --api-key $$STRIPE_SECRET_KEY --forward-to http://host.docker.internal:7047/api/v1/webhook --skip-verify > /tmp/stripe.log 2>&1 &
+        stripe listen --api-key $$STRIPE_SECRET_KEY --forward-to https://host.docker.internal:7047/api/v1/webhooks --events checkout.session.completed,checkout.session.expired --skip-verify 2>&1 | tee /tmp/stripe.log &
         
         while ! grep -q 'whsec_' /tmp/stripe.log; do sleep 1; done;
         SECRET=$$(grep -o 'whsec_[a-zA-Z0-9]*' /tmp/stripe.log | head -n 1);
@@ -72,7 +72,6 @@
         echo 'Successfully configured flatshare server with dynamic webhook secret.';
         tail -f /tmp/stripe.log
 
-    command: listen --api-key ${STRIPE_SECRET_KEY} --forward-to https://host.docker.internal:7047/api/v1/webhooks --skip-verify
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:

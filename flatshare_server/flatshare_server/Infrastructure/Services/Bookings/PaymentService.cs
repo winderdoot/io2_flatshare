@@ -67,10 +67,10 @@ public class PaymentService
             Mode = "payment",
             ClientReferenceId = booking.BookingId.ToString(),
 
-            // TODO: Add shit here
             Metadata = new Dictionary<string, string>
             {
-                { "TenantId", booking.TenantId.ToString() }
+                { "BookingId", booking.BookingId.ToString() },
+                { "PaymentId", payment.PaymentId.ToString() },
             },
         };
 
@@ -138,5 +138,43 @@ public class PaymentService
             return payment.IntoDTO();
 
         throw ErrorResponse.Generate("Forbidden", StatusCodes.Status403Forbidden);
+    }
+
+    public async Task GatewayConfirmedAsync(Guid bookingId)
+    {
+        var booking = await dbContext.Bookings.FindAsync(bookingId);
+        if (booking is null)
+            throw ErrorResponse.Generate("Booking not found", StatusCodes.Status404NotFound);
+
+        var payment = await dbContext.Payments
+            .Where(p => p.BookingId == bookingId)
+            .OrderByDescending(p => p.PaymentId)
+            .FirstOrDefaultAsync();
+
+        if (payment is null)
+            throw ErrorResponse.Generate("Payment not found", StatusCodes.Status404NotFound);
+
+        payment.GatewayConfirmed();
+        booking.PaymentSuccess();
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task UserAbortedAsync(Guid bookingId)
+    {
+        var booking = await dbContext.Bookings.FindAsync(bookingId);
+        if (booking is null)
+            throw ErrorResponse.Generate("Booking not found", StatusCodes.Status404NotFound);
+
+        var payment = await dbContext.Payments
+            .Where(p => p.BookingId == bookingId)
+            .OrderByDescending(p => p.PaymentId)
+            .FirstOrDefaultAsync();
+
+        if (payment is null)
+            throw ErrorResponse.Generate("Payment not found", StatusCodes.Status404NotFound);
+
+        payment.UserAborted();
+        booking.TenantCancel();
+        await dbContext.SaveChangesAsync();
     }
 }
