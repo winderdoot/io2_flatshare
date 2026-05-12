@@ -1,28 +1,36 @@
 ﻿using flatshare_server.Infrastructure.Model;
 using flatshare_server.Infrastructure.Model.Bookings;
+using flatshare_server.Infrastructure.Model.Responses.Booking;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Services.Bookings;
+using flatshare_server.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
 public class PaymentController
 (
-    PaymentService paymentService
+    PaymentService paymentService,
+    AuthService authService
 )
     : ControllerBase
 {
-    [HttpGet("{paymentId}/success")]
-    public async Task<IActionResult> PaymentSuccess([FromRoute] Guid paymentId)
+    [Authorize]
+    [HttpGet("{paymentId}")]
+    public async Task<ActionResult<PaymentDTO>> GetById([FromRoute] Guid paymentId)
     {
-        //await paymentService.HandlePaymentSuccess(paymentId, bookingId);
-        return Ok("Payment Successful");
+        var userId = authService.GetUserId(User);
+        var dto = await paymentService.GetById(paymentId, userId);
+        return Ok(dto);
     }
 
-    [HttpPost("{paymentId}/cancel")]
-    public async Task<IActionResult> PaymentCancel([FromRoute] Guid paymentId)
+    [Authorize]
+    [HttpGet]
+    public async Task<ActionResult<PaymentDTO>> GetByBookingId([FromQuery] Guid bookingId)
     {
-        //await paymentService.HandlePaymentCancel(paymentId, bookingId);
-        return Ok("Payment Cancelled");
+        var userId = authService.GetUserId(User);
+        var dto = await paymentService.GetByBookingId(bookingId, userId);
+        return Ok(dto);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace flatshare_server.Infrastructure.Model.Bookings;
+﻿using flatshare_server.Infrastructure.Model.Responses.Booking;
+
+namespace flatshare_server.Infrastructure.Model.Bookings;
 
 public class Payment
 {
@@ -15,6 +17,18 @@ public class Payment
     public Money Amount { get; init; }
     private PaymentStatus _status = PaymentStatus.Initiated;
     public PaymentStatus Status { get => _status; init => _status = value; }
+    private Payment() { }
+    public PaymentDTO IntoDTO()
+    {
+        return new PaymentDTO 
+        { 
+            BookingId = BookingId, 
+            PaymentId = PaymentId, 
+            TotalValue = Amount.Value, 
+            Currency = Amount.CurrencyStr(), 
+            Status = Status
+        };
+    }
 
     public Payment(Guid bookingId, Money amount)
     {
