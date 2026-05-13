@@ -103,6 +103,13 @@ public class FlatshareDbContext : DbContext
                     .HasIndex("OwnerId")
                     .HasDatabaseName("IX_Listings_OwnerId");
             })
+            .Entity<Unavailability>(entity =>
+            {
+                entity
+                    .Property<Guid>("Id")
+                    .ValueGeneratedOnAdd();
+                entity.HasKey("Id");
+            })
             .Entity<UserSession>(entity =>
             {
                 entity.HasKey(e => e.Id);

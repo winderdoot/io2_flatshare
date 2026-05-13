@@ -135,4 +135,16 @@ public class ListingService
         listing.Archive();
         await _context.SaveChangesAsync();
     }
+    public async Task AddUnavailabilityAsync(Guid listingId, Unavailability unavailability)
+    {
+        var listing = await GetByIdAsync(listingId);
+        listing.AddUnavailability(unavailability);
+        await _context.SaveChangesAsync();
+    }
+    public async Task RemoveUnavailabilityAsync(Guid id, UnavailabilityRange unavailability)
+    {
+        var listing = await GetByIdAsync(id);
+        listing.RemoveUnavailability(unavailability.Since, unavailability.Until);
+        await _context.SaveChangesAsync();
+    }
 }

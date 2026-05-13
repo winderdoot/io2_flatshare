@@ -16,6 +16,7 @@ public class ListingDTO
     public required float Area { get; init; }
     public required Address Location { get; init; }
     public required ListingAttributes Attributes { get; init; }
+    public required List<Unavailability> Unavailabilities { get; init; }
 }
 
 
