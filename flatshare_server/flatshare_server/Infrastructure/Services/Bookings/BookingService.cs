@@ -10,6 +10,7 @@ using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Model.Bookings;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Model;
+using flatshare_server.Infrastructure.Model.Listings;
 
 namespace flatshare_server.Infrastructure.Services;
 
@@ -64,6 +65,12 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
             throw ErrorResponse.Generate("Room Occupied", StatusCodes.Status409Conflict);
         }
 
+        var unavailable = listing.Unavailabilities.Find(u => !(request.EndDate < u.Since || request.StartDate > u.Until));
+        if (unavailable is not null)
+        {
+            throw ErrorResponse.Generate($"Room Unavailable between {unavailable.Since} to {unavailable.Until}: {unavailable.Message}", StatusCodes.Status409Conflict);
+        }
+
         Money totalPrice = CalculatePrice(listing.Price, request.StartDate, request.EndDate);
 
         var booking = Booking.TryCreate(request, userId, totalPrice);
@@ -93,6 +100,21 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
 
         if (booking.Status != Booking.BookingStatus.PendingApproval)
             throw ErrorResponse.Generate($"Cannot accept booking from status {booking.Status}", StatusCodes.Status400BadRequest);
+
+        var unavailable = listing.Unavailabilities.Find(u => !(booking.EndDate < u.Since || booking.StartDate > u.Until));
+        if (unavailable is not null)
+        {
+            throw ErrorResponse.Generate($"Room no longer available between {unavailable.Since} to {unavailable.Until}: {unavailable.Message}", StatusCodes.Status409Conflict);
+        }
+        await listingService.AddUnavailabilityAsync(
+            listing.Id, 
+            new Unavailability 
+            { 
+                Since = booking.StartDate, 
+                Until = booking.EndDate , 
+                Message = $"Booking {booking.BookingId} accepted" 
+            }
+        );
 
         booking.OwnerAccept();
         await dbContext.SaveChangesAsync();
