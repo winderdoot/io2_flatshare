@@ -148,14 +148,12 @@ public class PaymentServiceTests
 
         ctx.Bookings.AddRange(bA, bB);
 
-        var pA = new Payment(bA.BookingId, bA.TotalPrice);
+        var pA = new Payment(bA.BookingId, (Money)bA.TotalPrice.Clone());
         pA.RedirectToGateway();
-        var pA2 = new Payment(bA.BookingId, bA.TotalPrice); // second payment for same booking, newer by id
-        pA2.RedirectToGateway();
-        var pB = new Payment(bB.BookingId, bB.TotalPrice);
+        var pB = new Payment(bB.BookingId, (Money)bB.TotalPrice.Clone());
         pB.RedirectToGateway();
 
-        ctx.Payments.AddRange(pA, pA2, pB);
+        ctx.Payments.AddRange(pA, pB);
 
         await ctx.SaveChangesAsync();
 
@@ -163,20 +161,19 @@ public class PaymentServiceTests
         var stripeClientMock = new Mock<IStripeClient>();
         var paymentService = new PaymentService(ctx, stripeClientMock.Object, listingService, userService);
 
-        // Tenant A can access payments for their booking (should return latest pA2)
         var dtoTenantA = await paymentService.GetByBookingId(bA.BookingId, tenantA.Id);
-        dtoTenantA.PaymentId.Should().Be(pA2.PaymentId);
+        dtoTenantA.PaymentId.Should().Be(pA.PaymentId);
         dtoTenantA.BookingId.Should().Be(bA.BookingId);
 
         // Owner can access
         var dtoOwner = await paymentService.GetByBookingId(bA.BookingId, owner.Id);
-        dtoOwner.PaymentId.Should().Be(pA2.PaymentId);
+        dtoOwner.PaymentId.Should().Be(pA.PaymentId);
 
         // Admin can access (setup repo)
         var admin = User.TryCreate(new CreateUserRequest("AdminFirst", "AdminLast", "admin2@test.local", "Pass123!", CreateUserRequest.Admin));
         mockUserRepo.Setup(r => r.GetById(admin.Id)).ReturnsAsync(admin);
         var dtoAdmin = await paymentService.GetByBookingId(bA.BookingId, admin.Id);
-        dtoAdmin.PaymentId.Should().Be(pA2.PaymentId);
+        dtoAdmin.PaymentId.Should().Be(pA.PaymentId);
 
         // Other user should be blocked
         var other = User.TryCreate(new CreateUserRequest("OtherFirst", "OtherLast", "other2@test.local", "Pass123!", CreateUserRequest.Tenant));

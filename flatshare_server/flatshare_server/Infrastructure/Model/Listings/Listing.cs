@@ -30,6 +30,7 @@ public class Listing
     public float AreaMeterSq { get; private set; }
     public Address Address { get; private set; }
     public ListingAttributes Attributes { get; private set; }
+    public List<Unavailability> Unavailabilities { get; private set; } = [];
 
     public User? Owner { get; private set; }
 
@@ -51,8 +52,30 @@ public class Listing
             Id = Id,
             Location = Address,
             OwnerContact = OwnerContact,
-            Title = Title
+            Title = Title,
+            Unavailabilities = [.. Unavailabilities]
         };
+    }
+    public void AddUnavailability(Unavailability unavailability)
+    {
+        Unavailabilities.Add(unavailability);
+    }
+    public void RemoveUnavailability(DateOnly since, DateOnly until)
+    {
+        if (until <= since)
+        {
+            throw ErrorResponse.Generate($"'until' date must be later than 'since' date", StatusCodes.Status400BadRequest);
+        }
+
+        List<Unavailability> toRemove = [.. Unavailabilities.Where(u => u.Since == since && u.Until == until)];
+        if (!toRemove.Any())
+        {
+            throw ErrorResponse.Generate($"No unavailability found for given date range", StatusCodes.Status404NotFound);
+        }
+        foreach (var unavailability in toRemove)
+        {
+            Unavailabilities.Remove(unavailability);
+        }
     }
 
     public static Listing TryCreate(CreateListingRequest request, User owner)
@@ -102,7 +125,8 @@ public class Listing
             OwnerContact = request.OwnerContact,
             AreaMeterSq = request.Area,
             Photos = [],
-            Owner = owner
+            Owner = owner,
+            Unavailabilities = []
         };
 
         return listing;

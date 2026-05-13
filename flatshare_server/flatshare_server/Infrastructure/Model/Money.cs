@@ -3,7 +3,7 @@ using flatshare_server.Infrastructure.Model.Responses;
 
 namespace flatshare_server.Infrastructure.Model;
 
-public class Money
+public class Money : ICloneable
 {
     public enum Currency
     {
@@ -45,5 +45,9 @@ public class Money
             Currency.EUR => 4.2m * Value,
             _ => throw new InvalidOperationException($"Invalid currency type"),
         };
+    }
+    public object Clone()
+    {
+        return new Money { Curr = Curr, Value = Value };
     }
 }

@@ -191,4 +191,16 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
         var entities = await query.OrderByDescending(b => b.CreatedAt).ToListAsync();
         return entities.Select(b => b.IntoDTO()).ToList();
     }
+
+    public async Task VerifyUnavailabilityCollisionsAsync(Guid listingId, DateOnly since, DateOnly until)
+    {
+        var conflict = await dbContext.Bookings
+            .Where(b => b.ListingId == listingId
+                        && (b.Status == Booking.BookingStatus.Confirmed || b.Status == Booking.BookingStatus.PendingPayment))
+            .AnyAsync(b => !(until < b.StartDate || since > b.EndDate));
+        if (conflict)
+        {
+            throw ErrorResponse.Generate("Room Occupied", StatusCodes.Status409Conflict);
+        }
+    }
 }

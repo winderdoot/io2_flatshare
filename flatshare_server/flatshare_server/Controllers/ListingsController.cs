@@ -11,26 +11,16 @@ namespace flatshare_server.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class ListingsController : Controller
+public class ListingsController
+(
+    ListingService listingService,
+    AuthService authService,
+    BookingService bookingService
+) : Controller
 {
-    private readonly ListingService _service;
-    private readonly AuthService _auth;
-    private readonly UserService _users;
-    public ListingsController
-    (
-        ListingService listingService,
-        AuthService authService,
-        UserService userService
-    ) 
-    {
-        _service = listingService;
-        _auth = authService;
-        _users = userService;
-    }
-
     private async Task AssertListingOwner(Guid listingId)
     {
-        var listing = await _service.GetByIdAsync(listingId, attachOwner: true);
+        var listing = await listingService.GetByIdAsync(listingId, attachOwner: true);
         if (listing is null)
         {
             throw ErrorResponse.Generate("Listing not found", StatusCodes.Status404NotFound);
@@ -40,7 +30,7 @@ public class ListingsController : Controller
         {
             throw ErrorResponse.Generate("Listing has no owner", StatusCodes.Status500InternalServerError);
         }
-        if (ownerId != _auth.GetUserId(User))
+        if (ownerId != authService.GetUserId(User))
         {
             throw ErrorResponse.Generate("Unauthorized", StatusCodes.Status401Unauthorized);
         }
@@ -49,21 +39,21 @@ public class ListingsController : Controller
     [HttpGet("{id}")]
     public async Task<ActionResult<ListingDTO>> Get([FromRoute] Guid id)
     {
-        return Ok((await _service.GetByIdAsync(id)).IntoDTO());
+        return Ok((await listingService.GetByIdAsync(id)).IntoDTO());
     }
     [HttpGet]
     public async Task<ActionResult<ListingDTO>> Get([FromQuery] ListingFilter filter)
     {
-        return Ok(await _service.GetByFilterAsync(filter));
+        return Ok(await listingService.GetByFilterAsync(filter));
     }
 
     [HttpPost]
     [Authorize(Roles = AuthService.LandlordRole)]
     public async Task<ActionResult<ListingCreatedResponse>> CreateNew([FromBody] CreateListingRequest request)
     {
-        Guid ownerId = _auth.GetUserId(User);
+        Guid ownerId = authService.GetUserId(User);
 
-        var listing = await _service.CreateNewAsync(request, ownerId);
+        var listing = await listingService.CreateNewAsync(request, ownerId);
         return CreatedAtAction(
             actionName: nameof(Get),
             routeValues: new { id = listing.Id },
@@ -76,7 +66,7 @@ public class ListingsController : Controller
     public async Task<ActionResult<ListingDTO>> Update([FromRoute] Guid id, [FromBody] UpdateListingRequest request)
     {
         await AssertListingOwner(id);
-        var updated = await _service.UpdateAsync(id, request);
+        var updated = await listingService.UpdateAsync(id, request);
         return Ok(updated.IntoDTO());
     }
 
@@ -85,7 +75,7 @@ public class ListingsController : Controller
     public async Task<IActionResult> Submit([FromRoute] Guid id)
     {
         await AssertListingOwner(id);
-        await _service.SubmitAsync(id);
+        await listingService.SubmitAsync(id);
         return NoContent();
     }
 
@@ -93,7 +83,7 @@ public class ListingsController : Controller
     [Authorize(Roles = AuthService.AdminRole)]
     public async Task<IActionResult> RequestFixes([FromRoute] Guid id)
     {
-        await _service.RequestFixesAsync(id);
+        await listingService.RequestFixesAsync(id);
         return NoContent();
     }
 
@@ -101,7 +91,7 @@ public class ListingsController : Controller
     [Authorize(Roles = AuthService.AdminRole)]
     public async Task<IActionResult> Approve([FromRoute] Guid id)
     {
-        await _service.ApproveAsync(id);
+        await listingService.ApproveAsync(id);
         return NoContent();
     }
 
@@ -110,7 +100,7 @@ public class ListingsController : Controller
     public async Task<IActionResult> Hide([FromRoute] Guid id)
     {
         await AssertListingOwner(id);
-        await _service.HideAsync(id);
+        await listingService.HideAsync(id);
         return NoContent();
     }
 
@@ -119,7 +109,7 @@ public class ListingsController : Controller
     public async Task<IActionResult> Publish([FromRoute] Guid id)
     {
         await AssertListingOwner(id);
-        await _service.PublishAsync(id);
+        await listingService.PublishAsync(id);
         return NoContent();
     }
 
@@ -131,7 +121,27 @@ public class ListingsController : Controller
         {
             await AssertListingOwner(id);
         }
-        await _service.ArchiveAsync(id);
+        await listingService.ArchiveAsync(id);
         return NoContent();
     }
+
+    [HttpPost("{id}/unavailability")]
+    [Authorize(Roles = $"{AuthService.LandlordRole}")]
+    public async Task<IActionResult> AddUnavailability([FromRoute] Guid id, [FromBody] Unavailability unavailability)
+    {
+        await AssertListingOwner(id);
+        await listingService.AddUnavailabilityAsync(id, unavailability);
+        return NoContent();
+    }
+
+    [HttpDelete("{id}/unavailability")]
+    [Authorize(Roles = $"{AuthService.LandlordRole}")]
+    public async Task<IActionResult> RemoveUnavailability([FromRoute] Guid id, [FromBody] UnavailabilityRange unavailability)
+    {
+        await AssertListingOwner(id);
+        await bookingService.VerifyUnavailabilityCollisionsAsync(id, unavailability.Since, unavailability.Until);
+        await listingService.RemoveUnavailabilityAsync(id, unavailability);
+        return NoContent();
+    }
+
 }
