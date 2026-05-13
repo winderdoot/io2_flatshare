@@ -17,7 +17,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Start Dependencies (Docker Compose)
-      run: docker compose up -d
+      run: docker compose up db azurite -d
       working-directory: ${{ env.DOCKER_COMPOSE_DIR }}
 
     - name: Setup .NET
