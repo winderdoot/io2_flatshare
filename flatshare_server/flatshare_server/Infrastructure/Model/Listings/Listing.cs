@@ -193,6 +193,9 @@ public class Listing
 
         if (request.Attributes is not null)
             Attributes = request.Attributes;
+
+        if (request.Status.HasValue)
+            Status = request.Status.Value;
     }
 
     /* Private validation helpers */

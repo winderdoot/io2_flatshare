@@ -1,6 +1,7 @@
 ﻿using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Model.Users;
+using flatshare_server.Infrastructure.Model;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Utils;
 
@@ -100,5 +101,12 @@ public class UserService
         await _userRepo.Update(user);
 
         return tenantRole.TenantPreferences.IntoDTO();
+    }
+
+    public async Task UpdateStatusByIdAsync(Guid userId, AccountStatus newStatus)
+    {
+        var user = await _userRepo.GetById(userId);
+        user.Status = newStatus;
+        await _userRepo.Update(user);
     }
 }

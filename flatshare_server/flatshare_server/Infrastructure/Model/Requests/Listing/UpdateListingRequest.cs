@@ -1,5 +1,6 @@
 ﻿namespace flatshare_server.Infrastructure.Model.Requests.Listing;
 using flatshare_server.Infrastructure.Model.Listings;
+using flatshare_server.Infrastructure.Model.Listings;
 
 public record class UpdateListingRequest
 {
@@ -13,4 +14,5 @@ public record class UpdateListingRequest
     public float? Area { get; init; } = null;
     public Address? Location { get; init; } = null;
     public ListingAttributes? Attributes { get; init; } = null;
+    public Listing.ListingStatus? Status { get; init; } = null;
 }

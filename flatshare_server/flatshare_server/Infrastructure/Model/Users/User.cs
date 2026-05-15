@@ -27,7 +27,7 @@ public class User
     public required AccountStatus Status 
     { 
         get => _status; 
-        init => _status = value; 
+        set => _status = value; 
     }
     private UserRole _role = null!;
     public required UserRole Role 

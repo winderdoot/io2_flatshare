@@ -154,7 +154,7 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
         );
     }
 
-    public async Task<CancelBookingResponse> Cancel(Guid bookingId, Guid userId, CancelBookingRequest request)
+    public async Task<CancelBookingResponse> UserCancel(Guid bookingId, Guid userId, CancelBookingRequest request)
     {
         var booking = await dbContext.Bookings.FindAsync(bookingId);
         if (booking is null)
@@ -178,6 +178,11 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
             DateTime.UtcNow,
             "NOT_APPLICABLE"
         );
+    }
+
+    public async Task AdminForceCancel(Guid bookingId, Guid userId)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<BookingDTO> GetById(Guid bookingId, Guid userId)

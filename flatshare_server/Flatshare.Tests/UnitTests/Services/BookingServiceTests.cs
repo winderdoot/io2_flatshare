@@ -218,7 +218,7 @@ public class BookingServiceTests
         var bookingId = Guid.Parse(created.BookingId);
 
         var cancelReq = new CancelBookingRequest("Change of plans");
-        var resp = await bookingService.Cancel(bookingId, tenant.Id, cancelReq);
+        var resp = await bookingService.UserCancel(bookingId, tenant.Id, cancelReq);
 
         resp.Should().NotBeNull();
         resp.Status.Should().Be("Cancelled");
@@ -251,7 +251,7 @@ public class BookingServiceTests
         ctx.Bookings.Add(existing);
         await ctx.SaveChangesAsync();
 
-        var act = async () => await bookingService.Cancel(existing.BookingId, tenant.Id, new CancelBookingRequest("Too late"));
+        var act = async () => await bookingService.UserCancel(existing.BookingId, tenant.Id, new CancelBookingRequest("Too late"));
 
         var ex = await act.Should().ThrowAsync<ServerResponseException>();
         ex.Which.Response.Status.Should().Be(StatusCodes.Status409Conflict);

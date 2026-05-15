@@ -57,7 +57,7 @@ public class WebhookService
                     throw ErrorResponse.Generate("BookingId not found in session metadata", StatusCodes.Status400BadRequest);
                 }
 
-                await paymentService.GatewayConfirmedAsync(bookingId.Value);
+                await paymentService.GatewayConfirmedAsync(bookingId.Value, session.Id);
 
                 Console.WriteLine($"Payment successful for Booking: {bookingId}");
             }

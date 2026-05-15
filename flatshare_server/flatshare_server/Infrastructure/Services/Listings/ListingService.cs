@@ -99,6 +99,19 @@ public class ListingService
         return listing;
     }
 
+    public async Task BatchModerationHideByUserIdAsync(Guid userId)
+    {
+        var listings = await _context.Listings.Where(l => l.Owner.Id == userId).ToListAsync() ;
+
+        var request = new UpdateListingRequest { Status = Listing.ListingStatus.HiddenByModeration };
+        foreach (var listing in listings)
+        {
+            listing.ApplyUpdate(request);
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
     public async Task SubmitAsync(Guid id)
     {
         var listing = await GetByIdAsync(id);

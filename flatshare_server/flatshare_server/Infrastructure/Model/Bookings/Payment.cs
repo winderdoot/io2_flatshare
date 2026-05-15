@@ -10,13 +10,22 @@ public class Payment
         Redirected,
         Succeeded,
         Failed,
-        Cancelled
+        Cancelled,
+        Refunded
     }
     public Guid PaymentId { get; init; }
     public Guid BookingId { get; init; }
     public Money Amount { get; init; }
     private PaymentStatus _status = PaymentStatus.Initiated;
     public PaymentStatus Status { get => _status; init => _status = value; }
+
+    private string? _externalReference = null;
+    public string? ExternalReference
+    {
+        get => _externalReference;
+        set => _externalReference = value;
+    }
+
     private Payment() { }
     public PaymentDTO IntoDTO()
     {
@@ -71,5 +80,12 @@ public class Payment
         if (Status != PaymentStatus.Failed)
             throw new InvalidOperationException($"Cannot retry from status {Status}");
         _status = PaymentStatus.Initiated;
+    }
+
+    public void MarkAsRefunded()
+    {
+        if (Status != PaymentStatus.Succeeded)
+            throw new InvalidOperationException("Can only refund successful payments.");
+        _status = PaymentStatus.Refunded;
     }
 }

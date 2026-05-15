@@ -140,7 +140,7 @@ public class PaymentService
         throw ErrorResponse.Generate("Forbidden", StatusCodes.Status403Forbidden);
     }
 
-    public async Task GatewayConfirmedAsync(Guid bookingId)
+    public async Task GatewayConfirmedAsync(Guid bookingId, string stripeSessionId)
     {
         var booking = await dbContext.Bookings.FindAsync(bookingId);
         if (booking is null)
@@ -154,8 +154,13 @@ public class PaymentService
         if (payment is null)
             throw ErrorResponse.Generate("Payment not found", StatusCodes.Status404NotFound);
 
+        var service = new SessionService(stripeClient);
+        var session = await service.GetAsync(stripeSessionId);
+
+        payment.ExternalReference = session.PaymentIntentId;
         payment.GatewayConfirmed();
         booking.PaymentSuccess();
+
         await dbContext.SaveChangesAsync();
     }
 
@@ -176,5 +181,39 @@ public class PaymentService
         payment.UserAborted();
         booking.TenantCancel();
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task InitiateBookingRefund(Guid bookingId)
+    {
+        var payment = await dbContext.Payments
+            .Where(p => p.BookingId == bookingId && p.Status == Payment.PaymentStatus.Succeeded)
+            .OrderByDescending(p => p.PaymentId)
+            .FirstOrDefaultAsync();
+
+        if (payment == null || string.IsNullOrEmpty(payment.ExternalReference))
+        {
+            throw ErrorResponse.Generate("No refundable transaction found for this booking.");
+        }
+
+        var options = new RefundCreateOptions
+        {
+            PaymentIntent = payment.ExternalReference,
+            Reason = "user banned",
+        };
+
+        var service = new RefundService(stripeClient);
+
+        try
+        {
+            await service.CreateAsync(options);
+
+            payment.MarkAsRefunded();
+
+            await dbContext.SaveChangesAsync();
+        }
+        catch (StripeException ex)
+        {
+            throw ErrorResponse.Generate($"Stripe Refund Failed: {ex.Message}");
+        }
     }
 }

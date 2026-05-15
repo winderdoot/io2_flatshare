@@ -49,7 +49,7 @@ public class BookingsController
     public async Task<ActionResult<CancelBookingResponse>> CancelBooking([FromRoute] Guid bookingId, [FromBody] CancelBookingRequest request)
     {
         var userId = authService.GetUserId(User);
-        var resp = await bookingService.Cancel(bookingId, userId, request);
+        var resp = await bookingService.UserCancel(bookingId, userId, request);
         return Ok(resp);
     }
 
