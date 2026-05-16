@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import type { ListingDTO } from "../../models/listing";
-import { findMockListing } from "./mockListings";
+import { useListingDetail } from "./useListingDetail";
+import rentHouse from "../../assets/rent_house.png";
 import "./ListingDetail.css";
 
 function formatDate(iso: string): string {
@@ -44,13 +45,38 @@ function attributeChips(listing: ListingDTO) {
 
 export const ListingDetail = () => {
   const { listingId } = useParams<{ listingId: string }>();
-  const listing = listingId ? findMockListing(listingId) : undefined;
+  const { data: listing, isLoading, isError, error } = useListingDetail(listingId);
 
-  if (!listingId || !listing) {
+  if (!listingId) {
     return (
       <div className="listing-detail">
         <div className="listing-detail-empty">
-          <p>Nie znaleziono ogłoszenia (mock — sprawdź identyfikator w URL).</p>
+          <p>Brak identyfikatora ogłoszenia w adresie URL.</p>
+          <p>
+            <Link to="/offer">Wróć do listy ofert</Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="listing-detail">
+        <div className="listing-detail-empty">
+          <p>Ładowanie ogłoszenia…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !listing) {
+    const message =
+      error instanceof Error ? error.message : "Nie znaleziono ogłoszenia.";
+    return (
+      <div className="listing-detail">
+        <div className="listing-detail-empty">
+          <p>{message}</p>
           <p>
             <Link to="/offer">Wróć do listy ofert</Link>
           </p>
@@ -67,7 +93,7 @@ export const ListingDetail = () => {
   ].join(", ");
 
   const chips = attributeChips(listing);
-  const imageSrc = listing.coverImageUrl ?? "";
+  const imageSrc = listing.coverImageUrl ?? rentHouse;
 
   return (
     <article className="listing-detail">
@@ -76,11 +102,7 @@ export const ListingDetail = () => {
       </Link>
 
       <div className="listing-detail-hero">
-        {imageSrc ? (
-          <img src={imageSrc} alt={listing.title} />
-        ) : (
-          <div aria-hidden style={{ width: "100%", height: "100%" }} />
-        )}
+        <img src={imageSrc} alt={listing.title} />
         <div className="listing-detail-price-pill">
           {listing.price} {listing.currency} / mies.
         </div>
@@ -135,6 +157,21 @@ export const ListingDetail = () => {
               </p>
             </div>
           </div>
+
+          {listing.unavailabilities && listing.unavailabilities.length > 0 && (
+            <div className="listing-detail-unavailabilities">
+              <h3>Niedostępność</h3>
+              <ul>
+                {listing.unavailabilities.map((u, i) => (
+                  <li key={i}>
+                    {formatDate(u.since)} – {formatDate(u.until)}
+                    {u.message && <span> ({u.message})</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="listing-detail-contact">
             <div className="listing-detail-facts">
               <div className="listing-detail-fact">
