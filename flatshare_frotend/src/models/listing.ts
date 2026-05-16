@@ -23,6 +23,13 @@ export type ListingAttributes = {
   profile: ListingTenantProfile;
 };
 
+/** Odpowiada `Unavailability` z API. */
+export type Unavailability = {
+  since: string;
+  until: string;
+  message: string;
+};
+
 /**
  * Odpowiada `ListingDTO` z API (`GET api/v1/Listings/{id}`).
  * Zdjęcia: encja ma `Photos`, ale DTO na razie ich nie zwraca — na froncie
@@ -41,5 +48,6 @@ export type ListingDTO = {
   area: number;
   location: Location;
   attributes: ListingAttributes;
+  unavailabilities?: Unavailability[];
   coverImageUrl?: string;
 };
