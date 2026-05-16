@@ -143,5 +143,27 @@ public class ListingsController
         await listingService.RemoveUnavailabilityAsync(id, unavailability);
         return NoContent();
     }
+    [HttpGet("under-review")]
+    [Authorize(Roles = AuthService.AdminRole)]
+    public async Task<ActionResult<List<ListingDTO>>> GetUnderReviewListings()
+    {
+        var listings = await listingService.GetListingsUnderReviewAsync();
+        return Ok(listings);
+    }
 
+    [HttpPatch("{id}/moderation-hide")]
+    [Authorize(Roles = AuthService.AdminRole)]
+    public async Task<IActionResult> ModerationHide([FromRoute] Guid id)
+    {
+        await listingService.HideByModerationAsync(id);
+        return NoContent();
+    }
+
+    [HttpPatch("{id}/reinstate")]
+    [Authorize(Roles = AuthService.AdminRole)]
+    public async Task<IActionResult> Reinstate([FromRoute] Guid id)
+    {
+        await listingService.ReinstateAsync(id);
+        return NoContent();
+    }
 }

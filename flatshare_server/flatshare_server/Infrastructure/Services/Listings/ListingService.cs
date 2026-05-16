@@ -147,4 +147,24 @@ public class ListingService
         listing.RemoveUnavailability(unavailability.Since, unavailability.Until);
         await _context.SaveChangesAsync();
     }
+    public async Task HideByModerationAsync(Guid id)
+    {
+        var listing = await GetByIdAsync(id);
+        listing.HideByModeration();
+        await _context.SaveChangesAsync();
+    }
+    public async Task ReinstateAsync(Guid id)
+    {
+        var listing = await GetByIdAsync(id);
+        listing.Reinstate();
+        await _context.SaveChangesAsync();
+    }
+    public async Task<List<ListingDTO>> GetListingsUnderReviewAsync()
+    {
+        var results = await _context.Listings
+            .Where(l => l.Status == Listing.ListingStatus.UnderReview)
+            .ToListAsync();
+
+        return results.Select(listing => listing.IntoDTO()).ToList();
+    }
 }
