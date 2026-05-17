@@ -125,4 +125,48 @@ export const landlordListingsService = {
     }
     return res.json();
   },
+
+  submit: async (token: string, id: string): Promise<void> => {
+    const res = await fetch(`${API_URL}/api/v1/listings/${id}/submit`, {
+      method: "PATCH",
+      headers: authHeaders(token),
+    });
+    if (!res.ok) {
+      const message = await readErrorMessage(res);
+      throw { status: res.status, message } satisfies ListingRequestError;
+    }
+  },
+
+  publish: async (token: string, id: string): Promise<void> => {
+    const res = await fetch(`${API_URL}/api/v1/listings/${id}/publish`, {
+      method: "PATCH",
+      headers: authHeaders(token),
+    });
+    if (!res.ok) {
+      const message = await readErrorMessage(res);
+      throw { status: res.status, message } satisfies ListingRequestError;
+    }
+  },
+
+  hide: async (token: string, id: string): Promise<void> => {
+    const res = await fetch(`${API_URL}/api/v1/listings/${id}/hide`, {
+      method: "PATCH",
+      headers: authHeaders(token),
+    });
+    if (!res.ok) {
+      const message = await readErrorMessage(res);
+      throw { status: res.status, message } satisfies ListingRequestError;
+    }
+  },
+
+  archive: async (token: string, id: string): Promise<void> => {
+    const res = await fetch(`${API_URL}/api/v1/listings/${id}/archive`, {
+      method: "PATCH",
+      headers: authHeaders(token),
+    });
+    if (!res.ok) {
+      const message = await readErrorMessage(res);
+      throw { status: res.status, message } satisfies ListingRequestError;
+    }
+  },
 };

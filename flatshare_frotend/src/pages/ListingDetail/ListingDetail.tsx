@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import type { ListingDTO } from "../../models/listing";
 import { useListingDetail } from "./useListingDetail";
 import rentHouse from "../../assets/rent_house.png";
@@ -45,7 +45,13 @@ function attributeChips(listing: ListingDTO) {
 
 export const ListingDetail = () => {
   const { listingId } = useParams<{ listingId: string }>();
+  const location = useLocation();
   const { data: listing, isLoading, isError, error } = useListingDetail(listingId);
+
+  const fromMyListings =
+    (location.state as { from?: string } | null)?.from === "/my-listings";
+  const backTo = fromMyListings ? "/my-listings" : "/offer";
+  const backLabel = fromMyListings ? "← Wróć do moich ogłoszeń" : "← Wróć do ofert";
 
   if (!listingId) {
     return (
@@ -53,7 +59,7 @@ export const ListingDetail = () => {
         <div className="listing-detail-empty">
           <p>Brak identyfikatora ogłoszenia w adresie URL.</p>
           <p>
-            <Link to="/offer">Wróć do listy ofert</Link>
+            <Link to={backTo}>{backLabel}</Link>
           </p>
         </div>
       </div>
@@ -78,7 +84,7 @@ export const ListingDetail = () => {
         <div className="listing-detail-empty">
           <p>{message}</p>
           <p>
-            <Link to="/offer">Wróć do listy ofert</Link>
+            <Link to={backTo}>{backLabel}</Link>
           </p>
         </div>
       </div>
@@ -97,8 +103,8 @@ export const ListingDetail = () => {
 
   return (
     <article className="listing-detail">
-      <Link className="listing-detail-back" to="/offer">
-        ← Wróć do ofert
+      <Link className="listing-detail-back" to={backTo}>
+        {backLabel}
       </Link>
 
       <div className="listing-detail-hero">
