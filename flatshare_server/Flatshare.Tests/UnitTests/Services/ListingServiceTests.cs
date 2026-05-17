@@ -398,4 +398,103 @@ public class ListingServiceTests
         var exception = await act.Should().ThrowAsync<ServerResponseException>();
         exception.Which.Response.Status.Should().Be(StatusCodes.Status400BadRequest);
     }
+
+    [Fact]
+    public async Task GetListingsUnderReviewAsync_ShouldReturnOnlyUnderReviewListings()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
+
+        var req1 = GenerateValidRequest();
+        var req2 = GenerateValidRequest();
+
+        var listingDraft = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req1, owner);
+        var listingUnderReview = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req2, owner);
+
+        context.Listings.Add(listingDraft);
+        context.Listings.Add(listingUnderReview);
+        await context.SaveChangesAsync();
+
+        await service.SubmitAsync(listingUnderReview.Id);
+
+        // Act
+        var results = await service.GetListingsUnderReviewAsync();
+
+        // Assert
+        results.Should().NotBeNull();
+        results.Should().HaveCount(1);
+        results.First().Id.Should().Be(listingUnderReview.Id);
+        results.First().Status.Should().Be(Listing.ListingStatus.UnderReview);
+    }
+
+    [Fact]
+    public async Task HideByModerationAsync_ShouldChangeStatusToHiddenByModeration_WhenActive()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
+
+        var req = GenerateValidRequest();
+        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req, owner);
+        context.Listings.Add(listing);
+        await context.SaveChangesAsync();
+
+        // Przejœcie do stanu Active
+        await service.SubmitAsync(listing.Id);
+        await service.ApproveAsync(listing.Id);
+
+        // Act
+        await service.HideByModerationAsync(listing.Id);
+
+        // Assert
+        var updatedListing = await service.GetByIdAsync(listing.Id);
+        updatedListing.Status.Should().Be(Listing.ListingStatus.HiddenByModeration);
+    }
+
+    [Fact]
+    public async Task ReinstateAsync_ShouldChangeStatusToActive_WhenHiddenByModeration()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+        var service = new ListingService(context, mockUserService.Object);
+
+        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+            new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
+
+        var req = GenerateValidRequest();
+        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req, owner);
+        context.Listings.Add(listing);
+        await context.SaveChangesAsync();
+
+        // Przejœcie do stanu HiddenByModeration
+        await service.SubmitAsync(listing.Id);
+        await service.ApproveAsync(listing.Id);
+        await service.HideByModerationAsync(listing.Id);
+
+        // Act
+        await service.ReinstateAsync(listing.Id);
+
+        // Assert
+        var updatedListing = await service.GetByIdAsync(listing.Id);
+        updatedListing.Status.Should().Be(Listing.ListingStatus.Active);
+    }
 }

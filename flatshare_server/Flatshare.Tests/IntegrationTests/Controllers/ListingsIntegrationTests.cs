@@ -161,4 +161,130 @@ public class ListingsIntegrationTests : IClassFixture<FlatshareApiFactory>
         listings!.First().Location.City.Should().Be("Poznañ");
         listings!.First().Location.District.Should().Be("Je¿yce");
     }
+    [Fact]
+    public async Task GetUnderReviewListings_ShouldReturn200AndListings_WhenUserIsAdmin()
+    {
+        // Arrange
+        Guid adminId;
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<FlatshareDbContext>();
+
+            var adminRequest = new CreateUserRequest("Admin", "User", "admin@test.pl", "Pass123!", "ADMIN");
+            var adminUser = flatshare_server.Infrastructure.Model.Users.User.TryCreate(adminRequest);
+            adminId = adminUser.Id;
+            db.Users.Add(adminUser);
+
+            var landlordRequest = new CreateUserRequest("Jan", "Kowalski", "landlord@test.pl", "Pass123!", CreateUserRequest.Landlord);
+            var landlord = flatshare_server.Infrastructure.Model.Users.User.TryCreate(landlordRequest);
+            db.Users.Add(landlord);
+
+            var req = GenerateValidRequest();
+            var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req, landlord);
+            listing.SubmitForReview();
+            db.Listings.Add(listing);
+
+            await db.SaveChangesAsync();
+        }
+
+        _client.DefaultRequestHeaders.Add("X-Test-User-Id", adminId.ToString());
+        _client.DefaultRequestHeaders.Add("X-Test-User-Role", "ADMIN");
+
+        // Act
+        var response = await _client.GetAsync("/api/v1/listings/under-review");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        jsonOptions.Converters.Add(new JsonStringEnumConverter());
+        var listings = await response.Content.ReadFromJsonAsync<List<ListingDTO>>(jsonOptions);
+
+        listings.Should().NotBeNull();
+        listings.Should().HaveCount(1);
+        listings!.First().Status.Should().Be(Listing.ListingStatus.UnderReview);
+    }
+
+    [Fact]
+    public async Task ModerationHide_ShouldReturn204_WhenUserIsAdmin()
+    {
+        // Arrange
+        Guid adminId;
+        Guid listingId;
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<FlatshareDbContext>();
+
+            var adminRequest = new CreateUserRequest("Admin", "User", "admin@test.pl", "Pass123!", "ADMIN");
+            var adminUser = flatshare_server.Infrastructure.Model.Users.User.TryCreate(adminRequest);
+            adminId = adminUser.Id;
+            db.Users.Add(adminUser);
+
+            var landlordRequest = new CreateUserRequest("Jan", "Kowalski", "landlord@test.pl", "Pass123!", CreateUserRequest.Landlord);
+            var landlord = flatshare_server.Infrastructure.Model.Users.User.TryCreate(landlordRequest);
+            db.Users.Add(landlord);
+
+            var req = GenerateValidRequest();
+            var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req, landlord);
+
+            listing.SubmitForReview();
+            listing.Approve();
+
+            db.Listings.Add(listing);
+            listingId = listing.Id;
+
+            await db.SaveChangesAsync();
+        }
+
+        _client.DefaultRequestHeaders.Add("X-Test-User-Id", adminId.ToString());
+        _client.DefaultRequestHeaders.Add("X-Test-User-Role", "ADMIN");
+
+        // Act
+        var response = await _client.PatchAsync($"/api/v1/listings/{listingId}/moderation-hide", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task Reinstate_ShouldReturn204_WhenUserIsAdmin()
+    {
+        // Arrange
+        Guid adminId;
+        Guid listingId;
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<FlatshareDbContext>();
+
+            var adminRequest = new CreateUserRequest("Admin", "User", "admin@test.pl", "Pass123!", "ADMIN");
+            var adminUser = flatshare_server.Infrastructure.Model.Users.User.TryCreate(adminRequest);
+            adminId = adminUser.Id;
+            db.Users.Add(adminUser);
+
+            var landlordRequest = new CreateUserRequest("Jan", "Kowalski", "landlord@test.pl", "Pass123!", CreateUserRequest.Landlord);
+            var landlord = flatshare_server.Infrastructure.Model.Users.User.TryCreate(landlordRequest);
+            db.Users.Add(landlord);
+
+            var req = GenerateValidRequest();
+            var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req, landlord);
+
+            listing.SubmitForReview();
+            listing.Approve();
+            listing.HideByModeration();
+
+            db.Listings.Add(listing);
+            listingId = listing.Id;
+
+            await db.SaveChangesAsync();
+        }
+
+        _client.DefaultRequestHeaders.Add("X-Test-User-Id", adminId.ToString());
+        _client.DefaultRequestHeaders.Add("X-Test-User-Role", "ADMIN");
+
+        // Act
+        var response = await _client.PatchAsync($"/api/v1/listings/{listingId}/reinstate", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
 }
