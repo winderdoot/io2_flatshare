@@ -105,6 +105,19 @@ export const LandlordListings = () => {
   // ── Data fetching ───────────────────────────────────────────────────────────
 
   useEffect(() => {
+    const state = location.state as
+      | { toast?: { message: string; kind: "success" | "error" } }
+      | null;
+    if (state?.toast) {
+      addToast(state.toast.message, state.toast.kind);
+      window.history.replaceState({}, "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Data fetching ───────────────────────────────────────────────────────────
+
+  useEffect(() => {
     if (user?.role !== "LANDLORD" || !user.id) {
       setLoading(false);
       setItems(null);
