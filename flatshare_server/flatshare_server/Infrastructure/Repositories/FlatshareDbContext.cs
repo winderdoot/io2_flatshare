@@ -48,7 +48,8 @@ public class FlatshareDbContext : DbContext
                 entity
                     .HasDiscriminator<string>("RoleType")
                     .HasValue<TenantRole>("TENANT")
-                    .HasValue<LandlordRole>("LANDLORD");
+                    .HasValue<LandlordRole>("LANDLORD")
+                    .HasValue<AdminRole>("ADMIN");
             })
             .Entity<TenantRole>(entity =>
             {
