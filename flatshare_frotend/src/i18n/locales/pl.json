@@ -1,7 +1,6 @@
 {
   "nav": {
     "home": "Strona główna",
-    "colors": "Kolory",
     "account": "Moje konto",
     "offer": "Oferty",
     "preferences": "Preferencje",
@@ -17,16 +16,30 @@
     "pln": "PLN (zł)",
     "usd": "USD ($)"
   },
+  "theme": {
+    "switchToLight": "Przełącz na jasny motyw",
+    "switchToDark": "Przełącz na ciemny motyw"
+  },
   "home": {
-    "title": "Strona główna",
+    "title": "FlatShare",
     "subtitle": "Przykładowe ogłoszenia — czynsz jest w PLN i przeliczany przy wyświetlaniu.",
     "listing1": "Pokój, Kraków — Kazimierz",
     "listing2": "Kawalerka, Warszawa — Mokotów",
     "listing3": "Mieszkanie współdzielone, Wrocław — centrum",
-    "perMonth": "/ miesiąc"
-  },
-  "colorPalette": {
-    "title": "Paleta kolorów"
+    "perMonth": "/ miesiąc",
+    "heroBadge": "Znajdź swoje nowe miejsce",
+    "heroTitle": "Wynajmuj. Dziel. Mieszkaj razem.",
+    "heroSubtitle": "FlatShare łączy najemców i właścicieli ze sprawdzonymi, nowoczesnymi ogłoszeniami w całej Polsce — szybko, przejrzyście i z myślą o tym, jak ludzie naprawdę mieszkają razem.",
+    "heroPrimary": "Przeglądaj oferty",
+    "heroSecondary": "Zaloguj się",
+    "featuredTitle": "Przykładowe ogłoszenia",
+    "featuredLead": "Podgląd tego, co aktualnie jest w bazie — ceny są przechowywane w PLN i wyświetlane w wybranej walucie.",
+    "featureVerifiedTitle": "Zweryfikowane ogłoszenia",
+    "featureVerifiedDesc": "Każda oferta jest sprawdzana przez nasz zespół, zanim trafi na listę — bez spamu i niespodzianek.",
+    "featureMatchingTitle": "Inteligentne dopasowanie",
+    "featureMatchingDesc": "Powiedz nam, czego szukasz — zwierzęta, palenie, dzielnice, budżet — a my pokażemy tylko pasujące.",
+    "featureBilingualTitle": "Dwujęzycznie i wielowalutowo",
+    "featureBilingualDesc": "Stworzone dla polskich i zagranicznych najemców. Zmień język i walutę jednym kliknięciem."
   },
   "login": {
     "emailLabel": "E-mail",

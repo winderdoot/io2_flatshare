@@ -6,6 +6,7 @@ import "./Login.css";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { authService } from "../../auth/AuthService";
+import { getPostLoginPath } from "../../auth/postLoginRedirect";
 
 
 export const Login = () => {      
@@ -20,8 +21,14 @@ export const Login = () => {
   const location = useLocation();
 
   if (user) {
-    const from = location.state?.from?.pathname || "/";
-    return <Navigate to={from} replace />;
+    const from = location.state?.from?.pathname;
+    return (
+      <Navigate
+        to={getPostLoginPath(from, user.role)}
+        replace
+        state={{}}
+      />
+    );
   }
 
   const handleSubmit = async () => {
@@ -44,8 +51,10 @@ export const Login = () => {
       login(token, loggedInUser);
 
       const from = location.state?.from?.pathname;
-
-      navigate(from || "/", { replace: true });
+      navigate(getPostLoginPath(from, loggedInUser.role), {
+        replace: true,
+        state: {},
+      });
 
     } catch (err) {
       setError("Invalid email or password");

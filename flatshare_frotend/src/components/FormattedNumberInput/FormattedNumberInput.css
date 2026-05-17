@@ -9,19 +9,36 @@
 }
 
 .formatted-input {
-    padding: 8px 35px 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    flex-shrink: 0;
+    padding: 0.6rem 2.25rem 0.6rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
     flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+    font: inherit;
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.formatted-input::placeholder {
+    color: color-mix(in srgb, var(--color-text-secondary) 70%, transparent);
+}
+
+.formatted-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--color-surface-2);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .formatted-input-suffix {
     position: absolute;
-    right: 10px;
+    right: 0.85rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #666;
+    color: var(--color-text-secondary);
     pointer-events: none;
-    font-size: 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
 }

@@ -1,70 +1,57 @@
+.background {
+    width: 100vw;
+    min-height: calc(100svh - var(--navbar-height));
+    position: relative;
+    padding: 2rem var(--container-pad);
+    box-sizing: border-box;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        radial-gradient(circle at 20% 25%, var(--color-primary-tint), transparent 55%),
+        radial-gradient(circle at 80% 75%, var(--color-accent-tint), transparent 60%),
+        var(--color-bg);
+}
+
+/* Hide legacy auth background image */
+.background img {
+    display: none;
+}
+
+.login-form-container {
+    width: 100%;
+    max-width: 28rem;
+
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    padding: 2.25rem 2rem;
+    border-radius: var(--radius-lg);
+    box-sizing: border-box;
+
+    box-shadow: var(--shadow);
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.75rem;
+
+    position: relative;
+    z-index: 1;
+}
+
 .fields-container {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
     width: 100%;
-
-    overflow-y: auto;
 }
 
 .fields-container::-webkit-scrollbar {
     display: none;
 }
-
-.background {
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    inset: 0;
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-    pointer-events: none;
-}
-
-.background img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    
-    position: fixed;
-    inset: 0;
-    
-    z-index: -1;
-    pointer-events: none;
-    
-    transform: scale(1.05);
-    filter: blur(0.5rem) brightness(1.1);
-}
-
-/* ===== CARD ===== */
-
-.login-form-container {
-    width: 90%;
-    max-width: 40rem;
-    max-height: 70vh;
-    
-    background-color: var(--color-bg);
-    padding: 1.5rem 2rem;
-    border-radius: 1rem;
-    box-sizing: border-box;
-    
-    box-shadow: var(--shadow);
-    
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2rem;
-
-    pointer-events: all;
-    position: relative;
-    z-index: 1;
-}
-
-/* ===== BUTTONS ===== */
 
 .buttons-container {
     display: flex;
@@ -73,54 +60,60 @@
     gap: 0.9rem;
 }
 
-/* ===== BUTTON ===== */
-
-button {
+.login-form-container button {
     background: var(--color-primary);
-    color: white;
+    color: var(--color-on-primary);
     border: none;
-    padding: 0.7rem;
-    border-radius: 0.6rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: background var(--transition), opacity var(--transition);
 }
 
-button:hover:not(:disabled) {
-    opacity: 0.9;
+.login-form-container button:hover:not(:disabled) {
+    background: var(--color-primary-hover);
 }
 
-button:disabled {
-    opacity: 0.7;
+.login-form-container button:disabled {
+    opacity: 0.6;
     cursor: not-allowed;
     position: relative;
 }
 
-/* spinner */
-button:disabled::after {
+.login-form-container button:disabled::after {
     content: "";
     margin-left: 8px;
     width: 14px;
     height: 14px;
-    border: 2px solid var(--color-bg);
-    border-top: 2px solid transparent;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
     border-radius: 50%;
     display: inline-block;
     animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.login-form-container label,
+.login-form-container label a {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    text-align: center;
 }
 
-/* ===== ERROR ===== */
+.login-form-container label a {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.login-form-container label a:hover {
+    color: color-mix(in srgb, var(--color-primary) 75%, var(--color-text-primary) 25%);
+}
 
 .error-message {
-    color: #ef4444;
-    font-size: 14px;
+    color: var(--color-accent-strong);
+    font-size: 0.85rem;
+    text-align: center;
+    margin: 0;
 }

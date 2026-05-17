@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth/AuthContext";
 import type { ListingDTO, ListingStatus } from "../../models/listing";
@@ -53,6 +53,7 @@ export const LandlordListings = () => {
   const { t, i18n } = useTranslation();
   const { user, token } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [items, setItems] = useState<ListingDTO[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -77,17 +78,29 @@ export const LandlordListings = () => {
     );
   }, []);
 
-  // Show toast if redirected here from ListingEditor after create/edit
+  // Show toast if redirected here from ListingEditor after create/edit.
+  // Must clear state via React Router (not window.history), otherwise Strict Mode /
+  // stale location.state can show the same toast twice.
   useEffect(() => {
     const state = location.state as
       | { toast?: { message: string; kind: "success" | "error" } }
       | null;
-    if (state?.toast) {
-      addToast(state.toast.message, state.toast.kind);
-      window.history.replaceState({}, "");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const payload = state?.toast;
+    if (!payload) return;
+
+    addToast(payload.message, payload.kind);
+    navigate(
+      { pathname: location.pathname, search: location.search, hash: location.hash },
+      { replace: true, state: {} }
+    );
+  }, [
+    location.state,
+    location.pathname,
+    location.search,
+    location.hash,
+    navigate,
+    addToast,
+  ]);
 
   // ── Data fetching ───────────────────────────────────────────────────────────
 

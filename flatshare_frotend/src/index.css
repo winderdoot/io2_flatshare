@@ -1,6 +1,7 @@
 :root {
-  --color-bg: #fff; 
-  --color-text-primary: #121923;
+  /* ── Strict palette (single source of truth) ─────────────────── */
+  --color-bg: #121923;
+  --color-text-primary: #fff;
   --color-text-secondary: #A9A8DC;
 
   --color-primary: #544FCC;
@@ -9,54 +10,175 @@
   --color-accent: #30DC7B;
   --color-accent-strong: #FFBA3B;
 
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px,
-    rgba(0, 0, 0, 0.05) 0 0 8px -2px;
+  /* ── Semantic on-color tokens (text on solid accents) ────────── */
+  /* On primary/accent solid backgrounds we always need a high-contrast
+     text colour. In dark mode that's the same as text-primary (white);
+     in light mode the role moves to --color-bg (which is white there). */
+  --color-on-primary: var(--color-text-primary);
+  --color-on-accent: var(--color-bg);
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  /* ── Derived surfaces (no new raw colors) ────────────────────── */
+  --color-surface: color-mix(in srgb, var(--color-bg) 88%, var(--color-primary) 12%);
+  --color-surface-2: color-mix(in srgb, var(--color-bg) 78%, var(--color-primary) 22%);
+  --color-surface-elev: color-mix(in srgb, var(--color-bg) 70%, var(--color-primary) 30%);
+  --color-overlay: color-mix(in srgb, var(--color-bg) 65%, transparent);
+
+  /* ── Borders ─────────────────────────────────────────────────── */
+  --color-border-subtle: color-mix(in srgb, var(--color-text-secondary) 14%, transparent);
+  --color-border: color-mix(in srgb, var(--color-text-secondary) 28%, transparent);
+  --color-border-strong: color-mix(in srgb, var(--color-text-secondary) 52%, transparent);
+
+  /* ── State tints (re-use accents) ────────────────────────────── */
+  --color-primary-hover: color-mix(in srgb, var(--color-primary) 85%, var(--color-text-primary) 15%);
+  --color-primary-press: color-mix(in srgb, var(--color-primary) 80%, var(--color-bg) 20%);
+  --color-primary-tint: color-mix(in srgb, var(--color-primary) 18%, transparent);
+
+  --color-accent-tint: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --color-accent-strong-tint: color-mix(in srgb, var(--color-accent-strong) 22%, transparent);
+  --color-secondary-tint: color-mix(in srgb, var(--color-text-secondary) 14%, transparent);
+
+  --color-focus-ring: color-mix(in srgb, var(--color-primary) 38%, transparent);
+
+  /* ── Shadows (tinted with theme background) ──────────────────── */
+  --shadow-sm:
+    0 1px 2px color-mix(in srgb, var(--color-bg) 60%, transparent);
+  --shadow:
+    0 1px 2px color-mix(in srgb, var(--color-bg) 55%, transparent),
+    0 10px 28px color-mix(in srgb, var(--color-bg) 70%, transparent);
+  --shadow-lg:
+    0 4px 12px color-mix(in srgb, var(--color-bg) 60%, transparent),
+    0 24px 60px color-mix(in srgb, var(--color-bg) 80%, transparent);
+  --shadow-primary:
+    0 8px 24px color-mix(in srgb, var(--color-primary) 35%, transparent);
+
+  /* ── Radii ───────────────────────────────────────────────────── */
+  --radius-xs: 0.35rem;
+  --radius-sm: 0.625rem;
+  --radius: 0.875rem;
+  --radius-lg: 1.125rem;
+  --radius-xl: 1.5rem;
+  --radius-pill: 999px;
+  /* Shared “pill” control radius (buttons, nav chips) */
+  --radius-button: 999px;
+
+  /* ── Typography ──────────────────────────────────────────────── */
+  --sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  --navbar-height: 64px;
-  --max-width: 1126px;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.35rem;
+  --font-size-2xl: 1.75rem;
+  --font-size-3xl: clamp(1.75rem, 3.4vw, 2.25rem);
+  --font-size-display: clamp(2.25rem, 6vw, 3.75rem);
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
+  --line-tight: 1.15;
+  --line-snug: 1.35;
+  --line-base: 1.55;
+  --line-loose: 1.75;
+
+  /* ── Layout ──────────────────────────────────────────────────── */
+  --navbar-height: 68px;
+  --max-width: 1180px;
+  --container-pad: clamp(1rem, 3vw, 2rem);
+
+  --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  font-size: 16px;
+  font-family: var(--sans);
+  font-weight: 400;
+  line-height: var(--line-base);
+  letter-spacing: 0.005em;
   color: var(--color-text-primary);
   background: var(--color-bg);
+  color-scheme: dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #121923; 
-    --color-text-primary: #fff;
-    --color-text-secondary: #A9A8DC;
+/* ── Light theme override (manual toggle via `data-theme="light"`) ── */
 
-    --color-primary: #544FCC;
-    --color-primary-soft: #F2EAE4;
+[data-theme="light"] {
+  /* Repurposed palette — same seven brand colors, light mode mapping */
+  --color-bg: #ffffff;
+  /* Body copy: ciemny fiolet z palety (nie czarny) */
+  --color-text-primary: color-mix(in srgb, var(--color-primary) 38%, #1e1a52 62%);
+  --color-text-secondary: color-mix(in srgb, var(--color-primary) 52%, #4a4580 48%);
+  /* --color-primary, --color-primary-soft, --color-accent, --color-accent-strong stay identical */
 
-    --color-accent: #30DC7B;
-    --color-accent-strong: #FFBA3B;
-  }
+  /* On-color tokens swap roles so text on solid brand fills stays light */
+  --color-on-primary: #ffffff;
+  /* Tekst na zielonym / żółtym tle — głęboki fiolet dla kontrastu */
+  --color-on-accent: color-mix(in srgb, var(--color-primary) 42%, #1a1738 58%);
+
+  /* Jasny motyw: czyste białe tła kart i pól (bez szarego / kremowego) */
+  --color-surface: #ffffff;
+  --color-surface-2: #ffffff;
+  --color-surface-elev: #ffffff;
+  --color-overlay: color-mix(in srgb, var(--color-text-primary) 28%, transparent);
+
+  /* Borders — readable dark ink on light surfaces */
+  --color-border-subtle: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  --color-border: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+  --color-border-strong: color-mix(in srgb, var(--color-text-primary) 32%, transparent);
+
+  /* Primary hover/press derived from the dark anchor for the lighter bg */
+  --color-primary-hover: color-mix(in srgb, var(--color-primary) 88%, var(--color-text-primary) 12%);
+  --color-primary-press: color-mix(in srgb, var(--color-primary) 78%, var(--color-text-primary) 22%);
+
+  /* Shadows tinted with dark ink instead of bg (would be white otherwise) */
+  --shadow-sm:
+    0 1px 2px color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+  --shadow:
+    0 1px 2px color-mix(in srgb, var(--color-text-primary) 8%, transparent),
+    0 10px 28px color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+  --shadow-lg:
+    0 4px 12px color-mix(in srgb, var(--color-text-primary) 12%, transparent),
+    0 24px 60px color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+
+  color-scheme: light;
+}
+
+/* Jasny motyw: delikatny fioletowy „halo” przy focusie zamiast szarego tła */
+[data-theme="light"] input:focus,
+[data-theme="light"] select:focus,
+[data-theme="light"] textarea:focus {
+  background: color-mix(in srgb, var(--color-primary) 4.5%, #ffffff 95.5%);
+}
+
+/* Native date picker icon: invert filter for dark theme only */
+[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  min-height: 100svh;
+  overflow-x: hidden;
 }
 
 body {
-  margin: 0;
+  font-family: var(--sans);
+  font-size: var(--font-size-md);
+  line-height: var(--line-base);
 }
 
 #root {
-  width: var(--max-width);
+  width: 100%;
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0;
   text-align: left;
   min-height: 100svh;
   display: flex;
@@ -64,52 +186,294 @@ body {
   box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
+/* ── Headings & text ─────────────────────────────────────────── */
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--heading);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: var(--line-tight);
   margin: 0;
 }
 
-label {
-  font-size: .9rem;
+h1 {
+  font-size: var(--font-size-3xl);
+  letter-spacing: -0.025em;
 }
+
+h2 {
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-snug);
+}
+
+h3 {
+  font-size: var(--font-size-xl);
+  line-height: var(--line-snug);
+}
+
+h4 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+  color: var(--color-text-primary);
+  line-height: var(--line-base);
+}
+
+small,
+.text-secondary,
+.muted {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition);
+}
+
+a:hover {
+  color: color-mix(in srgb, var(--color-primary) 70%, var(--color-text-primary) 30%);
+}
+
+[data-theme="light"] a:hover {
+  color: var(--color-accent);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-primary) 60%, transparent);
+  color: var(--color-text-primary);
+}
+
+[data-theme="light"] ::selection {
+  background: color-mix(in srgb, var(--color-accent-strong) 42%, transparent);
+  color: var(--color-text-primary);
+}
+
+/* ── Base button ─────────────────────────────────────────────── */
 
 button {
   cursor: pointer;
   background-color: var(--color-primary);
-  color: var(--color-bg);
+  color: var(--color-on-primary);
   border: none;
-  border-radius: .5rem;
-  font-size: 1rem;
-  font-weight: bold;
-  letter-spacing: .06rem;
-  padding: .5rem 1rem;
-  transition: all 0.2s ease;
+  border-radius: var(--radius-button);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.7rem 1.35rem;
+  line-height: 1.2;
+  box-shadow: var(--shadow-sm);
+  transition:
+    background-color var(--transition),
+    color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition),
+    border-color var(--transition),
+    opacity var(--transition);
+}
 
-  &:hover {
-    background-color: color-mix(in srgb, var(--color-primary) 90%, transparent 10%);
-  }
+button:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  box-shadow:
+    0 2px 8px color-mix(in srgb, var(--color-primary) 28%, transparent),
+    var(--shadow-sm);
+}
+
+button:active:not(:disabled) {
+  background-color: var(--color-primary-press);
+  transform: translateY(1px);
+}
+
+/* Alternatywa: „akcja potwierdzająca” w zieleni (główny akcent) */
+button.button--accent,
+button[data-variant="accent"] {
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+button.button--accent:hover:not(:disabled),
+button[data-variant="accent"]:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-accent) 88%, var(--color-text-primary) 12%);
+  box-shadow:
+    0 2px 10px color-mix(in srgb, var(--color-accent) 35%, transparent),
+    var(--shadow-sm);
+}
+
+button.button--accent:active:not(:disabled),
+button[data-variant="accent"]:active:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-accent) 78%, var(--color-text-primary) 22%);
+}
+
+/* Alternatywa: żółty CTA */
+button.button--warm,
+button[data-variant="warm"] {
+  background-color: var(--color-accent-strong);
+  color: var(--color-on-accent);
+}
+
+button.button--warm:hover:not(:disabled),
+button[data-variant="warm"]:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-accent-strong) 90%, var(--color-text-primary) 10%);
+  box-shadow:
+    0 2px 10px color-mix(in srgb, var(--color-accent-strong) 40%, transparent),
+    var(--shadow-sm);
+}
+
+button.button--warm:active:not(:disabled),
+button[data-variant="warm"]:active:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-accent-strong) 82%, var(--color-text-primary) 18%);
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* ── Inputs ──────────────────────────────────────────────────── */
+
+input,
+select,
+textarea {
+  font: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.85rem;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in srgb, var(--color-text-secondary) 70%, transparent);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-primary);
+  background: var(--color-surface-2);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--color-text-secondary) 50%),
+    linear-gradient(135deg, var(--color-text-secondary) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 12px) calc(50% - 3px);
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 2.25rem;
+}
+
+select option {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(80%) sepia(20%) saturate(800%) hue-rotate(210deg);
+  cursor: pointer;
+}
+
+/* ── Lists ───────────────────────────────────────────────────── */
+
+ul, ol {
+  padding-left: 1.25rem;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+ul li,
+ol li {
+  padding: 0.15rem 0;
+  line-height: var(--line-base);
+}
+
+ul li::marker {
+  color: var(--color-primary);
+}
+
+ol li::marker {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+[data-theme="light"] ol li::marker {
+  color: color-mix(in srgb, var(--color-accent-strong) 70%, var(--color-primary) 30%);
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-primary) 65%, transparent);
+  border-radius: var(--radius-pill);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* ── Spinner (shared utility) ────────────────────────────────── */
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }

@@ -1,6 +1,6 @@
 .landlord-listings {
   width: 100%;
-  padding: 1.5rem 1.25rem 3.5rem;
+  padding: 2rem var(--container-pad) 4rem;
   box-sizing: border-box;
 }
 
@@ -15,24 +15,22 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0;
-  border-bottom: none;
+  margin-bottom: 1.75rem;
 }
 
 .landlord-listings-title {
   margin: 0 0 0.35rem 0;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-size: var(--font-size-3xl);
   font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
+  letter-spacing: -0.025em;
+  line-height: var(--line-tight);
   color: var(--color-text-primary);
 }
 
 .landlord-listings-subtitle {
   margin: 0;
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: var(--font-size-md);
+  line-height: var(--line-base);
   color: var(--color-text-secondary);
   max-width: 36rem;
 }
@@ -49,14 +47,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.65rem 1.15rem;
-  border-radius: 0.75rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: var(--radius-sm);
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--font-size-sm);
   text-decoration: none;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.1s ease;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
 }
 
 .landlord-listings-btn:disabled {
@@ -66,34 +64,37 @@
 
 .landlord-listings-btn--primary {
   background: var(--color-primary);
-  color: var(--color-on-primary, #fff);
+  color: var(--color-on-primary);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-primary);
 }
 
 .landlord-listings-btn--primary:hover:not(:disabled) {
-  opacity: 0.92;
-  transform: none;
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  transform: translateY(-1px);
 }
 
 .landlord-listings-notice {
   margin: 0 0 1.25rem 0;
-  padding: 1.25rem 1.35rem;
-  border-radius: 1rem;
+  padding: 1.35rem 1.5rem;
+  border-radius: var(--radius-lg);
   background: linear-gradient(
     135deg,
-    var(--color-primary-soft) 0%,
-    color-mix(in srgb, var(--color-primary-soft) 85%, var(--color-bg)) 100%
+    var(--color-primary-tint) 0%,
+    color-mix(in srgb, var(--color-primary) 6%, var(--color-bg)) 100%
   );
   color: var(--color-text-primary);
-  box-shadow: var(--shadow);
-  border: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 26%, transparent);
 }
 
 .landlord-listings-error {
   margin: 0 0 1.5rem 0;
   padding: 1rem 1.25rem;
-  border-radius: 0.85rem;
-  background: color-mix(in srgb, #c62828 12%, var(--color-bg));
-  border: 1px solid color-mix(in srgb, #c62828 28%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-accent-strong) 14%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-accent-strong) 40%, transparent);
   color: var(--color-text-primary);
 }
 
@@ -103,48 +104,64 @@
 }
 
 .landlord-listings-empty {
-  padding: 2rem 1.5rem;
+  margin: 0;
+  padding: 2.5rem 1.5rem;
   text-align: center;
   color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .landlord-listings-table-wrap {
   overflow-x: auto;
-  border-radius: 1.15rem;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  border: 1px solid color-mix(in srgb, var(--color-primary) 12%, var(--color-text-secondary));
-  background: var(--color-bg);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
 }
 
 .landlord-listings-table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.92rem;
+  color: var(--color-text-primary);
 }
 
 .landlord-listings-table th,
 .landlord-listings-table td {
   text-align: left;
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-text-secondary) 22%, transparent);
+  padding: 0.95rem 1.1rem;
   vertical-align: middle;
 }
 
 .landlord-listings-table th {
   font-weight: 600;
   color: var(--color-text-secondary);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  background: color-mix(in srgb, var(--color-primary-soft) 25%, transparent);
+  letter-spacing: 0.08em;
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border-subtle);
+  white-space: nowrap;
+}
+
+.landlord-listings-table tbody td {
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .landlord-listings-table tbody tr:last-child td {
   border-bottom: none;
 }
 
+.landlord-listings-table tbody tr {
+  transition: background var(--transition);
+}
+
 .landlord-listings-table tbody tr:hover {
-  background: color-mix(in srgb, var(--color-primary-soft) 35%, transparent);
+  background: var(--color-secondary-tint);
 }
 
 .landlord-listings-link {
@@ -154,65 +171,64 @@
 }
 
 .landlord-listings-link:hover {
+  color: color-mix(in srgb, var(--color-primary) 70%, var(--color-text-primary) 30%);
   text-decoration: underline;
 }
 
 .landlord-listings-status {
-  display: inline-block;
-  padding: 0.28rem 0.65rem;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 650;
-  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   flex-shrink: 0;
 }
 
 .landlord-listings-status--draft {
-  background: color-mix(in srgb, var(--color-text-secondary) 20%, transparent);
-  color: var(--color-text-primary);
+  background: var(--color-secondary-tint);
+  color: var(--color-text-secondary);
 }
 
 .landlord-listings-status--underReview {
-  background: color-mix(in srgb, #f9a825 38%, transparent);
-  color: var(--color-text-primary);
+  background: var(--color-accent-strong-tint);
+  color: var(--color-accent-strong);
 }
 
 .landlord-listings-status--active {
-  background: color-mix(in srgb, #2e7d32 26%, transparent);
-  color: var(--color-text-primary);
+  background: var(--color-accent-tint);
+  color: var(--color-accent);
 }
 
 .landlord-listings-status--hidden {
-  background: color-mix(in srgb, var(--color-text-secondary) 16%, transparent);
+  background: var(--color-secondary-tint);
   color: var(--color-text-secondary);
 }
 
 .landlord-listings-status--hiddenByModeration {
-  background: color-mix(in srgb, #c62828 22%, transparent);
-  color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--color-accent-strong) 28%, transparent);
+  color: var(--color-accent-strong);
 }
 
 .landlord-listings-status--archived {
-  background: color-mix(in srgb, var(--color-text-secondary) 12%, transparent);
-  color: var(--color-text-secondary);
+  background: color-mix(in srgb, var(--color-text-secondary) 10%, transparent);
+  color: color-mix(in srgb, var(--color-text-secondary) 80%, transparent);
 }
 
-/* ── Busy row ─────────────────────────────────────────────────────────────── */
-
+/* Busy row */
 .ll-row--busy {
   opacity: 0.55;
   pointer-events: none;
 }
 
-/* ── Actions td ───────────────────────────────────────────────────────────── */
-
+/* Actions td */
 .ll-actions-td {
-  min-width: 200px;
+  min-width: 220px;
 }
 
-/* ── Action cell (button group) ───────────────────────────────────────────── */
-
+/* Action cell (button group) */
 .ll-action-cell {
   display: flex;
   flex-direction: column;
@@ -220,77 +236,83 @@
   align-items: flex-start;
 }
 
-/* ── Action buttons ───────────────────────────────────────────────────────── */
-
+/* Action buttons */
 .ll-action-btn {
-  /* Reset global button defaults */
   appearance: none;
   box-sizing: border-box;
   font-family: var(--sans);
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
   text-decoration: none;
 
-  /* Layout – fixed equal width so all labels occupy the same space */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 176px;
-  height: 34px;
-  padding: 0 0.75rem;
+  height: 36px;
+  padding: 0 0.85rem;
 
-  /* Typography */
   font-size: 0.78rem;
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
   text-align: center;
 
-  /* Shape */
-  border-radius: 0.55rem;
-  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: opacity 0.15s ease, filter 0.15s ease;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
 
 .ll-action-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-.ll-action-btn:not(:disabled):hover {
-  filter: brightness(0.88);
-}
-
-/* Submit for review → solid primary purple */
 .ll-action-btn--submit {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
 }
 
-/* Publish / Republish → green tint */
+.ll-action-btn--submit:not(:disabled):hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
 .ll-action-btn--publish {
-  background: color-mix(in srgb, var(--color-accent) 22%, var(--color-bg));
+  background: var(--color-accent-tint);
   border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
-  color: color-mix(in srgb, var(--color-accent) 60%, #054d24);
+  color: var(--color-accent);
 }
 
-/* Hide → neutral indigo-tinted */
+.ll-action-btn--publish:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-accent) 28%, var(--color-bg));
+  border-color: var(--color-accent);
+}
+
 .ll-action-btn--hide {
-  background: color-mix(in srgb, var(--color-text-secondary) 16%, var(--color-bg));
-  border-color: color-mix(in srgb, var(--color-text-secondary) 38%, transparent);
+  background: var(--color-secondary-tint);
+  border-color: var(--color-border);
   color: var(--color-text-primary);
 }
 
-/* Archive → muted red */
-.ll-action-btn--archive {
-  background: color-mix(in srgb, #c62828 10%, var(--color-bg));
-  border-color: color-mix(in srgb, #c62828 35%, transparent);
-  color: color-mix(in srgb, #c62828 80%, var(--color-text-primary));
+.ll-action-btn--hide:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-text-secondary) 22%, transparent);
+  border-color: var(--color-border-strong);
 }
 
-/* ── Spinner ──────────────────────────────────────────────────────────────── */
+.ll-action-btn--archive {
+  background: color-mix(in srgb, var(--color-accent-strong) 12%, var(--color-bg));
+  border-color: color-mix(in srgb, var(--color-accent-strong) 38%, transparent);
+  color: var(--color-accent-strong);
+}
 
+.ll-action-btn--archive:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-accent-strong) 22%, var(--color-bg));
+  border-color: var(--color-accent-strong);
+}
+
+/* Spinner */
 .ll-spinner {
   display: inline-block;
   width: 14px;
@@ -305,27 +327,26 @@
   to { transform: rotate(360deg); }
 }
 
-/* ── Status-specific inline labels ───────────────────────────────────────── */
-
+/* Status-specific inline labels */
 .ll-review-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-pill);
   font-size: 0.78rem;
   font-weight: 600;
-  background: color-mix(in srgb, #f9a825 28%, transparent);
-  color: var(--color-text-primary);
+  background: var(--color-accent-strong-tint);
+  color: var(--color-accent-strong);
   white-space: nowrap;
-  border: 1px solid color-mix(in srgb, #f9a825 45%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent-strong) 45%, transparent);
 }
 
 .ll-moderation-note {
   font-size: 0.73rem;
-  color: color-mix(in srgb, #c62828 75%, var(--color-text-primary));
+  color: var(--color-accent-strong);
   font-style: italic;
-  line-height: 1.35;
+  line-height: 1.4;
   max-width: 176px;
 }
 
@@ -343,18 +364,15 @@
   font-style: italic;
 }
 
-/* ── Links row ────────────────────────────────────────────────────────────── */
-
 .ll-links-row {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.35rem;
   white-space: nowrap;
   font-size: 0.88rem;
 }
 
-/* ── Toast notifications ──────────────────────────────────────────────────── */
-
+/* Toast notifications */
 .ll-toast-wrap {
   position: fixed;
   bottom: 1.5rem;
@@ -369,32 +387,29 @@
 .ll-toast {
   min-width: 260px;
   max-width: 360px;
-  padding: 0.75rem 1.1rem;
-  border-radius: 0.75rem;
+  padding: 0.85rem 1.15rem;
+  border-radius: var(--radius);
   font-size: 0.88rem;
   font-weight: 500;
   box-shadow: var(--shadow);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-subtle);
   animation: ll-slide-in 0.2s ease;
 }
 
 .ll-toast--success {
-  background: color-mix(in srgb, var(--color-accent) 22%, var(--color-bg));
-  color: color-mix(in srgb, var(--color-accent) 60%, #054d24);
   border-left: 4px solid var(--color-accent);
 }
 
 .ll-toast--error {
-  background: color-mix(in srgb, #c62828 12%, var(--color-bg));
-  color: color-mix(in srgb, #c62828 80%, var(--color-text-primary));
-  border-left: 4px solid #c62828;
+  border-left: 4px solid var(--color-accent-strong);
 }
 
 @keyframes ll-slide-in {
   from { transform: translateX(110%); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
-
-/* ── Responsive ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 520px) {
   .landlord-listings-head {

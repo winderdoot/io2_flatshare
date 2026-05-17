@@ -39,49 +39,61 @@ export default function SearchFilters() {
   return (
     <div className={styles.container}>
       <div className={styles.row}>
-        <select
-          name="city"
-          value={filters.city}
-          onChange={handleCityChange}
-          className={styles.select}
-        >
-          <option value="">{t("filters.city")}</option>
-          {Object.keys(locationConfig).map((city) => (
-            <option key={city} value={city}>
-              {cityOptions[city as keyof typeof cityOptions]}
-            </option>
-          ))}
-        </select>
-
-        <select
-          name="district"
-          value={filters.district}
-          onChange={handleChange}
-          disabled={!filters.city}
-          className={styles.select}
-        >
-          <option value="">{t("filters.district")}</option>
-          {filters.city &&
-            locationConfig[filters.city].map((d) => (
-              <option key={d} value={d}>
-                {d}
+        <div className={styles.col}>
+          <label htmlFor="filter-city">{t("filters.city")}</label>
+          <select
+            id="filter-city"
+            name="city"
+            value={filters.city}
+            onChange={handleCityChange}
+            className={styles.select}
+          >
+            <option value="">{t("filters.city")}</option>
+            {Object.keys(locationConfig).map((city) => (
+              <option key={city} value={city}>
+                {cityOptions[city as keyof typeof cityOptions]}
               </option>
             ))}
-        </select>
+          </select>
+        </div>
 
-        <select
-          name="profile"
-          value={filters.profile}
-          onChange={handleChange}
-          className={styles.select}
-        >
-          <option value="">{t("filters.profile")}</option>
-          {Object.entries(profileConfig).map(([value, label]) => (
-            <option key={value} value={value}>
-              {t(label)}
-            </option>
-          ))}
-        </select>
+        <div className={styles.col}>
+          <label htmlFor="filter-district">{t("filters.district")}</label>
+          <select
+            id="filter-district"
+            name="district"
+            value={filters.district}
+            onChange={handleChange}
+            disabled={!filters.city}
+            className={styles.select}
+          >
+            <option value="">{t("filters.district")}</option>
+            {filters.city &&
+              locationConfig[filters.city].map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+          </select>
+        </div>
+
+        <div className={styles.col}>
+          <label htmlFor="filter-profile">{t("filters.profile")}</label>
+          <select
+            id="filter-profile"
+            name="profile"
+            value={filters.profile}
+            onChange={handleChange}
+            className={styles.select}
+          >
+            <option value="">{t("filters.profile")}</option>
+            {Object.entries(profileConfig).map(([value, label]) => (
+              <option key={value} value={value}>
+                {t(label)}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className={styles.row}>
