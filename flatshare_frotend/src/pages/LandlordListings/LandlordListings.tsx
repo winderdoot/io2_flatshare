@@ -108,12 +108,22 @@ export const LandlordListings = () => {
     const state = location.state as
       | { toast?: { message: string; kind: "success" | "error" } }
       | null;
-    if (state?.toast) {
-      addToast(state.toast.message, state.toast.kind);
-      window.history.replaceState({}, "");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const payload = state?.toast;
+    if (!payload) return;
+
+    addToast(payload.message, payload.kind);
+    navigate(
+      { pathname: location.pathname, search: location.search, hash: location.hash },
+      { replace: true, state: {} }
+    );
+  }, [
+    location.state,
+    location.pathname,
+    location.search,
+    location.hash,
+    navigate,
+    addToast,
+  ]);
 
   // ── Data fetching ───────────────────────────────────────────────────────────
 
