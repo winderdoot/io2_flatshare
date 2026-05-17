@@ -50,4 +50,5 @@ export type ListingDTO = {
   attributes: ListingAttributes;
   unavailabilities?: Unavailability[];
   coverImageUrl?: string;
+  createdAt?: string;
 };
