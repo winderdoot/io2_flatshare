@@ -1,7 +1,6 @@
 {
   "nav": {
     "home": "Home",
-    "colors": "Colors",
     "account": "My account",
     "offer": "Offers",
     "preferences": "Preferences",
@@ -17,16 +16,30 @@
     "pln": "PLN (zł)",
     "usd": "USD ($)"
   },
+  "theme": {
+    "switchToLight": "Switch to light theme",
+    "switchToDark": "Switch to dark theme"
+  },
   "home": {
-    "title": "Home",
+    "title": "FlatShare",
     "subtitle": "Sample listings — rent is stored in PLN and converted for display.",
     "listing1": "Room, Kraków — Kazimierz",
     "listing2": "Studio, Warszawa — Mokotów",
     "listing3": "Shared flat, Wrocław — center",
-    "perMonth": "/ month"
-  },
-  "colorPalette": {
-    "title": "Color palette"
+    "perMonth": "/ month",
+    "heroBadge": "Find your next home",
+    "heroTitle": "Share a flat. Share a life.",
+    "heroSubtitle": "FlatShare connects tenants and landlords with verified, modern listings across Poland — fast, transparent, and built for the way people really live together.",
+    "heroPrimary": "Browse offers",
+    "heroSecondary": "Sign in",
+    "featuredTitle": "Sample listings",
+    "featuredLead": "A glimpse of what's currently being listed — prices are stored in PLN and shown in your chosen currency.",
+    "featureVerifiedTitle": "Verified listings",
+    "featureVerifiedDesc": "Every offer is reviewed by our team before going live — no spam, no surprises.",
+    "featureMatchingTitle": "Smart matching",
+    "featureMatchingDesc": "Tell us what you need — pets, smoking, districts, budget — and only see places that fit.",
+    "featureBilingualTitle": "Bilingual & multi-currency",
+    "featureBilingualDesc": "Built for Polish and international tenants. Switch language and currency in one click."
   },
   "login": {
     "emailLabel": "Email",

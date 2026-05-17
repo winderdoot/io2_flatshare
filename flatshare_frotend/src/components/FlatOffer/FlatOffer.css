@@ -1,17 +1,21 @@
 .offer-card {
     width: 320px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    background: var(--color-bg);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
     cursor: pointer;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .offer-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+    border-color: var(--color-primary);
 }
 
 .offer-image-wrapper {
@@ -19,56 +23,70 @@
     width: 100%;
     height: 200px;
     overflow: hidden;
+    background: var(--color-surface-elev);
 }
 
 .offer-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform var(--transition);
+}
+
+.offer-card:hover .offer-image {
+    transform: scale(1.04);
 }
 
 .offer-price {
     position: absolute;
-    bottom: 10px;
-    right: 10px;
+    bottom: 12px;
+    right: 12px;
     background: var(--color-primary);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 14px;
+    color: var(--color-on-primary);
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius-button);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    box-shadow: var(--shadow-primary);
 }
 
 .offer-content {
-    padding: 16px;
+    padding: 1.1rem 1.15rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    flex: 1;
 }
 
 .offer-title {
-    margin: 0 0 8px;
-    font-size: 20px;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    line-height: var(--line-snug);
 }
 
 .offer-mini-info {
     display: flex;
     flex-direction: column;
-    gap: 0rem;
+    gap: 0.25rem;
 }
 
 .offer-area,
 .offer-location {
-    font-size: 14px;
+    font-size: 0.85rem;
     color: var(--color-text-secondary);
-    margin-bottom: 10px;
-}
-
-.offer-location {
-    margin-bottom: 0px;
+    margin: 0;
+    line-height: var(--line-snug);
+    word-break: break-word;
 }
 
 .offer-description {
-    font-size: 14px;
+    font-size: 0.88rem;
     color: var(--color-text-secondary);
-    margin-bottom: 16px;
+    margin: 0;
+    line-height: var(--line-base);
 
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -80,38 +98,59 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 0.4rem;
 }
 
 .offer-phone {
-    font-size: 14px;
-    color: var(--color-text-primary);
+    font-size: 0.82rem;
+    color: var(--color-text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
 }
 
 .contact-button {
     cursor: pointer;
     background-color: var(--color-primary);
-    color: var(--color-bg);
+    color: var(--color-on-primary);
     border: none;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    font-weight: bold;
-    letter-spacing: 0.06rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     padding: 0.5rem 1rem;
-    transition: all 0.2s ease;
+    transition: background var(--transition), transform var(--transition);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
     font-family: inherit;
+    flex-shrink: 0;
 }
 
 .contact-button:hover {
-    background-color: color-mix(in srgb, var(--color-primary) 90%, transparent 10%);
+    background-color: var(--color-primary-hover);
+    color: var(--color-on-primary);
+    transform: translateY(-1px);
+}
+
+[data-theme="light"] .contact-button {
+    background-color: var(--color-accent-strong);
+    color: var(--color-on-accent);
+}
+
+[data-theme="light"] .contact-button:hover {
+    background-color: color-mix(in srgb, var(--color-accent-strong) 90%, var(--color-text-primary) 10%);
+    color: var(--color-on-accent);
 }
 
 .offer-card.horizontal {
     display: flex;
+    flex-direction: row;
     width: 100%;
     height: auto;
     min-height: 225px;
@@ -132,18 +171,16 @@
 
 .offer-card.horizontal .offer-image {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
 .offer-card.horizontal .offer-content {
-    display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 16px;
+    padding: 1.25rem 1.35rem;
     width: 100%;
 }
 
@@ -152,4 +189,20 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+@media (max-width: 640px) {
+    .offer-card.horizontal {
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .offer-card.horizontal .offer-image-wrapper {
+        width: 100%;
+        height: 200px;
+    }
+
+    .offer-card.horizontal .offer-image {
+        position: relative;
+    }
 }

@@ -1,6 +1,6 @@
 .listing-editor {
   width: 100%;
-  padding: 1.5rem 1.25rem 3.5rem;
+  padding: 2rem var(--container-pad) 4rem;
   box-sizing: border-box;
 }
 
@@ -12,14 +12,13 @@
 .listing-editor-page-head {
   margin-bottom: 2rem;
   padding-bottom: 1.75rem;
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--color-text-secondary) 16%, transparent);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .listing-editor-back {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
   margin-bottom: 1.1rem;
   font-size: 0.9rem;
   color: var(--color-primary);
@@ -33,63 +32,63 @@
 
 .listing-editor-title {
   margin: 0 0 0.75rem 0;
-  font-size: clamp(1.65rem, 3.2vw, 2.05rem);
-  font-weight: 650;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
+  font-size: var(--font-size-3xl);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: var(--line-tight);
   color: var(--color-text-primary);
 }
 
 .listing-editor-lead {
   margin: 0;
   max-width: 40rem;
-  font-size: 1.0625rem;
-  line-height: 1.65;
+  font-size: var(--font-size-md);
+  line-height: var(--line-base);
   color: var(--color-text-secondary);
 }
 
 .listing-editor-banner {
   margin: 0 0 1.25rem 0;
   padding: 1rem 1.2rem;
-  border-radius: 0.85rem;
-  background: color-mix(in srgb, #f9a825 14%, var(--color-bg));
-  border: 1px solid color-mix(in srgb, #f9a825 32%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-accent-strong) 12%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-accent-strong) 34%, transparent);
   color: var(--color-text-primary);
-  font-size: 0.9375rem;
-  line-height: 1.5;
+  font-size: 0.92rem;
+  line-height: var(--line-snug);
 }
 
 .listing-editor-error {
   margin: 0 0 1rem 0;
   padding: 0.95rem 1.15rem;
-  border-radius: 0.85rem;
-  background: color-mix(in srgb, #c62828 12%, var(--color-bg));
-  border: 1px solid color-mix(in srgb, #c62828 28%, transparent);
-  font-size: 0.9375rem;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-accent-strong) 14%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-accent-strong) 38%, transparent);
+  color: var(--color-text-primary);
+  font-size: 0.92rem;
   line-height: 1.45;
 }
 
 .listing-editor-success {
   margin: 0 0 1rem 0;
   padding: 0.95rem 1.15rem;
-  border-radius: 0.85rem;
-  background: color-mix(in srgb, #2e7d32 14%, var(--color-bg));
-  border: 1px solid color-mix(in srgb, #2e7d32 28%, transparent);
-  font-size: 0.9375rem;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 38%, transparent);
+  color: var(--color-text-primary);
+  font-size: 0.92rem;
   line-height: 1.45;
 }
 
 .listing-editor-form {
   display: flex;
   flex-direction: column;
-  gap: 1.35rem;
+  gap: 0;
   padding: 0;
-  border-radius: 1.1rem;
-  background: var(--color-bg);
-  box-shadow:
-    0 1px 2px color-mix(in srgb, var(--color-text-primary) 6%, transparent),
-    0 4px 18px color-mix(in srgb, var(--color-text-primary) 5%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-text-secondary) 14%, transparent);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--color-border-subtle);
   overflow: hidden;
 }
 
@@ -101,22 +100,22 @@
 }
 
 .listing-editor-panel + .listing-editor-panel {
-  border-top: 1px solid color-mix(in srgb, var(--color-text-secondary) 12%, transparent);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .listing-editor-panel-title {
   margin: 0 0 0.15rem 0;
-  font-size: 0.8125rem;
-  font-weight: 650;
+  font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.08em;
   color: var(--color-text-secondary);
 }
 
 .listing-editor-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.05rem 1.15rem;
+  gap: 1rem 1.15rem;
 }
 
 @media (max-width: 640px) {
@@ -132,7 +131,7 @@
 }
 
 .listing-editor-label {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -142,36 +141,40 @@
 .listing-editor-textarea {
   width: 100%;
   box-sizing: border-box;
-  padding: 0.65rem 0.85rem;
-  border-radius: 0.55rem;
-  border: 1px solid color-mix(in srgb, var(--color-text-secondary) 28%, transparent);
-  background: color-mix(in srgb, var(--color-bg) 97%, var(--color-text-secondary));
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-2);
   color: var(--color-text-primary);
-  font-size: 0.96875rem;
+  font-size: 0.96rem;
   font-family: inherit;
   line-height: 1.4;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.listing-editor-input::placeholder,
+.listing-editor-textarea::placeholder {
+  color: color-mix(in srgb, var(--color-text-secondary) 70%, transparent);
 }
 
 .listing-editor-input:focus,
 .listing-editor-select:focus,
 .listing-editor-textarea:focus {
   outline: none;
-  background: var(--color-bg);
-  border-color: color-mix(in srgb, var(--color-primary) 55%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent);
+  background: var(--color-surface-elev);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .listing-editor-input:disabled,
 .listing-editor-select:disabled,
 .listing-editor-textarea:disabled {
-  opacity: 0.72;
-  background: color-mix(in srgb, var(--color-bg) 88%, var(--color-text-secondary));
+  opacity: 0.62;
   cursor: not-allowed;
 }
 
 .listing-editor-textarea {
-  min-height: 7.5rem;
+  min-height: 8rem;
   resize: vertical;
 }
 
@@ -179,7 +182,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
   gap: 0.65rem 1rem;
-  margin-top: 0.15rem;
+  margin-top: 0.2rem;
 }
 
 .listing-editor-check {
@@ -189,20 +192,21 @@
   font-size: 0.9rem;
   line-height: 1.4;
   color: var(--color-text-primary);
-  padding: 0.65rem 0.75rem;
-  border-radius: 0.55rem;
-  border: 1px solid color-mix(in srgb, var(--color-text-secondary) 16%, transparent);
-  background: color-mix(in srgb, var(--color-bg) 96%, var(--color-text-secondary));
+  padding: 0.75rem 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-2);
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color var(--transition), background var(--transition);
 }
 
 .listing-editor-check:hover {
-  border-color: color-mix(in srgb, var(--color-primary) 22%, transparent);
+  border-color: var(--color-primary);
+  background: var(--color-surface-elev);
 }
 
 .listing-editor-check:has(input:disabled) {
-  opacity: 0.72;
+  opacity: 0.65;
   cursor: not-allowed;
 }
 
@@ -220,24 +224,24 @@
   gap: 0.75rem;
   padding: 1.25rem 1.5rem 1.5rem;
   margin: 0;
-  border-top: 1px solid color-mix(in srgb, var(--color-text-secondary) 12%, transparent);
-  background: color-mix(in srgb, var(--color-primary-soft) 18%, var(--color-bg));
+  border-top: 1px solid var(--color-border-subtle);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-bg));
 }
 
 .listing-editor-submit {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.78rem 1.5rem;
-  border-radius: 0.55rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: var(--radius-sm);
   border: none;
-  font-weight: 650;
-  font-size: 0.9375rem;
+  font-weight: 600;
+  font-size: 0.94rem;
   cursor: pointer;
   background: var(--color-primary);
-  color: var(--color-on-primary, #fff);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--color-text-primary) 12%, transparent);
-  transition: opacity 0.15s ease, transform 0.12s ease;
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-primary);
+  transition: background var(--transition), transform var(--transition);
 }
 
 .listing-editor-submit:disabled {
@@ -248,7 +252,7 @@
 }
 
 .listing-editor-submit:hover:not(:disabled) {
-  opacity: 0.94;
+  background: var(--color-primary-hover);
   transform: translateY(-1px);
 }
 

@@ -1,5 +1,6 @@
 import "./i18n";
 import { CurrencyProvider } from "./context/CurrencyContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
@@ -12,12 +13,14 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <CurrencyProvider>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <App />
-        </QueryClientProvider>
-      </AuthProvider>
-    </CurrencyProvider>
+    <ThemeProvider>
+      <CurrencyProvider>
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
+            <App />
+          </QueryClientProvider>
+        </AuthProvider>
+      </CurrencyProvider>
+    </ThemeProvider>
   </StrictMode>
 );
