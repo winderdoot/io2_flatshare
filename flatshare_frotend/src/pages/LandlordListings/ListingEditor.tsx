@@ -193,14 +193,17 @@ export const ListingEditor = () => {
 
     try {
       if (isEdit && listingId) {
-        const updated = await landlordListingsService.update(token, listingId, body);
-        applyDto(updated);
-        setSuccess(t("landlordListings.updated"));
-        navigate("/my-listings");
+        await landlordListingsService.update(token, listingId, body);
+        navigate("/my-listings", {
+          replace: true,
+          state: { toast: { message: t("landlordListings.updated"), kind: "success" } },
+        });
       } else {
-        const created = await landlordListingsService.create(token, body);
-        setSuccess(t("landlordListings.created"));
-        navigate(`/my-listings/${created.id}/edit`, { replace: true });
+        await landlordListingsService.create(token, body);
+        navigate("/my-listings", {
+          replace: true,
+          state: { toast: { message: t("landlordListings.created"), kind: "success" } },
+        });
       }
     } catch (e: unknown) {
       setError(messageForListingFailure(e, t, "save"));
