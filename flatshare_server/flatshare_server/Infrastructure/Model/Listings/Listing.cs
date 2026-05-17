@@ -304,6 +304,14 @@ public class Listing
         }
         Status = ListingStatus.HiddenByModeration;
     }
+    public void Reinstate()
+    {
+        if (Status != ListingStatus.HiddenByModeration)
+        {
+            throw ErrorResponse.Generate($"Listing must be in '{nameof(ListingStatus.HiddenByModeration)}' status to reinstate", StatusCodes.Status400BadRequest);
+        }
+        Status = ListingStatus.Active;
+    }
     public void Hide()
     {
         if (Status != ListingStatus.Active)
