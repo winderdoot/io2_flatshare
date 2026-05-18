@@ -9,6 +9,11 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
+    env:
+      DOCKER_COMPOSE_DIR: ./flatshare_server/flatshare_server
+      DOTNET_SLN_DIR: ./flatshare_server
+      FRONTEND_DIR: ./flatshare_frotend
+
     steps:
       - uses: actions/checkout@v4
 
@@ -17,6 +22,7 @@ jobs:
           node-version: lts/*
 
       - name: Install dependencies
+        working-directory: ${{ env.FRONTEND_DIR }}
         run: npm ci
 
       - name: Install Playwright Browsers
