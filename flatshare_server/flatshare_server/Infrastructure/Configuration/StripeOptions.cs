@@ -4,7 +4,7 @@ public record class StripeOptions
 {
     public static string OptionsKey = "StripeOptions";
 
-    public required string SecretKey { get; init; }
-    public required string PublishableKey { get; init; }
-    public required string WebhookSecretInitKey { get; init; }
+    public required string SecretKey { get; set; }
+    public required string PublishableKey { get; set; }
+    public required string WebhookSecretInitKey { get; set; }
 }

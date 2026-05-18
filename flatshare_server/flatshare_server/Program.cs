@@ -53,6 +53,10 @@ if (builder.Environment.EnvironmentName != "Testing")
     builder.Services.AddScoped<IStorageService, BlobStorageService>();
 }
 
+if (builder.Environment.IsEnvironment("CI"))
+{
+    builder.Services.InjectStubCIConfiguration(builder.Configuration);
+}
 
 /* Add services */
 builder.Services.AddMemoryCache();
