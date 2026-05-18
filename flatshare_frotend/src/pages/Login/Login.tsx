@@ -86,7 +86,7 @@ export const Login = () => {
         </div>
 
         <div className="buttons-container">
-          <button onClick={handleSubmit} disabled={loading}>
+          <button onClick={handleSubmit} disabled={loading} data-testid="login-button">
             {loading ? t("login.submitLoading") : t("login.submit")}
           </button>
 

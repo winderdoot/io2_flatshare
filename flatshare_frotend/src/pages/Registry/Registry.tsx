@@ -198,7 +198,7 @@ export const Registry = () => {
           </div>
 
           <div className="buttons-container">
-            <button type="button" onClick={handleSubmit} disabled={loading}>
+            <button type="button" onClick={handleSubmit} disabled={loading} data-testid="register-button">
               {t("registry.submit")}
             </button>
             <label>
