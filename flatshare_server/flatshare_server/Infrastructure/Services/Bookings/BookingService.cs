@@ -214,6 +214,23 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
         return entities.Select(b => b.IntoDTO()).ToList();
     }
 
+    public async Task<List<BookingDTO>> GetForListingOwner(Guid listingId, Guid ownerId)
+    {
+        var ownerCheck = await dbContext.Listings
+            .AsNoTracking()
+            .Where(l => l.Id == listingId)
+            .Select(l => EF.Property<Guid>(l, "OwnerId"))
+            .FirstOrDefaultAsync();
+
+        if (ownerCheck == Guid.Empty)
+            throw ErrorResponse.Generate("Listing not found", StatusCodes.Status404NotFound);
+
+        if (ownerCheck != ownerId)
+            throw ErrorResponse.Generate("Forbidden", StatusCodes.Status403Forbidden);
+
+        return await Get(null, listingId);
+    }
+
     public async Task VerifyUnavailabilityCollisionsAsync(Guid listingId, DateOnly since, DateOnly until)
     {
         var conflict = await dbContext.Bookings

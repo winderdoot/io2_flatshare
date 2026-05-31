@@ -1,7 +1,9 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 import type { ListingDTO } from "../../models/listing";
 import { AvailabilityCalendar } from "../../components/AvailabilityCalendar/AvailabilityCalendar";
+import { useAuth } from "../../auth/AuthContext";
 import { useListingDetail } from "./useListingDetail";
+import { BookingForm } from "./BookingForm";
 import rentHouse from "../../assets/rent_house.png";
 import "./ListingDetail.css";
 
@@ -47,6 +49,7 @@ function attributeChips(listing: ListingDTO) {
 export const ListingDetail = () => {
   const { listingId } = useParams<{ listingId: string }>();
   const location = useLocation();
+  const { user, token } = useAuth();
   const { data: listing, isLoading, isError, error } = useListingDetail(listingId);
 
   const fromMyListings =
@@ -192,6 +195,10 @@ export const ListingDetail = () => {
               </div>
             </div>
           </div>
+
+          {user?.role === "TENANT" && token && listing.status === "Active" && (
+            <BookingForm listingId={listingId} listing={listing} token={token} />
+          )}
         </aside>
       </div>
     </article>

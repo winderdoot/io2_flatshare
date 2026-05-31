@@ -33,10 +33,16 @@ const Navbar = () => {
           <NavLink to="/" end className={linkClass}>{t("nav.home")}</NavLink>
           <NavLink to="/offer" className={linkClass}>{t("nav.offer")}</NavLink>
           {user?.role === "TENANT" && (
-            <NavLink to="/preferences" className={linkClass}>{t("nav.preferences")}</NavLink>
+            <>
+              <NavLink to="/preferences" className={linkClass}>{t("nav.preferences")}</NavLink>
+              <NavLink to="/my-bookings" className={linkClass}>{t("nav.myBookings")}</NavLink>
+            </>
           )}
           {user?.role === "LANDLORD" && (
-            <NavLink to="/my-listings" className={linkClass}>{t("nav.myListings")}</NavLink>
+            <>
+              <NavLink to="/my-listings" className={linkClass}>{t("nav.myListings")}</NavLink>
+              <NavLink to="/booking-requests" className={linkClass}>{t("nav.bookingRequests")}</NavLink>
+            </>
           )}
           {user?.role === "ADMIN" && (
             <NavLink to="/admin" className={linkClass}>{t("nav.admin")}</NavLink>

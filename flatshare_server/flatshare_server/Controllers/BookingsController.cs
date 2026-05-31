@@ -69,10 +69,26 @@ public class BookingsController
         return Ok(resp);
     }
 
-    [Authorize(Roles = AuthService.TenantRole)]
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<List<BookingDTO>>> GetByQuery([FromQuery] Guid? tenantId, [FromQuery] Guid? listingId)
     {
-        return Ok(await bookingService.Get(tenantId, listingId));
+        var userId = authService.GetUserId(User);
+
+        if (User.IsInRole(AuthService.TenantRole))
+        {
+            return Ok(await bookingService.Get(tenantId, listingId));
+        }
+
+        if (User.IsInRole(AuthService.LandlordRole))
+        {
+            if (!listingId.HasValue)
+            {
+                return BadRequest("listingId is required for landlord booking queries");
+            }
+            return Ok(await bookingService.GetForListingOwner(listingId.Value, userId));
+        }
+
+        return Forbid();
     }
 }
