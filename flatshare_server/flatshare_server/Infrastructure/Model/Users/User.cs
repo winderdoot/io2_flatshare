@@ -115,4 +115,14 @@ public class User
 
         _passHash = PasswordEncoder.Encrypt(password, Id);
     }
+    public void Ban(string reason)
+    {
+        if (Status.Value == AccountStatus.Type.Deleted)
+        {
+            throw ErrorResponse.Generate("Cannot ban a deleted account", StatusCodes.Status400BadRequest);
+        }
+
+        Status.Value = AccountStatus.Type.Blocked;
+        Status.Reason = reason;
+    }
 }
