@@ -45,6 +45,14 @@ jobs:
         run: dotnet build --no-restore --configuration Release
         working-directory: ${{ env.DOTNET_SLN_DIR }}
 
+      - name: Drop Database
+        run: dotnet ef database drop
+        working-directory: ${{ env.DOCKER_COMPOSE_DIR }}
+
+      - name: Update Database
+        run: dotnet ef database update
+        working-directory: ${{ env.DOCKER_COMPOSE_DIR }}
+
       - name: Run Playwright tests
         run: npx playwright test
         working-directory: ${{ env.FRONTEND_DIR }}
