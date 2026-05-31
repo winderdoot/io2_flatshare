@@ -26,18 +26,18 @@
     restart: always
 
   # Service 2: Flatshare server
-  flatshare-server:
-    build:
-      context: . # Where the docker-compose.yaml is
-      dockerfile: ./flatshare_server/Dockerfile
-    container_name: flatshare-server-ct
-    ports:
-      - "8080:8080"
-    environment:
-      # This overrides the connection string in your appsettings.json
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=flatshare_db;Username=postgres;Password=MyPassword
-    depends_on:
-      - db
+  # flatshare-server:
+  #   build:
+  #     context: . # Where the docker-compose.yaml is
+  #     dockerfile: ./flatshare_server/Dockerfile
+  #   container_name: flatshare-server-ct
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     # This overrides the connection string in your appsettings.json
+  #     - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=flatshare_db;Username=postgres;Password=MyPassword
+  #   depends_on:
+  #     - db
 
   # Service 3: stripe-cli to tunnel webhook events to local/dockerized server
 
