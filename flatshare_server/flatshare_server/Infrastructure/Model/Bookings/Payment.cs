@@ -17,6 +17,7 @@ public class Payment
     public Money Amount { get; init; }
     private PaymentStatus _status = PaymentStatus.Initiated;
     public PaymentStatus Status { get => _status; init => _status = value; }
+    public string? StripePaymentIntentId { get; private set; }
     private Payment() { }
     public PaymentDTO IntoDTO()
     {
@@ -45,11 +46,13 @@ public class Payment
         _status = PaymentStatus.Redirected;
     }
 
-    public void GatewayConfirmed()
+    public void GatewayConfirmed(string paymentIntentId)
     {
         if (Status != PaymentStatus.Redirected)
             throw new InvalidOperationException($"Cannot confirm gateway from status {Status}");
+
         _status = PaymentStatus.Succeeded;
+        StripePaymentIntentId = paymentIntentId;
     }
 
     public void GatewayFailed()
