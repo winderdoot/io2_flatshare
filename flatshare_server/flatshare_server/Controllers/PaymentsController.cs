@@ -11,8 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class PaymentController
 (
-    PaymentService paymentService,
-    AuthService authService
+    PaymentService paymentService
 )
     : ControllerBase
 {
@@ -20,7 +19,7 @@ public class PaymentController
     [HttpGet("{paymentId}")]
     public async Task<ActionResult<PaymentDTO>> GetById([FromRoute] Guid paymentId)
     {
-        var userId = authService.GetUserId(User);
+        var userId = AuthService.GetUserId(User);
         var dto = await paymentService.GetById(paymentId, userId);
         return Ok(dto);
     }
@@ -29,7 +28,7 @@ public class PaymentController
     [HttpGet]
     public async Task<ActionResult<PaymentDTO>> GetByBookingId([FromQuery] Guid bookingId)
     {
-        var userId = authService.GetUserId(User);
+        var userId = AuthService.GetUserId(User);
         var dto = await paymentService.GetByBookingId(bookingId, userId);
         return Ok(dto);
     }

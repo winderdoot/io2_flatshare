@@ -19,6 +19,8 @@ using flatshare_server.Infrastructure.Model.Listings;
 using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Model.Responses.Booking;
 using flatshare_server.Infrastructure.Model.Exceptions;
+using Microsoft.Extensions.Options;
+using flatshare_server.Infrastructure.Configuration;
 
 namespace Flatshare.Tests.IntegrationTests.Services;
 
@@ -120,7 +122,7 @@ public class ListingUnavailabilityIntegrationTests
         SeedPublishedListing(ctx, out var owner, out var listing);
 
         var listingService = new ListingService(ctx, userService);
-        var bookingService = new BookingService(ctx, listingService, userService);
+        var bookingService = new BookingService(ctx, listingService);
 
         // publish listing
         await listingService.SubmitAsync(listing.Id);

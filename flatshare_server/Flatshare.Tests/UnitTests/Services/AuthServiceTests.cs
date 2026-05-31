@@ -205,7 +205,7 @@ public class AuthServiceTests
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims));
 
         // Act
-        var result = _authService.GetUserId(principal);
+        var result = AuthService.GetUserId(principal);
 
         // Assert
         result.Should().Be(userId);
@@ -218,7 +218,7 @@ public class AuthServiceTests
         var principal = new ClaimsPrincipal(new ClaimsIdentity());
 
         // Act
-        var act = () => _authService.GetUserId(principal);
+        var act = () => AuthService.GetUserId(principal);
 
         // Assert
         var exception = act.Should().Throw<ServerResponseException>().Which;

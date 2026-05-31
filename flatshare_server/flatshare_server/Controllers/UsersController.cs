@@ -38,7 +38,7 @@ public class UsersController : Controller
     [Authorize]
     public async Task<ActionResult<UserDTO>> GetById(Guid id)
     {
-        _auth.AssertUserIs(User, id);
+        AuthService.AssertUserIs(User, id);
         UserDTO user = (await _userService.GetByIdAsync(id)).IntoDTO();
 
         return Ok(user);
@@ -48,7 +48,7 @@ public class UsersController : Controller
     [Authorize(Roles = AuthService.TenantRole)]
     public async Task<ActionResult<TenantPreferencesDTO>> GetMyPreferences()
     {
-        Guid userId = _auth.GetUserId(User);
+        Guid userId = AuthService.GetUserId(User);
         var preferences = await _userService.GetPreferencesAsync(userId);
         return Ok(preferences);
     }
@@ -57,7 +57,7 @@ public class UsersController : Controller
     [Authorize(Roles = AuthService.TenantRole)]
     public async Task<ActionResult<TenantPreferencesDTO>> UpdateMyPreferences([FromBody] TenantPreferencesDTO request)
     {
-        Guid userId = _auth.GetUserId(User);
+        Guid userId = AuthService.GetUserId(User);
         var updatedPreferences = await _userService.UpdatePreferencesAsync(userId, request);
         return Ok(updatedPreferences);
     }
