@@ -72,7 +72,7 @@ public class BookingsController
     [HttpGet]
     public async Task<ActionResult<List<BookingDTO>>> GetByQuery([FromQuery] Guid? tenantId, [FromQuery] Guid? listingId)
     {
-        var userId = authService.GetUserId(User);
+        var userId = AuthService.GetUserId(User);
 
         if (User.IsInRole(AuthService.TenantRole))
         {
