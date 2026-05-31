@@ -370,6 +370,13 @@ export const LandlordListings = () => {
                             {" · "}
                             <Link
                               className="landlord-listings-link"
+                              to={`/my-listings/${row.id}/availability`}
+                            >
+                              {t("landlordListings.btnCalendar")}
+                            </Link>
+                            {" · "}
+                            <Link
+                              className="landlord-listings-link"
                               to={`/offer/${row.id}`}
                               state={{ from: "/my-listings" }}
                             >

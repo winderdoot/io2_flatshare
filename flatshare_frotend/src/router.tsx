@@ -15,6 +15,7 @@ import { RestartPassword } from "./pages/RestartPassword/RestartPassword";
 import { TenantPreferences } from "./pages/TenantPreferences/TenantPreferences";
 import { LandlordListings } from "./pages/LandlordListings/LandlordListings";
 import { ListingEditor } from "./pages/LandlordListings/ListingEditor";
+import { ListingAvailability } from "./pages/LandlordListings/ListingAvailability";
 import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
 import { AdminRoute } from "./auth/AdminRoute";
 
@@ -71,6 +72,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <ListingEditor />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/my-listings/:listingId/availability",
+        element: (
+          <PrivateRoute>
+            <ListingAvailability />
           </PrivateRoute>
         ),
       },

@@ -1,0 +1,290 @@
+.listing-availability {
+  width: 100%;
+  padding: 2rem var(--container-pad) 4rem;
+  box-sizing: border-box;
+}
+
+.listing-availability-inner {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.listing-availability-head {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.listing-availability-back {
+  display: inline-flex;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.listing-availability-back:hover {
+  text-decoration: underline;
+}
+
+.listing-availability-title {
+  margin: 0 0 0.5rem;
+  font-size: var(--font-size-3xl);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--color-text-primary);
+}
+
+.listing-availability-lead {
+  margin: 0;
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  line-height: var(--line-base);
+}
+
+.listing-availability-links {
+  margin-top: 1rem;
+}
+
+.listing-availability-link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.listing-availability-link:hover {
+  text-decoration: underline;
+}
+
+.listing-availability-banner,
+.listing-availability-error {
+  margin: 0 0 1rem;
+  padding: 0.95rem 1.15rem;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.listing-availability-banner {
+  background: color-mix(in srgb, var(--color-accent-strong) 12%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-accent-strong) 34%, transparent);
+}
+
+.listing-availability-error {
+  background: color-mix(in srgb, var(--color-accent-strong) 14%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-accent-strong) 38%, transparent);
+}
+
+.listing-availability-card {
+  padding: 1.25rem 1.35rem 1.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+}
+
+.listing-availability-card .avail-cal {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* Zarządzanie okresami (UnavailabilityManager) */
+.listing-availability-manage {
+  padding: 1.35rem 1.4rem 1.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow);
+}
+
+.listing-availability-manage-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.listing-availability-manage-lead {
+  margin: 0 0 1rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.listing-availability-manage-success,
+.listing-availability-manage-error {
+  margin: 0 0 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.listing-availability-manage-success {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 38%, transparent);
+  color: var(--color-text-primary);
+}
+
+.listing-availability-manage-error {
+  background: color-mix(in srgb, var(--color-accent-strong) 14%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-accent-strong) 38%, transparent);
+  color: var(--color-text-primary);
+}
+
+.listing-availability-manage-empty {
+  margin: 0 0 1rem;
+  font-size: 0.88rem;
+  color: var(--color-text-secondary);
+}
+
+.listing-availability-manage-list {
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.listing-availability-manage-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius);
+  background: var(--color-surface-elev);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.listing-availability-manage-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.listing-availability-manage-dates {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.listing-availability-manage-msg {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.listing-availability-manage-remove {
+  flex-shrink: 0;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--color-accent-strong) 40%, transparent);
+  background: transparent;
+  color: var(--color-accent-strong);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.listing-availability-manage-remove:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent-strong) 12%, transparent);
+}
+
+.listing-availability-manage-remove:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.listing-availability-manage-form {
+  margin: 0;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: var(--color-surface-elev);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.listing-availability-manage-form-title {
+  margin: 0 0 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+.listing-availability-manage-fields {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 480px) {
+  .listing-availability-manage-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.listing-availability-manage-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.listing-availability-manage-field--full {
+  margin-bottom: 0.85rem;
+}
+
+.listing-availability-manage-field span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.listing-availability-manage-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.listing-availability-manage-field input:focus {
+  outline: 2px solid color-mix(in srgb, var(--color-primary) 45%, transparent);
+  outline-offset: 1px;
+}
+
+.listing-availability-manage-field input:disabled {
+  opacity: 0.65;
+}
+
+.listing-availability-manage-submit {
+  width: 100%;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.listing-availability-manage-submit:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.listing-availability-manage-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

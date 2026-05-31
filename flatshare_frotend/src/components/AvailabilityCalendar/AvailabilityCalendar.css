@@ -1,0 +1,219 @@
+.avail-cal {
+  --avail-cal-month-w: min(100%, 17.5rem);
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.avail-cal--compact {
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.avail-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.avail-cal-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.avail-cal--compact .avail-cal-title {
+  font-size: 0.88rem;
+}
+
+.avail-cal-nav {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.avail-cal-nav-btn {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius);
+  background: var(--color-surface-elev);
+  color: var(--color-text-primary);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    transform 0.15s ease;
+}
+
+.avail-cal-nav-btn:hover {
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface-elev));
+  border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+.avail-cal-nav-btn:active {
+  transform: scale(0.96);
+}
+
+.avail-cal-scroll {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 0.25rem;
+  padding: 0.25rem 0.15rem 0.85rem;
+  margin: 0 -0.15rem;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-primary) 40%, transparent)
+    transparent;
+}
+
+.avail-cal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.avail-cal-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-radius: 999px;
+}
+
+.avail-cal-month {
+  flex: 0 0 var(--avail-cal-month-w);
+  scroll-snap-align: start;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    145deg,
+    var(--color-surface-elev) 0%,
+    color-mix(in srgb, var(--color-surface) 88%, var(--color-bg)) 100%
+  );
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow);
+}
+
+.avail-cal-month-label {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.avail-cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 0.35rem;
+}
+
+.avail-cal-weekday {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.avail-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.avail-cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.avail-cal-day span {
+  position: relative;
+  z-index: 1;
+}
+
+.avail-cal-day--empty {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.avail-cal-day--out {
+  opacity: 0.28;
+}
+
+.avail-cal-day--free {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.avail-cal-day--blocked {
+  background: color-mix(in srgb, var(--color-accent-strong) 22%, transparent);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-accent-strong) 35%, transparent);
+}
+
+.avail-cal-day--today.avail-cal-day--free,
+.avail-cal-day--today.avail-cal-day--blocked {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 50%, transparent),
+    0 0 0 2px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+.avail-cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.avail-cal-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.avail-cal-swatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 0.2rem;
+  flex-shrink: 0;
+}
+
+.avail-cal-swatch--free {
+  background: color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+
+.avail-cal-swatch--blocked {
+  background: color-mix(in srgb, var(--color-accent-strong) 45%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-accent-strong) 40%, transparent);
+}
+
+.avail-cal-swatch--out {
+  background: var(--color-border-subtle);
+  opacity: 0.5;
+}

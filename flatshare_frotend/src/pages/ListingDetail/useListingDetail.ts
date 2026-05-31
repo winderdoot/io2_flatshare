@@ -6,7 +6,7 @@ export const useListingDetail = (listingId: string | undefined) => {
     queryKey: ["listing", listingId],
     queryFn: () => landlordListingsService.getById(listingId!),
     enabled: !!listingId,
-    staleTime: 1000 * 60,
+    staleTime: 0,
     retry: 1,
   });
 };
