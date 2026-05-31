@@ -54,10 +54,7 @@ if (builder.Environment.EnvironmentName != "Testing")
 }
 
 /* Workaround */ 
-if (args.Contains("CI"))
-{
-    builder.Configuration.InjectStubCIConfiguration();
-}
+builder.Configuration.InjectStubCIConfiguration();
 
 /* Add services */
 builder.Services.AddMemoryCache();
