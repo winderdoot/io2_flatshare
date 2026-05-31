@@ -18,6 +18,9 @@ import { ListingEditor } from "./pages/LandlordListings/ListingEditor";
 import { ListingAvailability } from "./pages/LandlordListings/ListingAvailability";
 import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
 import { AdminRoute } from "./auth/AdminRoute";
+import { MyBookings } from "./pages/Bookings/MyBookings";
+import { BookingDetail } from "./pages/Bookings/BookingDetail";
+import { LandlordBookingRequests } from "./pages/Bookings/LandlordBookingRequests";
 
 export const router = createBrowserRouter([
   {
@@ -80,6 +83,38 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <ListingAvailability />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/my-bookings",
+        element: (
+          <PrivateRoute>
+            <MyBookings />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/my-bookings/:bookingId",
+        element: (
+          <PrivateRoute>
+            <BookingDetail />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/booking-requests",
+        element: (
+          <PrivateRoute>
+            <LandlordBookingRequests />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/booking-requests/:bookingId",
+        element: (
+          <PrivateRoute>
+            <BookingDetail />
           </PrivateRoute>
         ),
       },
