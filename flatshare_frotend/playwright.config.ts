@@ -36,12 +36,12 @@ export default defineConfig({
   webServer: [
     {
       command: 'dotnet run --configuration Release --environment CI',
-      url: 'http://127.0.0.1:7047',
+      url: 'https://localhost:7047',
       reuseExistingServer: !process.env.CI,
       cwd: '../flatshare_server/flatshare_server',
     },
     {
-      command: 'npm run start',
+      command: 'npm run dev',
       url: 'http://127.0.0.1:5173',
       reuseExistingServer: !process.env.CI,
     }
