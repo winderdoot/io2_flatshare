@@ -60,3 +60,9 @@ export type CreateBookingBody = {
 export type ReasonBody = {
   reason: string;
 };
+
+export type PayBookingBody = {
+  paymentMethod: string;
+  returnUrl: string;
+  cancelUrl: string;
+};

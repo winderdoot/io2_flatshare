@@ -1,11 +1,13 @@
-import { useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth/AuthContext";
 import { landlordListingsService } from "../LandlordListings/LandlordListingsService";
 import { bookingService } from "./bookingService";
 import { messageForBookingFailure } from "./bookingErrorUtils";
+import { paymentService } from "./paymentService";
+import type { GatewayPaymentStatus } from "../../models/payment";
 import {
   canLandlordAcceptReject,
   canTenantCancel,
@@ -16,11 +18,41 @@ import {
 import { compareIso, toIsoDate } from "../../components/AvailabilityCalendar/availabilityCalendarUtils";
 import "./Bookings.css";
 
+function tenantBookingDetailUrl(bookingId: string): string {
+  return `${window.location.origin}/my-bookings/${bookingId}`;
+}
+
+function buildPaymentUrls(bookingId: string) {
+  const base = tenantBookingDetailUrl(bookingId);
+  return {
+    returnUrl: `${base}?payment=return`,
+    cancelUrl: `${base}?payment=cancelled`,
+  };
+}
+
+function messageForPaymentReturn(
+  status: GatewayPaymentStatus,
+  t: (key: string) => string
+): { kind: "success" | "error" | "info"; message: string } {
+  switch (status) {
+    case "Succeeded":
+      return { kind: "success", message: t("booking.paymentSuccess") };
+    case "Failed":
+      return { kind: "error", message: t("booking.paymentFailed") };
+    case "Cancelled":
+      return { kind: "error", message: t("booking.paymentCancelled") };
+    default:
+      return { kind: "info", message: t("booking.paymentProcessing") };
+  }
+}
+
 export const BookingDetail = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t, i18n } = useTranslation();
   const { user, token } = useAuth();
   const queryClient = useQueryClient();
+  const returnHandledRef = useRef<string | null>(null);
 
   const [cancelReason, setCancelReason] = useState("");
   const [rejectReason, setRejectReason] = useState("");
@@ -28,6 +60,7 @@ export const BookingDetail = () => {
   const [actionError, setActionError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [acceptInfo, setAcceptInfo] = useState<string | null>(null);
+  const [verifyingPayment, setVerifyingPayment] = useState(false);
 
   const isLandlord = user?.role === "LANDLORD";
   const isTenant = user?.role === "TENANT";
@@ -97,6 +130,80 @@ export const BookingDetail = () => {
     },
   });
 
+  const payMutation = useMutation({
+    mutationFn: () => {
+      const urls = buildPaymentUrls(bookingId!);
+      return bookingService.pay(token!, bookingId!, {
+        paymentMethod: "card",
+        returnUrl: urls.returnUrl,
+        cancelUrl: urls.cancelUrl,
+      });
+    },
+    onSuccess: (resp) => {
+      if (!resp.redirectUrl) {
+        setActionError(t("booking.paymentNoRedirect"));
+        return;
+      }
+      window.location.assign(resp.redirectUrl);
+    },
+    onError: (e: unknown) => {
+      setSuccess(null);
+      setActionError(messageForBookingFailure(e, t));
+    },
+  });
+
+  const paymentReturn = searchParams.get("payment");
+
+  useEffect(() => {
+    if (!paymentReturn || !token || !bookingId || !isTenant) return;
+
+    const key = `${bookingId}:${paymentReturn}`;
+    if (returnHandledRef.current === key) return;
+    returnHandledRef.current = key;
+
+    setSearchParams({}, { replace: true });
+
+    if (paymentReturn === "cancelled") {
+      setSuccess(null);
+      setActionError(t("booking.paymentCancelled"));
+      return;
+    }
+
+    if (paymentReturn !== "return") return;
+
+    const verify = async () => {
+      setVerifyingPayment(true);
+      setActionError(null);
+      setSuccess(null);
+      try {
+        const payment = await paymentService.getByBookingId(token, bookingId);
+        await refresh();
+        const { kind, message } = messageForPaymentReturn(payment.status, t);
+        if (kind === "success") {
+          setSuccess(message);
+        } else if (kind === "error") {
+          setActionError(message);
+        } else {
+          setSuccess(message);
+        }
+      } catch (e: unknown) {
+        setActionError(messageForBookingFailure(e, t));
+      } finally {
+        setVerifyingPayment(false);
+      }
+    };
+
+    void verify();
+  }, [
+    paymentReturn,
+    token,
+    bookingId,
+    isTenant,
+    setSearchParams,
+    t,
+    queryClient,
+  ]);
+
   const handleCancel = (e: FormEvent) => {
     e.preventDefault();
     setActionError(null);
@@ -121,7 +228,12 @@ export const BookingDetail = () => {
   const busy =
     acceptMutation.isPending ||
     rejectMutation.isPending ||
-    cancelMutation.isPending;
+    cancelMutation.isPending ||
+    payMutation.isPending ||
+    verifyingPayment;
+
+  const showPayButton =
+    isTenant && booking?.status === "PendingPayment";
 
   const todayIso = toIsoDate(new Date());
   const stayStarted =
@@ -153,7 +265,9 @@ export const BookingDetail = () => {
           <h1 className="bookings-title">{t("booking.detailTitle")}</h1>
         </header>
 
-        {isLoading && <p>{t("booking.loading")}</p>}
+        {(isLoading || verifyingPayment) && (
+          <p>{verifyingPayment ? t("booking.verifyingPayment") : t("booking.loading")}</p>
+        )}
 
         {isError && (
           <p className="bookings-error" role="alert">
@@ -227,6 +341,31 @@ export const BookingDetail = () => {
                 </div>
               )}
             </div>
+
+            {showPayButton && (
+              <div className="bookings-actions bookings-actions--pay">
+                <p className="bookings-pay-lead">{t("booking.payLead")}</p>
+                <button
+                  type="button"
+                  className="bookings-btn bookings-btn--primary bookings-btn--pay"
+                  disabled={busy}
+                  onClick={() => {
+                    setActionError(null);
+                    setSuccess(null);
+                    payMutation.mutate();
+                  }}
+                >
+                  {payMutation.isPending ? (
+                    <>
+                      <span className="spinner" aria-hidden="true" />
+                      {t("booking.paying")}
+                    </>
+                  ) : (
+                    t("booking.payNow")
+                  )}
+                </button>
+              </div>
+            )}
 
             {isLandlord && canLandlordAcceptReject(booking.status) && (
               <div className="bookings-actions">

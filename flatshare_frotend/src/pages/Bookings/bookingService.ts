@@ -5,9 +5,11 @@ import type {
   BookingDTO,
   CancelBookingResponse,
   CreateBookingBody,
+  PayBookingBody,
   ReasonBody,
   RejectBookingResponse,
 } from "../../models/booking";
+import type { PaymentInitiatedResponse } from "../../models/payment";
 
 const authHeaders = (token: string) => ({
   "Content-Type": "application/json",
@@ -165,5 +167,27 @@ export const bookingService = {
     });
     if (!res.ok) throw await readError(res);
     return res.json();
+  },
+
+  pay: async (
+    token: string,
+    bookingId: string,
+    body: PayBookingBody
+  ): Promise<PaymentInitiatedResponse> => {
+    const res = await fetch(`${API_URL}/api/v1/bookings/${bookingId}/pay`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw await readError(res);
+    const data = (await res.json()) as Record<string, unknown>;
+    return {
+      paymentId: String(data.paymentId ?? data.PaymentId ?? ""),
+      bookingId: String(data.bookingId ?? data.BookingId ?? ""),
+      status: String(data.status ?? data.Status ?? ""),
+      redirectUrl: String(data.redirectUrl ?? data.RedirectUrl ?? ""),
+      amount: Number(data.amount ?? data.Amount ?? 0),
+      currency: String(data.currency ?? data.Currency ?? ""),
+    };
   },
 };
