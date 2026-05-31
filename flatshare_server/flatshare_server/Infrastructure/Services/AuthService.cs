@@ -124,7 +124,7 @@ namespace flatshare_server.Infrastructure.Services
             return session.UserId;
         }
 
-        public Guid GetUserId(ClaimsPrincipal? principal)
+        public static Guid GetUserId(ClaimsPrincipal? principal)
         {
             var claim = principal?.FindFirst(JwtRegisteredClaimNames.Sub);
             if (claim is null)
@@ -135,7 +135,7 @@ namespace flatshare_server.Infrastructure.Services
             return id;
         }
 
-        public void AssertUserIs(ClaimsPrincipal? principal, Guid userId)
+        public static void AssertUserIs(ClaimsPrincipal? principal, Guid userId)
         {
             var actualId = GetUserId(principal);
             if (actualId != userId)

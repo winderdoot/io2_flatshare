@@ -14,7 +14,6 @@ namespace flatshare_server.Controllers;
 public class ListingsController
 (
     ListingService listingService,
-    AuthService authService,
     BookingService bookingService
 ) : Controller
 {
@@ -30,7 +29,7 @@ public class ListingsController
         {
             throw ErrorResponse.Generate("Listing has no owner", StatusCodes.Status500InternalServerError);
         }
-        if (ownerId != authService.GetUserId(User))
+        if (ownerId != AuthService.GetUserId(User))
         {
             throw ErrorResponse.Generate("Unauthorized", StatusCodes.Status401Unauthorized);
         }
@@ -51,7 +50,7 @@ public class ListingsController
     [Authorize(Roles = AuthService.LandlordRole)]
     public async Task<ActionResult<ListingCreatedResponse>> CreateNew([FromBody] CreateListingRequest request)
     {
-        Guid ownerId = authService.GetUserId(User);
+        Guid ownerId = AuthService.GetUserId(User);
 
         var listing = await listingService.CreateNewAsync(request, ownerId);
         return CreatedAtAction(

@@ -11,10 +11,12 @@ using flatshare_server.Infrastructure.Model.Bookings;
 using flatshare_server.Infrastructure.Repositories;
 using flatshare_server.Infrastructure.Model;
 using flatshare_server.Infrastructure.Model.Listings;
+using System.Security.Claims;
+using Org.BouncyCastle.Asn1.Pkcs;
 
 namespace flatshare_server.Infrastructure.Services;
 
-public class BookingService(FlatshareDbContext dbContext, ListingService listingService, UserService userService)
+public class BookingService(FlatshareDbContext dbContext, ListingService listingService)
 {
     private static int MonthsBetweenInclusive(DateOnly start, DateOnly end)
     {
@@ -224,5 +226,36 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
         {
             throw ErrorResponse.Generate("Room Occupied", StatusCodes.Status409Conflict);
         }
+    }
+
+    public async Task<List<Booking>> GetUserBookingAsync(ClaimsPrincipal? user)
+    {
+        if (user is null)
+        {
+            throw ErrorResponse.Generate("Unauthorized", StatusCodes.Status401Unauthorized);
+        }
+
+        Guid userId = AuthService.GetUserId(user);
+
+        if (user.IsInRole(AuthService.LandlordRole))
+        {
+            /* Find all bookings that connect to a listing owned by the landlord user */  
+            return await dbContext.Bookings
+                .Where(b => dbContext.Listings
+                    .Include(l => l.Owner)
+                    .Any(l => l.Id == b.ListingId && l.Owner != null && l.Owner.Id == userId))
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
+        }
+        else if (user.IsInRole(AuthService.TenantRole))
+        {
+            /* Find all bookings made by the tenant user */
+            return await dbContext.Bookings
+                .Where(b => b.TenantId == userId)
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
+        }
+
+        throw ErrorResponse.Generate($"Invalid user role", StatusCodes.Status400BadRequest);
     }
 }

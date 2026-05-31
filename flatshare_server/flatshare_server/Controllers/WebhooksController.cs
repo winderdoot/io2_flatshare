@@ -11,8 +11,7 @@ using System.IO;
 [Route("api/v1/[controller]")]
 public class WebhooksController 
 (
-    WebhookService webhookService,
-    StripeWebhookSecretProvider secretProvider
+    WebhookService webhookService
 )
     : ControllerBase
 {

@@ -10,8 +10,7 @@ namespace flatshare_server.Controllers;
 [Route("api/v1/[controller]")]
 public class MatchesController
     (
-        MatchingService matchingService,
-        AuthService authService
+        MatchingService matchingService
     ) : Controller
 {
 
@@ -19,7 +18,7 @@ public class MatchesController
     [Authorize(Roles = AuthService.TenantRole)]
     public async Task<ActionResult<PageResponse<MatchDTO>>> Get([FromQuery] MatchesFilter filter)
     {
-        var userId = authService.GetUserId(User);
+        var userId = AuthService.GetUserId(User);
         var result = await matchingService.GetMatchesAsync(userId, filter);
 
         return Ok(result);

@@ -37,7 +37,7 @@ public class SessionsController : Controller
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
         var uid = await _authService.GetUserFromSession(id);
-        _authService.AssertUserIs(User, uid);
+        AuthService.AssertUserIs(User, uid);
         return Ok(new SessionDTO(id, uid));
     }
 
@@ -46,7 +46,7 @@ public class SessionsController : Controller
     public async Task<IActionResult> SessionRefresh([FromRoute] Guid id)
     {
         var uid = await _authService.GetUserFromSession(id);
-        _authService.AssertUserIs(User, uid);
+        AuthService.AssertUserIs(User, uid);
 
         (var token, var sessId, var expInSec, var role) = await _authService.Refresh(id);
         var responseBody = new LoggedInResponse(token, sessId, "Bearer", expInSec, role);
