@@ -58,7 +58,7 @@ jobs:
         working-directory: ${{ env.DOCKER_COMPOSE_DIR }}
 
       - name: Run Playwright tests
-        run: npx playwright test
+        run: DEBUG=pw:webserver,pw:api npx playwright test --reporter=line
         working-directory: ${{ env.FRONTEND_DIR }}
 
       - uses: actions/upload-artifact@v4

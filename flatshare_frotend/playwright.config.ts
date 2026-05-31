@@ -16,6 +16,11 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:5173',
     trace: 'on-first-retry',
+    video: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    launchOptions: {
+      slowMo: 50,
+    },
   },
 
   projects: [
@@ -37,12 +42,14 @@ export default defineConfig({
     {
       command: 'dotnet run --configuration Release -- CI',
       url: 'https://localhost:7047',
+      timeout: 120000,
       reuseExistingServer: !process.env.CI,
       cwd: '../flatshare_server/flatshare_server',
     },
     {
       command: 'npm run dev',
       url: 'http://127.0.0.1:5173',
+      timeout: 120000,
       reuseExistingServer: !process.env.CI,
     }
   ],
