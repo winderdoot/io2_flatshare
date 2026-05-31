@@ -141,7 +141,7 @@ public class PaymentService
         throw ErrorResponse.Generate("Forbidden", StatusCodes.Status403Forbidden);
     }
 
-    public async Task GatewayConfirmedAsync(Guid bookingId)
+    public async Task GatewayConfirmedAsync(Guid bookingId, string paymentIntentId)
     {
         var booking = await dbContext.Bookings.FindAsync(bookingId);
         if (booking is null)
@@ -155,8 +155,9 @@ public class PaymentService
         if (payment is null)
             throw ErrorResponse.Generate("Payment not found", StatusCodes.Status404NotFound);
 
-        payment.GatewayConfirmed();
+        payment.GatewayConfirmed(paymentIntentId);
         booking.PaymentSuccess();
+
         await dbContext.SaveChangesAsync();
     }
 

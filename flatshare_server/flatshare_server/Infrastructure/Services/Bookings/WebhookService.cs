@@ -52,12 +52,17 @@ public class WebhookService
             {
                 var session = stripeEvent.Data.Object as Session;
                 Guid? bookingId = session?.GetMetadataAs<Guid>("BookingId");
+
                 if (bookingId is null)
                 {
                     throw ErrorResponse.Generate("BookingId not found in session metadata", StatusCodes.Status400BadRequest);
                 }
 
-                await paymentService.GatewayConfirmedAsync(bookingId.Value);
+                // NOWE: Pobieramy ID transakcji ze Stripe
+                string paymentIntentId = session.PaymentIntentId;
+
+                // NOWE: Przekazujemy to ID do serwisu płatności
+                await paymentService.GatewayConfirmedAsync(bookingId.Value, paymentIntentId);
 
                 Console.WriteLine($"Payment successful for Booking: {bookingId}");
             }

@@ -55,7 +55,7 @@ namespace flatshare_server.Migrations
                     b.HasIndex("TenantId")
                         .HasDatabaseName("IX_Bookings_TenantId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.Bookings.Payment", b =>
@@ -70,12 +70,15 @@ namespace flatshare_server.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<string>("StripePaymentIntentId")
+                        .HasColumnType("text");
+
                     b.HasKey("PaymentId");
 
                     b.HasIndex("BookingId")
                         .HasDatabaseName("IX_Payments_BookingId");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.Foo", b =>
@@ -92,7 +95,7 @@ namespace flatshare_server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Foos");
+                    b.ToTable("Foos", (string)null);
                 });
 
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.Listings.Listing", b =>
@@ -140,7 +143,7 @@ namespace flatshare_server.Migrations
                     b.HasIndex("OwnerId")
                         .HasDatabaseName("IX_Listings_OwnerId");
 
-                    b.ToTable("Listings");
+                    b.ToTable("Listings", (string)null);
                 });
 
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.Listings.Unavailability", b =>
@@ -166,7 +169,7 @@ namespace flatshare_server.Migrations
 
                     b.HasIndex("ListingId");
 
-                    b.ToTable("Unavailability");
+                    b.ToTable("Unavailability", (string)null);
                 });
 
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.PasswordResetEntry", b =>
@@ -199,7 +202,7 @@ namespace flatshare_server.Migrations
 
                     b.HasIndex("UserId", "ResetCode");
 
-                    b.ToTable("PasswordResetEntries");
+                    b.ToTable("PasswordResetEntries", (string)null);
                 });
 
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.Users.User", b =>
@@ -230,7 +233,7 @@ namespace flatshare_server.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.Users.UserRole", b =>
@@ -254,7 +257,7 @@ namespace flatshare_server.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("UserRole");
+                    b.ToTable("UserRole", (string)null);
 
                     b.HasDiscriminator<string>("RoleType").HasValue("UserRole");
 
@@ -279,7 +282,40 @@ namespace flatshare_server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Sessions");
+                    b.ToTable("Sessions", (string)null);
+                });
+
+            modelBuilder.Entity("flatshare_server.Infrastructure.Model.ViolationReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TargetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ViolationReports", (string)null);
                 });
 
             modelBuilder.Entity("flatshare_server.Infrastructure.Model.Users.AdminRole", b =>
@@ -318,7 +354,7 @@ namespace flatshare_server.Migrations
 
                             b1.HasKey("BookingId");
 
-                            b1.ToTable("Bookings");
+                            b1.ToTable("Bookings", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("BookingId");
@@ -343,7 +379,7 @@ namespace flatshare_server.Migrations
 
                             b1.HasKey("PaymentId");
 
-                            b1.ToTable("Payments");
+                            b1.ToTable("Payments", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("PaymentId");
@@ -387,26 +423,7 @@ namespace flatshare_server.Migrations
                             b1.HasIndex("City", "District", "Street", "AptNumber")
                                 .HasDatabaseName("IDX_Listing_Address");
 
-                            b1.ToTable("Listings");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ListingId");
-                        });
-
-                    b.OwnsOne("flatshare_server.Infrastructure.Model.Money", "Price", b1 =>
-                        {
-                            b1.Property<Guid>("ListingId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Curr")
-                                .HasColumnType("integer");
-
-                            b1.Property<decimal>("Value")
-                                .HasColumnType("numeric");
-
-                            b1.HasKey("ListingId");
-
-                            b1.ToTable("Listings");
+                            b1.ToTable("Listings", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ListingId");
@@ -431,7 +448,26 @@ namespace flatshare_server.Migrations
 
                             b1.HasKey("ListingId");
 
-                            b1.ToTable("Listings");
+                            b1.ToTable("Listings", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ListingId");
+                        });
+
+                    b.OwnsOne("flatshare_server.Infrastructure.Model.Money", "Price", b1 =>
+                        {
+                            b1.Property<Guid>("ListingId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Curr")
+                                .HasColumnType("integer");
+
+                            b1.Property<decimal>("Value")
+                                .HasColumnType("numeric");
+
+                            b1.HasKey("ListingId");
+
+                            b1.ToTable("Listings", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ListingId");
@@ -481,7 +517,7 @@ namespace flatshare_server.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("Users");
+                            b1.ToTable("Users", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
@@ -520,7 +556,7 @@ namespace flatshare_server.Migrations
 
                             b1.HasKey("LandlordRoleId");
 
-                            b1.ToTable("UserRole");
+                            b1.ToTable("UserRole", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("LandlordRoleId");
@@ -555,7 +591,7 @@ namespace flatshare_server.Migrations
 
                             b1.HasKey("TenantRoleId");
 
-                            b1.ToTable("UserRole");
+                            b1.ToTable("UserRole", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("TenantRoleId");

@@ -1,11 +1,12 @@
 using flatshare_server.Infrastructure.Model;
-using flatshare_server.Infrastructure.Model.Requests;
-using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Model.Bookings;
 using flatshare_server.Infrastructure.Model.Listings;
+using flatshare_server.Infrastructure.Model.Requests;
+using flatshare_server.Infrastructure.Model.Responses;
 using flatshare_server.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace flatshare_server.Infrastructure.Services;
 
@@ -15,17 +16,20 @@ public class ReportService
     private readonly UserService _userService;
     private readonly ListingService _listingService;
     private readonly BookingService _bookingService;
+    private readonly IStripeClient _stripeClient;
 
     public ReportService(
         FlatshareDbContext dbContext,
         UserService userService,
         ListingService listingService,
-        BookingService bookingService)
+        BookingService bookingService,
+        IStripeClient stripeClient)
     {
         _dbContext = dbContext;
         _userService = userService;
         _listingService = listingService;
         _bookingService = bookingService;
+        _stripeClient = stripeClient;
     }
 
 
@@ -83,11 +87,14 @@ public class ReportService
     {
         var report = await GetReportByIdAsync(reportId);
 
+        // Blocking account
         var user = await _userService.GetByIdAsync(userId);
         user.Ban(reason);
 
+        // Hiding active listings
         var userListings = await _dbContext.Listings
-            .Where(l => EF.Property<Guid>(l, "OwnerId") == userId && l.Status == Listing.ListingStatus.Active)
+            .Include(l => l.Owner)
+            .Where(l => l.Owner != null && l.Owner.Id == userId && l.Status == Listing.ListingStatus.Active)
             .ToListAsync();
 
         foreach (var listing in userListings)
@@ -95,14 +102,35 @@ public class ReportService
             listing.HideByModeration();
         }
 
+        // Canclelling booking and returning money (Stripe Destination Charges)
         var listingIds = userListings.Select(l => l.Id).ToList();
         var activeBookings = await _dbContext.Bookings
             .Where(b => listingIds.Contains(b.ListingId) && b.Status == Booking.BookingStatus.Confirmed)
             .ToListAsync();
 
+        var refundService = new RefundService(_stripeClient);
+
         foreach (var booking in activeBookings)
         {
-            booking.CancelAfterFailure();
+            booking.AdminCancel();
+
+            // Finding payment of this booking
+            var payment = await _dbContext.Payments
+                .Where(p => p.BookingId == booking.BookingId && p.Status == Payment.PaymentStatus.Succeeded)
+                .OrderByDescending(p => p.PaymentId)
+                .FirstOrDefaultAsync();
+
+            if (payment != null && !string.IsNullOrEmpty(payment.StripePaymentIntentId))
+            {
+                var refundOptions = new RefundCreateOptions
+                {
+                    PaymentIntent = payment.StripePaymentIntentId,
+                    ReverseTransfer = true,
+                    RefundApplicationFee = false
+                };
+
+                await refundService.CreateAsync(refundOptions);
+            }
         }
 
         report.TakeAction();
