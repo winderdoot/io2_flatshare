@@ -25,11 +25,16 @@ public class Booking
     public required DateOnly StartDate { get; init; }
     public required DateOnly EndDate { get; init; }
     public required Money TotalPrice { get; init; }
-
     public required DateTime CreatedAt { get; init; }
-
     public bool IsPendingPayment => Status == BookingStatus.PendingPayment;
-
+    private Guid? _paymentId = null;
+    public Guid? PaymentId { get => _paymentId; }
+    public void SetPaymentID(Guid paymentId)
+    {
+        if (PaymentId != null)
+            throw ErrorResponse.Generate($"Booking: Cannot set payment ID when it's already set");
+        _paymentId = paymentId;
+    }
     private Booking() { }
 
     public static Booking TryCreate(CreateBookingRequest request, Guid tenantId, Money totalPrice)
@@ -153,7 +158,7 @@ public class Booking
             TotalPrice = TotalPrice.Value,
             Currency = TotalPrice.CurrencyStr(),
             Status = Status.ToString(),
-            PaymentStatus = Status == BookingStatus.Confirmed ? "SUCCEEDED" : "PENDING"
+            PaymentId = PaymentId?.ToString() ?? ""
         };
     }
 }

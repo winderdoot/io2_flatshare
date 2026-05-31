@@ -39,6 +39,7 @@ public class PaymentService
 
         var payment = new Payment(bookingId, booking.TotalPrice);
 
+        booking.SetPaymentID(payment.PaymentId);
         payment.RedirectToGateway();
         dbContext.Payments.Add(payment);
         await dbContext.SaveChangesAsync();
