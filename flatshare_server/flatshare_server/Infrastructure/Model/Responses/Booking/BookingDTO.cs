@@ -10,5 +10,5 @@ public record class BookingDTO
     public required decimal TotalPrice { get; init; }
     public required string Currency { get; init; }
     public required string Status { get; init; }
-    public required string PaymentStatus { get; init; }
+    public required string PaymentId{ get; init; }
 }
