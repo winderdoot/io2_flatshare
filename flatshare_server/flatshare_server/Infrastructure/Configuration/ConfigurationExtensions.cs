@@ -10,19 +10,24 @@ namespace flatshare_server.Infrastructure.Configuration;
 
 public static class ConfigurationExtensions
 {
-    public static IConfigurationBuilder AddStubCIConfiguration(this IConfigurationBuilder builder)
+    public static IConfigurationBuilder InjectStubCIConfiguration(this IConfigurationBuilder builder)
     {
         var stubData = new Dictionary<string, string?>
         {
-            { $"{EmailOptions.OptionsKey}:AppName", "Flatshare" },
-            { $"{EmailOptions.OptionsKey}:Host", "smtp.gmail.com" },
-            { $"{EmailOptions.OptionsKey}:Port", "587" },
-            { $"{EmailOptions.OptionsKey}:EmailAddress", "flatshare.app@gmail.com" },
-            { $"{EmailOptions.OptionsKey}:AppPassword", "STUB_EMAIL_PASSWORD_IGNORE" },
+            { $"{EmailOptions.OptionsKey}:{nameof(EmailOptions.AppName)}", "Flatshare" },
+            { $"{EmailOptions.OptionsKey}:{nameof(EmailOptions.Host)}", "smtp.gmail.com" },
+            { $"{EmailOptions.OptionsKey}:{nameof(EmailOptions.Port)}", "587" },
+            { $"{EmailOptions.OptionsKey}:{nameof(EmailOptions.EmailAddress)}", "flatshare.app@gmail.com" },
+            { $"{EmailOptions.OptionsKey}:{nameof(EmailOptions.AppPassword)}", "STUB_EMAIL_PASSWORD_IGNORE" },
 
-            { $"{StripeOptions.OptionsKey}:SecretKey", "sk_test_STUB_SECRET_KEY_IGNORE" },
-            { $"{StripeOptions.OptionsKey}:PublishableKey", "pk_test_STUB_PUBLISHABLE_KEY_IGNORE" },
-            { $"{StripeOptions.OptionsKey}:WebhookSecretInitKey", "whsec_STUB_WEBHOOK_SECRET_IGNORE" }
+            { $"{StripeOptions.OptionsKey}:{nameof(StripeOptions.SecretKey)}", "sk_test_STUB_SECRET_KEY_IGNORE" },
+            { $"{StripeOptions.OptionsKey}:{nameof(StripeOptions.PublishableKey)}", "pk_test_STUB_PUBLISHABLE_KEY_IGNORE" },
+            { $"{StripeOptions.OptionsKey}:{nameof(StripeOptions.WebhookSecretInitKey)}", "whsec_STUB_WEBHOOK_SECRET_IGNORE" },
+            
+            { $"{JwtOptions.OptionsKey}:{nameof(JwtOptions.Secret)}", "SUPER_SECRET_STUB_KEY_THAT_IS_LONG_ENOUGH" },
+            { $"{JwtOptions.OptionsKey}:{nameof(JwtOptions.Issuer)}", "FlatshareIssuer" },
+            { $"{JwtOptions.OptionsKey}:{nameof(JwtOptions.Audience)}", "FlatshareAudience" },
+            { $"{JwtOptions.OptionsKey}:{nameof(JwtOptions.ExpirationTimeInMinutes)}", "60" }
         };
 
         builder.AddInMemoryCollection(stubData);
