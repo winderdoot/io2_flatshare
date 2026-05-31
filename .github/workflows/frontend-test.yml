@@ -50,7 +50,7 @@ jobs:
         working-directory: ${{ env.DOTNET_SLN_DIR }}
 
       - name: Drop Database
-        run: dotnet ef database drop
+        run: dotnet ef database drop --force
         working-directory: ${{ env.DOCKER_COMPOSE_DIR }}
 
       - name: Update Database
