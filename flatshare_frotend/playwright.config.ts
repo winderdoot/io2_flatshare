@@ -39,13 +39,6 @@ export default defineConfig({
   ],
 
   webServer: [
-    // {
-    //   command: 'dotnet run --configuration Release -- CI',
-    //   url: 'http://localhost:7047',
-    //   timeout: 120000,
-    //   reuseExistingServer: !process.env.CI,
-    //   cwd: '../flatshare_server/flatshare_server',
-    // },
     {
       command: 'npm run dev',
       url: 'http://localhost:5173',

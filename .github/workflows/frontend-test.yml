@@ -57,6 +57,10 @@ jobs:
         run: dotnet ef database update
         working-directory: ${{ env.DOCKER_COMPOSE_DIR }}
 
+      - name: Start API
+        run: dotnet run --configuration Release
+        working-directory: ${{ env.DOTNET_SLN_DIR }}/flatshare_server
+
       - name: Run Playwright tests
         run: DEBUG=pw:webserver,pw:api npx playwright test --reporter=line
         working-directory: ${{ env.FRONTEND_DIR }}
