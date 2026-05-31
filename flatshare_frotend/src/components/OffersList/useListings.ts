@@ -68,6 +68,9 @@ const filterMatchesActiveListing = (
   if (filters.nonSmokingOnly === true && listing.attributes?.nonSmokingOnly === false) {
     return false;
   }
+  if (filters.closeToShops === true && listing.attributes?.closeToShops === false) {
+    return false;
+  }
 
   return true;
 };

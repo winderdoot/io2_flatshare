@@ -14,7 +14,7 @@ export interface Filters {
   maxPrice: string;
   petsAllowed: boolean;
   nonSmokingOnly: boolean;
-  closeToShops: string;
+  closeToShops: boolean;
   profile: ProfileValue;
   minArea: string;
   maxArea: string;
@@ -28,7 +28,7 @@ const initialFilters: Filters = {
   maxPrice: "",
   petsAllowed: false,
   nonSmokingOnly: false,
-  closeToShops: "",
+  closeToShops: false,
   profile: "",
   minArea: "",
   maxArea: "",
@@ -45,6 +45,7 @@ interface FiltersState {
 
   applyFilters: () => void;
   resetFilters: () => void;
+  initFromPreferences: (partial: Partial<Filters>) => void;
 }
 
 export const useFiltersStore = create<FiltersState>((set) => ({
@@ -78,5 +79,15 @@ export const useFiltersStore = create<FiltersState>((set) => ({
       filters: initialFilters,
       appliedFilters: initialFilters,
       page: 0
+    }),
+
+  initFromPreferences: (partial) =>
+    set((state) => {
+      const newFilters = { ...state.filters, ...partial };
+      return {
+        filters: newFilters,
+        appliedFilters: newFilters,
+        page: 0
+      };
     })
 }));

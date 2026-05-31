@@ -1,15 +1,27 @@
-
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./SearchFilters.module.css";
 import { cityOptions, locationConfig } from "./locationConfig";
 import FormattedNumberInput from "../FormattedNumberInput/FormattedNumberInput";
 import { City, Filters, Profile, useFiltersStore } from "./FiltersStore";
 import { profileConfig } from "./profileConfig";
+import { useSearchPreferences } from "./useSearchPreferences";
 
-export default function SearchFilters() {  
+export default function SearchFilters() {
   const { t } = useTranslation();
 
   const { filters, setFilter, applyFilters } = useFiltersStore();
+  const preferencesReady = useSearchPreferences();
+
+  useEffect(() => {
+    if (!preferencesReady) return;
+
+    const timer = window.setTimeout(() => {
+      applyFilters();
+    }, 400);
+
+    return () => window.clearTimeout(timer);
+  }, [filters, preferencesReady, applyFilters]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -155,16 +167,15 @@ export default function SearchFilters() {
           {t("filters.nonSmoking")}
         </label>
 
-        <div className={styles.col}>
-          <label>{t("filters.shopsNumber")}</label>
-          <FormattedNumberInput
-            value={filters.closeToShops}
-            onChange={(val) => setFilter("closeToShops", val)}
-            placeholder={t("filters.from")}
-            suffix={t("filters.shops")}
-          >
-          </FormattedNumberInput>
-        </div>
+        <label className={styles.checkboxGroup}>
+          <input
+            type="checkbox"
+            name="closeToShops"
+            checked={filters.closeToShops}
+            onChange={handleChange}
+          />
+          {t("filters.closeToShops")}
+        </label>
 
         <div className={styles.col}>
           <label>{t("filters.startDate")}</label>
