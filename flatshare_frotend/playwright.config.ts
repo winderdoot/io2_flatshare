@@ -35,7 +35,7 @@ export default defineConfig({
 
   webServer: [
     {
-      command: 'dotnet run --no-build --configuration Release --environment CI',
+      command: 'dotnet run --configuration Release --environment CI',
       url: 'http://127.0.0.1:7047',
       reuseExistingServer: !process.env.CI,
       cwd: '../flatshare_server/flatshare_server',
