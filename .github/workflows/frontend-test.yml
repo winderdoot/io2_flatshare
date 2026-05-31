@@ -61,7 +61,7 @@ jobs:
         run: dotnet run --configuration Release &
         working-directory: ${{ env.DOTNET_SLN_DIR }}/flatshare_server
         env:
-          ASPNETCORE_URLS: http://localhost:7047
+          ASPNETCORE_URLS: https://localhost:7047
 
       - name: Run Playwright tests
         run: DEBUG=pw:webserver,pw:api npx playwright test --reporter=line
