@@ -355,4 +355,42 @@ public class BookingServiceTests
         var resultAll = await bookingService.Get(null, null);
         resultAll.Should().HaveCount(3);
     }
+
+    [Fact]
+    public async Task AdminForceCancel_ShouldChangeStatusToCancelled()
+    {
+        // Arrange
+        var ctx = CreateInMemoryDbContext();
+
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+
+        SeedListingWithOwner(ctx, out var owner, out var listing);
+
+        var listingService = new ListingService(ctx, mockUserService.Object);
+        var bookingService = new BookingService(ctx, listingService, mockUserService.Object);
+
+        var tenant = User.TryCreate(new CreateUserRequest("TenantCFirst", "TenantCLast", "tenant4@test.local", "Pass123!", CreateUserRequest.Tenant));
+        var start = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20));
+        var end = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(50));
+        var req = new CreateBookingRequest(listing.Id, start, end);
+
+        var created = await bookingService.Create(req, tenant.Id);
+        var bookingId = Guid.Parse(created.BookingId);
+        var booking = await ctx.Bookings.Where(b => b.BookingId == bookingId).FirstOrDefaultAsync();
+
+        booking!.OwnerAccept();
+        booking!.PaymentSuccess();
+
+        // Act
+        var resp = await bookingService.AdminForceCancel(bookingId, tenant.Id);
+
+        // Assert
+        resp.Should().Be(true);
+
+        var stored = await ctx.Bookings.FindAsync(bookingId);
+        stored!.Status.ToString().Should().Be("Cancelled");
+    }
 }

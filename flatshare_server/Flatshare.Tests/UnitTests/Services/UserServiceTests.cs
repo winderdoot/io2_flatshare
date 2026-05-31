@@ -1,4 +1,5 @@
-﻿using flatshare_server.Infrastructure.Model.Exceptions;
+﻿using flatshare_server.Infrastructure.Model;
+using flatshare_server.Infrastructure.Model.Exceptions;
 using flatshare_server.Infrastructure.Model.Requests;
 using flatshare_server.Infrastructure.Model.Users;
 using flatshare_server.Infrastructure.Repositories;
@@ -42,7 +43,7 @@ public class UserServiceTests
 
         // Act
         var user = await _userService.GetByIdAsync(id);
-        
+
         // Assert
         _userRepoMock.Verify(repo => repo.GetById(id), Times.Once);
         user.Id.Should().Be(landlordUser.Id);
@@ -274,5 +275,27 @@ public class UserServiceTests
         // Assert
         result.Should().BeFalse();
         _resetRepoMock.Verify(repo => repo.CheckValidity(It.IsAny<Guid>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Theory]
+    [InlineData(AccountStatus.Type.Blocked)]
+    [InlineData(AccountStatus.Type.Deleted)]
+    [InlineData(AccountStatus.Type.ResetRequested)]
+    public async Task UpdateStatus_ShouldChangeStatus_WhenProvidedNewStatus(AccountStatus.Type status)
+    {
+        // Arrange
+        var user = User.TryCreate(new CreateUserRequest("John", "Smith", "e@mail.com", "Pass123!", CreateUserRequest.Tenant));
+        var id = user.Id;
+
+        _userRepoMock.Setup(repo => repo.GetById(id)).ReturnsAsync(user);
+
+        var newAccountStatus = new AccountStatus { Value = status };
+
+        // Act
+        await _userService.UpdateStatusByIdAsync(id, newAccountStatus);
+
+        // Assert
+        _userRepoMock.Verify(repo => repo.Update(user), Times.Once);
+        user.Status.Should().Be(newAccountStatus);
     }
 }

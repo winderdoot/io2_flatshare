@@ -54,11 +54,11 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var user = User.TryCreate(
             new CreateUserRequest("Test", "User", "test@test.pl", "Pass123!", CreateUserRequest.Landlord));
 
         var request = GenerateValidRequest();
-        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(request, user);
+        var listing = Listing.TryCreate(request, user);
 
         context.Listings.Add(listing);
         await context.SaveChangesAsync();
@@ -84,7 +84,7 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var user = User.TryCreate(
             new CreateUserRequest("Test", "User", "test@test.pl", "Pass123!", CreateUserRequest.Landlord));
 
         var baseRequest = GenerateValidRequest();
@@ -93,9 +93,9 @@ public class ListingServiceTests
         var krakowRequest2 = baseRequest with { Location = new Address("Kraków", "Podgórze", "Lwowska", "2") };
         var warsawRequest = baseRequest with { Location = new Address("Warszawa", "Wola", "Prosta", "5") };
 
-        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(krakowRequest1, user));
-        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(krakowRequest2, user));
-        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(warsawRequest, user));
+        context.Listings.Add(Listing.TryCreate(krakowRequest1, user));
+        context.Listings.Add(Listing.TryCreate(krakowRequest2, user));
+        context.Listings.Add(Listing.TryCreate(warsawRequest, user));
         await context.SaveChangesAsync();
 
         var filter = new ListingFilter { City = "Kraków" };
@@ -121,7 +121,7 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var user = User.TryCreate(
             new CreateUserRequest("Test", "User", "test@test.pl", "Pass123!", CreateUserRequest.Landlord));
 
         var baseRequest = GenerateValidRequest();
@@ -130,9 +130,9 @@ public class ListingServiceTests
         var req2 = baseRequest with { Location = new Address("Kraków", "Kazimierz", "Szeroka", "2") };
         var req3 = baseRequest with { Location = new Address("Warszawa", "Œródmieœcie", "Z³ota", "44") };
 
-        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req1, user));
-        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req2, user));
-        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req3, user));
+        context.Listings.Add(Listing.TryCreate(req1, user));
+        context.Listings.Add(Listing.TryCreate(req2, user));
+        context.Listings.Add(Listing.TryCreate(req3, user));
         await context.SaveChangesAsync();
 
         var filter = new ListingFilter { City = "Kraków", District = "Kazimierz" };
@@ -159,15 +159,15 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var user = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var user = User.TryCreate(
             new CreateUserRequest("Test", "User", "test@test.pl", "Pass123!", CreateUserRequest.Landlord));
 
         var baseRequest = GenerateValidRequest();
         var req1 = baseRequest with { Location = new Address("Kraków", "Kazimierz", "Szeroka", "2") };
         var req2 = baseRequest with { Location = new Address("Warszawa", "Kazimierz", "InnaUlica", "5") };
 
-        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req1, user));
-        context.Listings.Add(flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req2, user));
+        context.Listings.Add(Listing.TryCreate(req1, user));
+        context.Listings.Add(Listing.TryCreate(req2, user));
         await context.SaveChangesAsync();
 
 
@@ -192,11 +192,11 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var owner = User.TryCreate(
             new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
 
         var createReq = GenerateValidRequest();
-        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+        var listing = Listing.TryCreate(createReq, owner);
 
         context.Listings.Add(listing);
         await context.SaveChangesAsync();
@@ -240,10 +240,10 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var owner = User.TryCreate(
             new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
         var createReq = GenerateValidRequest();
-        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+        var listing = Listing.TryCreate(createReq, owner);
 
         context.Listings.Add(listing);
         await context.SaveChangesAsync();
@@ -274,10 +274,10 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var owner = User.TryCreate(
             new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
         var createReq = GenerateValidRequest();
-        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+        var listing = Listing.TryCreate(createReq, owner);
 
         context.Listings.Add(listing);
         await context.SaveChangesAsync();
@@ -299,10 +299,6 @@ public class ListingServiceTests
         exception.Which.Response.Status.Should().Be(StatusCodes.Status400BadRequest);
     }
 
-    // ----------------------
-    // New tests: State transitions
-    // ----------------------
-
     [Fact]
     public async Task StateTransitions_ShouldFollowExpectedLifecycle()
     {
@@ -315,10 +311,10 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var owner = User.TryCreate(
             new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
         var createReq = GenerateValidRequest();
-        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+        var listing = Listing.TryCreate(createReq, owner);
 
         context.Listings.Add(listing);
         await context.SaveChangesAsync();
@@ -356,10 +352,10 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var owner = User.TryCreate(
             new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
         var createReq = GenerateValidRequest();
-        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+        var listing = Listing.TryCreate(createReq, owner);
 
         context.Listings.Add(listing);
         await context.SaveChangesAsync();
@@ -383,10 +379,10 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var owner = User.TryCreate(
             new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
         var createReq = GenerateValidRequest();
-        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(createReq, owner);
+        var listing = Listing.TryCreate(createReq, owner);
 
         context.Listings.Add(listing);
         await context.SaveChangesAsync();
@@ -410,14 +406,14 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var owner = User.TryCreate(
             new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
 
         var req1 = GenerateValidRequest();
         var req2 = GenerateValidRequest();
 
-        var listingDraft = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req1, owner);
-        var listingUnderReview = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req2, owner);
+        var listingDraft = Listing.TryCreate(req1, owner);
+        var listingUnderReview = Listing.TryCreate(req2, owner);
 
         context.Listings.Add(listingDraft);
         context.Listings.Add(listingUnderReview);
@@ -446,11 +442,11 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var owner = User.TryCreate(
             new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
 
         var req = GenerateValidRequest();
-        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req, owner);
+        var listing = Listing.TryCreate(req, owner);
         context.Listings.Add(listing);
         await context.SaveChangesAsync();
 
@@ -477,11 +473,11 @@ public class ListingServiceTests
         var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
         var service = new ListingService(context, mockUserService.Object);
 
-        var owner = flatshare_server.Infrastructure.Model.Users.User.TryCreate(
+        var owner = User.TryCreate(
             new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
 
         var req = GenerateValidRequest();
-        var listing = flatshare_server.Infrastructure.Model.Listings.Listing.TryCreate(req, owner);
+        var listing = Listing.TryCreate(req, owner);
         context.Listings.Add(listing);
         await context.SaveChangesAsync();
 
@@ -496,5 +492,39 @@ public class ListingServiceTests
         // Assert
         var updatedListing = await service.GetByIdAsync(listing.Id);
         updatedListing.Status.Should().Be(Listing.ListingStatus.Active);
+    }
+
+    [Fact]
+    public async Task HideByModeration_AllUsersListingsShouldGetHidden()
+    {
+        // Arrange
+        var context = CreateInMemoryDbContext();
+        var mockUserRepo = new Mock<IUserRepository>();
+        var mockResetRepo = new Mock<IResetCodesRepository>();
+        var mockSessionRepo = new Mock<ISessionRepository>();
+        var mockUserService = new Mock<UserService>(mockUserRepo.Object, mockResetRepo.Object, mockSessionRepo.Object);
+        var service = new ListingService(context, mockUserService.Object);
+        var count = 10;
+
+        var owner = User.TryCreate(
+            new CreateUserRequest("Owner", "Landlord", "owner@test.pl", "Pass123!", CreateUserRequest.Landlord));
+
+        for (int i = 0; i < count; i++)
+        {
+            var req = GenerateValidRequest();
+            var listing = Listing.TryCreate(req, owner);
+            context.Listings.Add(listing);
+        }
+        await context.SaveChangesAsync();
+
+        // Act
+        await service.BatchModerationHideByUserIdAsync(owner.Id);
+
+        // Assert
+        context.Listings.All(
+            l => l.Owner.Id == owner.Id &&
+            l.Status == Listing.ListingStatus.HiddenByModeration
+            )
+            .Should().Be(true);
     }
 }
