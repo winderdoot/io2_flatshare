@@ -35,7 +35,7 @@ export default defineConfig({
 
   webServer: [
     {
-      command: 'dotnet run --configuration Release --environment CI',
+      command: 'dotnet run --configuration Release -- CI',
       url: 'https://localhost:7047',
       reuseExistingServer: !process.env.CI,
       cwd: '../flatshare_server/flatshare_server',
