@@ -55,7 +55,7 @@ if (builder.Environment.EnvironmentName != "Testing")
 
 if (builder.Environment.IsEnvironment("CI"))
 {
-    builder.Services.InjectStubCIConfiguration(builder.Configuration);
+    builder.Configuration.AddStubCIConfiguration();
 }
 
 /* Add services */

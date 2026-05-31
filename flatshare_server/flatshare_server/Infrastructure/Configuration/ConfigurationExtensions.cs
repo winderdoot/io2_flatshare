@@ -10,25 +10,24 @@ namespace flatshare_server.Infrastructure.Configuration;
 
 public static class ConfigurationExtensions
 {
-    public static IServiceCollection InjectStubCIConfiguration(this IServiceCollection services, IConfiguration configuration)
+    public static IConfigurationBuilder AddStubCIConfiguration(this IConfigurationBuilder builder)
     {
-        services.Configure<EmailOptions>(options =>
+        var stubData = new Dictionary<string, string?>
         {
-            options.AppName = "Flatshare";
-            options.Host = "smtp.gmail.com";
-            options.Port = 587;
-            options.EmailAddress = "flatshare.app@gmail.com";
-            options.AppPassword = "STUB_EMAIL_PASSWORD_IGNORE";
-        });
+            { $"{EmailOptions.OptionsKey}:AppName", "Flatshare" },
+            { $"{EmailOptions.OptionsKey}:Host", "smtp.gmail.com" },
+            { $"{EmailOptions.OptionsKey}:Port", "587" },
+            { $"{EmailOptions.OptionsKey}:EmailAddress", "flatshare.app@gmail.com" },
+            { $"{EmailOptions.OptionsKey}:AppPassword", "STUB_EMAIL_PASSWORD_IGNORE" },
 
-        services.Configure<StripeOptions>(options =>
-        {
-            options.SecretKey = "sk_test_STUB_SECRET_KEY_IGNORE";
-            options.PublishableKey = "pk_test_STUB_PUBLISHABLE_KEY_IGNORE";
-            options.WebhookSecretInitKey = "whsec_STUB_WEBHOOK_SECRET_IGNORE";
-        });
+            { $"{StripeOptions.OptionsKey}:SecretKey", "sk_test_STUB_SECRET_KEY_IGNORE" },
+            { $"{StripeOptions.OptionsKey}:PublishableKey", "pk_test_STUB_PUBLISHABLE_KEY_IGNORE" },
+            { $"{StripeOptions.OptionsKey}:WebhookSecretInitKey", "whsec_STUB_WEBHOOK_SECRET_IGNORE" }
+        };
 
-        return services;
+        builder.AddInMemoryCollection(stubData);
+
+        return builder;
     }
     public static IServiceCollection AddAppOptions(this IServiceCollection services, IConfiguration configuration)
     {
