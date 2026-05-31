@@ -58,14 +58,16 @@ jobs:
         working-directory: ${{ env.DOCKER_COMPOSE_DIR }}
 
       - name: Start API
-        run: dotnet run --configuration Release
+        run: dotnet run --configuration Release &
         working-directory: ${{ env.DOTNET_SLN_DIR }}/flatshare_server
-        env:
-          ASPNETCORE_URLS: https://localhost:7047
+
+      - name: Sleep
+        run: sleep 10
+        working-directory: ${{ env.DOCKER_COMPOSE_DIR }}
 
       - name: Run Playwright tests
-        run: npx playwright test --verbose
-        # run: DEBUG=pw:webserver,pw:api npx playwright test --reporter=line
+        # run: npx playwright test --verbose
+        run: DEBUG=pw:webserver,pw:api npx playwright test --reporter=line
         working-directory: ${{ env.FRONTEND_DIR }}
 
       - uses: actions/upload-artifact@v4
