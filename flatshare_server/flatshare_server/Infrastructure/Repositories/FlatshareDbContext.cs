@@ -18,6 +18,7 @@ public class FlatshareDbContext : DbContext
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<PasswordResetEntry> PasswordResetEntries { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<ViolationReport> ViolationReports { get; set; }
 
     public FlatshareDbContext(DbContextOptions<FlatshareDbContext> options)
     : base(options)
@@ -161,7 +162,15 @@ public class FlatshareDbContext : DbContext
                 entity.HasKey(p => p.PaymentId);
                 entity.OwnsOne(p => p.Amount);
                 entity.HasIndex(p => p.BookingId).HasDatabaseName("IX_Payments_BookingId");
-            });
+            })
+            .Entity<ViolationReport>(entity =>
+             {
+                 entity.HasKey(e => e.Id);
+                 entity.Property(e => e.Type).HasConversion<string>();
+                 entity.Property(e => e.Status).HasConversion<string>();
+                 entity.Property(e => e.Reason).IsRequired();
+                 entity.Property(e => e.Details).IsRequired();
+             });
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
