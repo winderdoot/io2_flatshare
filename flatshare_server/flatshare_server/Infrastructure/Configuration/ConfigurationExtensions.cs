@@ -12,28 +12,42 @@ public static class ConfigurationExtensions
 {
     public static IConfigurationBuilder InjectStubCIConfiguration(this IConfigurationBuilder builder)
     {
-        var stubData = new Dictionary<string, string?>
+        var currentConfig = builder.Build();
+
+        var stubData = new Dictionary<string, string?>();
+
+        if (!currentConfig.GetSection(EmailOptions.OptionsKey).Exists())
         {
-            { $"{EmailOptions.OptionsKey}:{nameof(EmailOptions.AppName)}", "Flatshare" },
-            { $"{EmailOptions.OptionsKey}:{nameof(EmailOptions.Host)}", "smtp.gmail.com" },
-            { $"{EmailOptions.OptionsKey}:{nameof(EmailOptions.Port)}", "587" },
-            { $"{EmailOptions.OptionsKey}:{nameof(EmailOptions.EmailAddress)}", "flatshare.app@gmail.com" },
-            { $"{EmailOptions.OptionsKey}:{nameof(EmailOptions.AppPassword)}", "STUB_EMAIL_PASSWORD_IGNORE" },
+            stubData.Add($"{EmailOptions.OptionsKey}:{nameof(EmailOptions.AppName)}", "Flatshare");
+            stubData.Add($"{EmailOptions.OptionsKey}:{nameof(EmailOptions.Host)}", "smtp.gmail.com");
+            stubData.Add($"{EmailOptions.OptionsKey}:{nameof(EmailOptions.Port)}", "587");
+            stubData.Add($"{EmailOptions.OptionsKey}:{nameof(EmailOptions.EmailAddress)}", "flatshare.app@gmail.com");
+            stubData.Add($"{EmailOptions.OptionsKey}:{nameof(EmailOptions.AppPassword)}", "STUB_EMAIL_PASSWORD_IGNORE");
+        }
 
-            { $"{StripeOptions.OptionsKey}:{nameof(StripeOptions.SecretKey)}", "sk_test_STUB_SECRET_KEY_IGNORE" },
-            { $"{StripeOptions.OptionsKey}:{nameof(StripeOptions.PublishableKey)}", "pk_test_STUB_PUBLISHABLE_KEY_IGNORE" },
-            { $"{StripeOptions.OptionsKey}:{nameof(StripeOptions.WebhookSecretInitKey)}", "whsec_STUB_WEBHOOK_SECRET_IGNORE" },
-            
-            { $"{JwtOptions.OptionsKey}:{nameof(JwtOptions.Secret)}", "SUPER_SECRET_STUB_KEY_THAT_IS_LONG_ENOUGH" },
-            { $"{JwtOptions.OptionsKey}:{nameof(JwtOptions.Issuer)}", "FlatshareIssuer" },
-            { $"{JwtOptions.OptionsKey}:{nameof(JwtOptions.Audience)}", "FlatshareAudience" },
-            { $"{JwtOptions.OptionsKey}:{nameof(JwtOptions.ExpirationTimeInMinutes)}", "60" }
-        };
+        if (!currentConfig.GetSection(StripeOptions.OptionsKey).Exists())
+        {
+            stubData.Add($"{StripeOptions.OptionsKey}:{nameof(StripeOptions.SecretKey)}", "sk_test_STUB_SECRET_KEY_IGNORE");
+            stubData.Add($"{StripeOptions.OptionsKey}:{nameof(StripeOptions.PublishableKey)}", "pk_test_STUB_PUBLISHABLE_KEY_IGNORE");
+            stubData.Add($"{StripeOptions.OptionsKey}:{nameof(StripeOptions.WebhookSecretInitKey)}", "whsec_STUB_WEBHOOK_SECRET_IGNORE");
+        }
 
-        builder.AddInMemoryCollection(stubData);
+        if (!currentConfig.GetSection(JwtOptions.OptionsKey).Exists())
+        {
+            stubData.Add($"{JwtOptions.OptionsKey}:{nameof(JwtOptions.Secret)}", "SUPER_SECRET_STUB_KEY_THAT_IS_LONG_ENOUGH");
+            stubData.Add($"{JwtOptions.OptionsKey}:{nameof(JwtOptions.Issuer)}", "FlatshareIssuer");
+            stubData.Add($"{JwtOptions.OptionsKey}:{nameof(JwtOptions.Audience)}", "FlatshareAudience");
+            stubData.Add($"{JwtOptions.OptionsKey}:{nameof(JwtOptions.ExpirationTimeInMinutes)}", "60");
+        }
+
+        if (stubData.Count > 0)
+        {
+            builder.AddInMemoryCollection(stubData);
+        }
 
         return builder;
     }
+
     public static IServiceCollection AddAppOptions(this IServiceCollection services, IConfiguration configuration)
     {
         var emailOptions = configuration
