@@ -1,5 +1,6 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 import type { ListingDTO } from "../../models/listing";
+import { AvailabilityCalendar } from "../../components/AvailabilityCalendar/AvailabilityCalendar";
 import { useListingDetail } from "./useListingDetail";
 import rentHouse from "../../assets/rent_house.png";
 import "./ListingDetail.css";
@@ -164,19 +165,12 @@ export const ListingDetail = () => {
             </div>
           </div>
 
-          {listing.unavailabilities && listing.unavailabilities.length > 0 && (
-            <div className="listing-detail-unavailabilities">
-              <h3>Niedostępność</h3>
-              <ul>
-                {listing.unavailabilities.map((u, i) => (
-                  <li key={i}>
-                    {formatDate(u.since)} – {formatDate(u.until)}
-                    {u.message && <span> ({u.message})</span>}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <AvailabilityCalendar
+            availableSince={listing.availableSince}
+            availableUntil={listing.availableUntil}
+            unavailabilities={listing.unavailabilities}
+            compact
+          />
 
           <div className="listing-detail-contact">
             <div className="listing-detail-facts">

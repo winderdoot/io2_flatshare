@@ -43,12 +43,15 @@ public class ListingService
         if (attachOwner)
         {
             listing = await _context.Listings
+                .Include(l => l.Unavailabilities)
                 .Include(l => l.Owner)
                 .FirstOrDefaultAsync(l => l.Id == id);
         }
         else
         {
-            listing = await _context.Listings.FindAsync(id);
+            listing = await _context.Listings
+                .Include(l => l.Unavailabilities)
+                .FirstOrDefaultAsync(l => l.Id == id);
         }
         if (listing is null)
         {
@@ -59,7 +62,9 @@ public class ListingService
 
     public async Task<List<ListingDTO>> GetByFilterAsync(ListingFilter filter)
     {
-        var query = _context.Listings.AsQueryable();
+        var query = _context.Listings
+            .Include(l => l.Unavailabilities)
+            .AsQueryable();
 
         if (filter.OwnerId.HasValue)
         {

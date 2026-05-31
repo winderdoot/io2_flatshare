@@ -1,5 +1,41 @@
 import { API_URL } from "../../config";
-import type { ListingAttributes, ListingDTO, ListingStatus } from "../../models/listing";
+import type {
+  ListingAttributes,
+  ListingDTO,
+  ListingStatus,
+  Unavailability,
+} from "../../models/listing";
+
+type RawUnavailability = {
+  since?: string;
+  until?: string;
+  Since?: string;
+  Until?: string;
+  message?: string;
+  Message?: string;
+};
+
+function normalizeUnavailability(raw: RawUnavailability): Unavailability {
+  return {
+    since: (raw.since ?? raw.Since ?? "").slice(0, 10),
+    until: (raw.until ?? raw.Until ?? "").slice(0, 10),
+    message: raw.message ?? raw.Message ?? "",
+  };
+}
+
+/** Normalizuje odpowiedź API (camelCase / PascalCase, daty). */
+export function normalizeListingDto(raw: Record<string, unknown>): ListingDTO {
+  const periods = (raw.unavailabilities ?? raw.Unavailabilities) as
+    | RawUnavailability[]
+    | undefined;
+
+  const base = raw as unknown as ListingDTO;
+  return {
+    ...base,
+    id: String(raw.id ?? raw.Id ?? base.id),
+    unavailabilities: periods?.map(normalizeUnavailability) ?? [],
+  };
+}
 import type { Location } from "../../models/location";
 
 const authHeaders = (token: string) => ({
@@ -48,6 +84,8 @@ export type CreateListingBody = {
   attributes: ListingAttributes;
 };
 
+export type UnavailabilityRangeBody = Pick<Unavailability, "since" | "until">;
+
 export type UpdateListingBody = {
   title?: string;
   description?: string;
@@ -78,7 +116,8 @@ export const landlordListingsService = {
       const message = await readErrorMessage(res);
       throw { status: res.status, message } satisfies ListingRequestError;
     }
-    return res.json();
+    const data = (await res.json()) as Record<string, unknown>[];
+    return data.map((row) => normalizeListingDto(row));
   },
 
   getById: async (id: string): Promise<ListingDTO> => {
@@ -90,7 +129,8 @@ export const landlordListingsService = {
       const message = await readErrorMessage(res);
       throw { status: res.status, message } satisfies ListingRequestError;
     }
-    return res.json();
+    const data = (await res.json()) as Record<string, unknown>;
+    return normalizeListingDto(data);
   },
 
   create: async (
@@ -163,6 +203,38 @@ export const landlordListingsService = {
     const res = await fetch(`${API_URL}/api/v1/listings/${id}/archive`, {
       method: "PATCH",
       headers: authHeaders(token),
+    });
+    if (!res.ok) {
+      const message = await readErrorMessage(res);
+      throw { status: res.status, message } satisfies ListingRequestError;
+    }
+  },
+
+  addUnavailability: async (
+    token: string,
+    id: string,
+    body: Unavailability
+  ): Promise<void> => {
+    const res = await fetch(`${API_URL}/api/v1/listings/${id}/unavailability`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const message = await readErrorMessage(res);
+      throw { status: res.status, message } satisfies ListingRequestError;
+    }
+  },
+
+  removeUnavailability: async (
+    token: string,
+    id: string,
+    body: UnavailabilityRangeBody
+  ): Promise<void> => {
+    const res = await fetch(`${API_URL}/api/v1/listings/${id}/unavailability`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
     });
     if (!res.ok) {
       const message = await readErrorMessage(res);

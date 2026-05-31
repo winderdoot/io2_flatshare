@@ -193,23 +193,6 @@
   color: var(--color-text-primary);
 }
 
-.listing-detail-unavailabilities ul {
-  margin: 0;
-  padding-left: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.92rem;
-}
-
-.listing-detail-unavailabilities li::marker {
-  color: var(--color-text-secondary);
-}
-
-.listing-detail-unavailabilities li span {
-  color: var(--color-text-secondary);
-}
-
 .listing-detail-empty {
   text-align: center;
   padding: 3rem 1rem;
