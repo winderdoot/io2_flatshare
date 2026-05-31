@@ -5,7 +5,9 @@ public record class ListingAttributes
     public enum TenantProfile
     {
         Student,
-        Tourist
+        Tourist,
+        WorkingPerson,
+        None
     }
 
     public bool PetsAllowed { get; init; } = true;
