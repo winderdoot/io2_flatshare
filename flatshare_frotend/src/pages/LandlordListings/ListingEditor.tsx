@@ -2,13 +2,15 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth/AuthContext";
-import type { ListingDTO, ListingTenantProfile } from "../../models/listing";
 import {
   isListingRequestError,
   landlordListingsService,
   type CreateListingBody,
 } from "./LandlordListingsService";
 import "./ListingEditor.css";
+import { getListingPhotos, deleteListingPhoto, uploadListingPhoto } from "../../images_service/ImagesService";
+import rentHouse from "../../assets/rent_house.png";
+import { type ListingPhoto } from "../../images_service/ImagesService";
 
 function toDateOnly(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -209,6 +211,88 @@ export const ListingEditor = () => {
       setError(messageForListingFailure(e, t, "save"));
     } finally {
       setSaving(false);
+    }
+  };
+
+  const [images, setImages] = useState<ListingPhoto[]>([]);
+
+  useEffect(() => {
+    return () => {
+      images.forEach((img) => {
+        if (img.url !== rentHouse) {
+          URL.revokeObjectURL(img.url);
+        }
+      });
+    };
+  }, [images]);
+
+  useEffect(() => {
+    if (!isEdit || !listingId || !token) return;
+
+    getListingPhotos(listingId, token)
+      .then((photos) => {
+        if (photos.length === 1 && photos[0].url === rentHouse) return;
+        setImages(photos);
+      })
+      .catch(console.error);
+  }, [isEdit, listingId, token]);
+
+  const loadImages = async () => {
+    if (!listingId || !token) return;
+
+    try {
+      const photos = await getListingPhotos(listingId, token);
+      
+      if (photos.length === 1 && photos[0].url === rentHouse) {
+        setImages([]);
+        return;
+      }
+      
+      setImages(photos);
+    } catch (e: unknown) {
+      console.error(e);
+    }
+  };
+
+  const deleteImage = async (photoId: string) => {
+    if (!listingId || !token || photoId === "default") return;
+
+    try {
+      await deleteListingPhoto(listingId, photoId, token);
+      await loadImages();
+    } catch (e: unknown) {
+      console.error(e);
+    }
+  };
+
+  const uploadImage = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!listingId || !token) return;
+
+    const files: FileList = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const localPhotos = Array.from(files).map((file) => ({
+      id: `temp-${Math.random()}`,
+      url: URL.createObjectURL(file),
+    }));
+
+    setImages((prev) => {
+      const current = prev.length === 1 && prev[0].url === rentHouse ? [] : prev;
+      return [...current, ...localPhotos];
+    });
+
+    try {
+      await Promise.all(
+        Array.from(files).map((file: File) =>
+          uploadListingPhoto(listingId, file, token)
+        )
+      );
+
+      await loadImages();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      e.target.value = "";
     }
   };
 
@@ -505,6 +589,43 @@ export const ListingEditor = () => {
               </label>
             </div>
           </section>
+
+         {
+            isEdit && listingId && (
+              <div className="photos-list">
+                {images.map((image) => (
+                  <div key={image.id} className="photo-item">
+                    <img src={image.url} className="photo-preview" alt="Listing" />
+                    <button
+                      type="button"
+                      onClick={() => deleteImage(image.id)}
+                      className="photo-delete-btn"
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )
+          }
+
+          {
+            isEdit &&
+            listingId &&
+            <div className="upload-panel">
+              <label className="upload-label">
+                 <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={uploadImage}
+                /> 
+                <span>
+                  +
+                </span>
+              </label> 
+            </div>
+          } 
 
           <div className="listing-editor-actions">
             <button

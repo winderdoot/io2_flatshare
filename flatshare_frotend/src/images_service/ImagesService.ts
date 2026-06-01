@@ -55,14 +55,20 @@ export const getListingThumbnail = async (
   }
 };
 
+export type ListingPhoto = {
+  id: string;
+  url: string;
+};
+
 export const getListingPhotos = async (
   listingId: string,
   token: string
-): Promise<string[]> => {
+): Promise<ListingPhoto[]> => {
   try {
     const photosResponse = await fetch(
       `${API_URL}/api/v1/listings/${listingId}/photos`,
       {
+        cache: "no-store",
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
@@ -70,21 +76,18 @@ export const getListingPhotos = async (
       }
     );
 
-    if (!photosResponse.ok) {
-      return [rentHouse];
-    }
+    if (!photosResponse.ok) return [{ id: "default", url: rentHouse }];
 
     const photosData: PhotosResponse = await photosResponse.json();
 
-    if (!photosData.photos?.length) {
-      return [rentHouse];
-    }
+    if (!photosData.photos?.length) return [{ id: "default", url: rentHouse }];
 
-    const imageUrls = await Promise.all(
+    const images = await Promise.all(
       photosData.photos.map(async (photoId) => {
         const imageResponse = await fetch(
           `${API_URL}/api/v1/listings/${listingId}/photos/${photoId}`,
           {
+            cache: "no-store", 
             headers: {
               Authorization: `Bearer ${token}`,
               Accept: "application/json",
@@ -92,17 +95,65 @@ export const getListingPhotos = async (
           }
         );
 
-        if (!imageResponse.ok) {
-          return rentHouse;
-        }
+        if (!imageResponse.ok) return { id: photoId, url: rentHouse };
 
         const blob = await imageResponse.blob();
-        return URL.createObjectURL(blob);
+        return { id: photoId, url: URL.createObjectURL(blob) };
       })
     );
 
-    return imageUrls;
+    return images;
   } catch {
-    return [rentHouse];
+    return [{ id: "default", url: rentHouse }];
   }
+};
+
+export const deleteListingPhoto = async (
+  listingId: string,
+  photoId: string,
+  token: string
+): Promise<void> => {
+  const response = await fetch(
+    `${API_URL}/api/v1/listings/${listingId}/photos/${photoId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    }
+  );
+
+  if (!response.ok && response.status !== 204) {
+    throw new Error("Error deleting photo");
+  }
+};
+
+export const uploadListingPhoto = async (
+  listingId: string,
+  file: File,
+  token: string
+): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(
+    `${API_URL}/api/v1/listings/${listingId}/photos`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+      body: formData,
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Error uploading photo");
+  }
+
+  const location = response.headers.get("Location");
+
+  return location ? location.split("/").pop()! : ""; 
 };
