@@ -569,11 +569,7 @@ export const ListingEditor = () => {
                   </button>
                 </div>
               ))}
-            </div>
-          )}
-
-          {isEdit && listingId && (
-            <div className="upload-panel">
+              <div className="upload-panel">
               <label className="upload-label">
                 <input
                   type="file"
@@ -582,8 +578,9 @@ export const ListingEditor = () => {
                   onChange={uploadImage}
                   disabled={uploadingPhotos}
                 />
-                <span>{uploadingPhotos ? "Ładowanie..." : "+"}</span>
+                <span>{"+"}</span>
               </label>
+            </div>
             </div>
           )}
 

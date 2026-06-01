@@ -279,6 +279,7 @@
 .photos-list {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 16px;
   margin: 16px 20px;
 }
@@ -298,11 +299,13 @@
 }
 
 .photo-delete-btn {
-  margin-top: 8px;
-  width: 100%;
-  padding: 8px 12px;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 4px 12px 8px;
   border: none;
-  border-radius: 6px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
   color: white;
   cursor: pointer;
   font-size: 14px;
@@ -325,12 +328,22 @@
 
 .upload-label {
   display: inline-block;
-  padding: 10px 14px;
+  width: 90px;
+  padding: 0px 0 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: var(--color-primary);
   color: white;
-  border-radius: 6px;
+  border-radius: 50%;
   cursor: pointer;
+  font-size: 50px;
+  margin: 0;
   font-weight: 500;
+}
+
+.upload-label:hover {
+  background-color: var(--color-primary-hover);
 }
 
 .upload-label input {
