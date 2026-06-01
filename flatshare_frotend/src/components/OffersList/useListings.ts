@@ -3,6 +3,7 @@ import { useFiltersStore } from "../SearchBar/FiltersStore";
 import { API_URL } from "../../config";
 import { cityOptions } from "../SearchBar/locationConfig";
 import type { ListingDTO } from "../../models/listing";
+import {getListingThumbnail} from "../../images_service/ImagesService";
 
 export interface Listing {
   id: string;
@@ -15,7 +16,7 @@ export interface Listing {
 
 type StoredUser = { id?: string; role?: string } | null;
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 5;
 
 const readStoredUser = (): StoredUser => {
   try {
@@ -107,26 +108,6 @@ const wrapAsPage = (filtered: ListingDTO[], page: number) => {
   };
 };
 
-const fetchFromMatches = async (
-  filters: Record<string, any>,
-  page: number,
-  token: string
-) => {
-  const query = buildMatchesQueryParams(filters, page);
-  const res = await fetch(`${API_URL}/api/v1/matches?${query}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!res.ok) {
-    throw new Error("Błąd pobierania ogłoszeń");
-  }
-  return res.json();
-};
-
 const fetchFromListings = async (filters: Record<string, any>, page: number) => {
   const params = new URLSearchParams();
   const city = resolveCity(filters.city);
@@ -150,6 +131,36 @@ const fetchFromListings = async (filters: Record<string, any>, page: number) => 
   const all = (await res.json()) as ListingDTO[];
   const filtered = all.filter((item) => filterMatchesActiveListing(item, filters));
   return wrapAsPage(filtered, page);
+};
+
+const fetchFromMatches = async (
+  filters: Record<string, any>,
+  page: number,
+  token: string
+) => {
+  const query = buildMatchesQueryParams(filters, page);
+  const res = await fetch(`${API_URL}/api/v1/matches?${query}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    throw new Error("Błąd pobierania ogłoszeń");
+  }
+
+  const all = await res.json();
+  await Promise.all(
+    all.content.map(async (item: any) => {
+      item.coverImageUrl = await getListingThumbnail(
+        item.listing.id,
+        token
+      );
+    })
+  );
+  return all;
 };
 
 const fetchListings = async (
