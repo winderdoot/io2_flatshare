@@ -26,7 +26,6 @@ export const getListingThumbnail = async (
     }
     
     const photosData: PhotosResponse = await photosResponse.json();
-    console.log(photosData);
 
     const firstPhotoId = photosData.photos?.[0];
 
