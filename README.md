@@ -1,3 +1,53 @@
+# Instrukcja obsługi
+
+## 1. Pobranie repozytorium
+```bash
+git clone https://github.com/winderdoot/io2_flatshare.git
+git checkout develop
+git pull
+```
+
+Po pobraniu najnowszych zmian z developa, polecam od razu wpisać następującą komendę zanim zaczniecie coś ruszać w kodzie. Podziękujecie mi później.
+```bash
+git update-index --assume-unchanged *repo_directory*/flatshare_server/.env
+```
+
+## 2. Dodanie sekretów
+Trzeba wejść w visual studio, otworzyć solucję ```*repo_dir*/flatshare_server/flatshare_server.sln``` i wcisnąć prawym przyciskiem na projekt *flatshare_server* i wybrać opcję *Manage User Secrets*.
+Otworzy się plik json z sekretami, trzeba tam wkleić obiekt json z sekretami (otrzymacie go na DM).
+
+## 3. Modyfikacja lokalnego .env do docker compose
+Aby stripe-cli mógł skomunikować się z backendem w bezpieczny sposób, potrzebny jest plik ```*repo_directory*/flatshare_server/.env.```
+Problem jest taki, że na githubie może być upubliczniona tylko atrapowa wersja tego pliku.
+Dlatego najpierw trzeba poprosić gita żeby ignorował dalsze zmiany w tym pliku:
+```bash
+git update-index --assume-unchanged *repo_directory*/flatshare_server/.env
+```
+A wkleić do środka zmodyfikowaną wersję pliku, którą dostaniecie na DM.
+
+## 4. Uruchomienie serwera
+
+Zostało uruchomienie docker compose'a i samego serwera:
+```bash
+# Uruchomienie serwisów w dockerze
+# Jeśli jesteś na windowsie, najpierw uruchom docker desktop!
+cd *repo_dir*/flatshare_server
+docker compose up db azurite stripe-cli -d
+
+# Uruchomienie serwera lokalnie. WAŻNE aby nie zapomnieć o profilu https
+cd *repo_dir*/flatshare_server/flatshare_server
+dotnet run --launch-profile "https"
+```
+
+## UWAGA
+
+Jesli potrzeba zamknąć serwer i uruchomić aplikację jeszcze raz. To trzeba najpierw zamknąć kontenery i uruchomić je jeszcze raz przed restartem serwera. Trzeba to zrobić bo inaczej płatności nie będą rejestrować webhooków - nie dostaniecie żadnych wyjątków ale aplikacja nie będzie prawidłowo działać.
+Zamykanie dockera:
+```bash
+cd *repo_dir*/flatshare_server
+docker compose down
+```
+
 # Podstawowe informacje o naszym projekcie
 
 **Stos technologiczny**:
