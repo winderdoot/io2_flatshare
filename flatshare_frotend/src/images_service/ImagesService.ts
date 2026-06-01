@@ -1,4 +1,3 @@
-import rentHouse from "../assets/rent_house.png";
 import { API_URL } from "../config.ts";
 
 type PhotosResponse = {
@@ -9,7 +8,7 @@ type PhotosResponse = {
 export const getListingThumbnail = async (
   listingId: string,
   token: string
-): Promise<string> => {
+): Promise<Blob | null> => {
   try {
     const photosResponse = await fetch(
       `${API_URL}/api/v1/listings/${listingId}/photos`,
@@ -22,7 +21,7 @@ export const getListingThumbnail = async (
     );
     
     if (!photosResponse.ok) {
-      return rentHouse;
+      return null;
     }
     
     const photosData: PhotosResponse = await photosResponse.json();
@@ -30,7 +29,7 @@ export const getListingThumbnail = async (
     const firstPhotoId = photosData.photos?.[0];
 
     if (!firstPhotoId) {
-      return rentHouse;
+      return null;
     }
 
     const imageResponse = await fetch(
@@ -44,20 +43,18 @@ export const getListingThumbnail = async (
     );
 
     if (!imageResponse.ok) {
-      return rentHouse;
+      return null;
     }
 
-    const blob = await imageResponse.blob();
-
-    return URL.createObjectURL(blob);
+    return await imageResponse.blob();
   } catch {
-    return rentHouse;
+    return null;
   }
 };
 
 export type ListingPhoto = {
   id: string;
-  url: string;
+  blob: Blob | null;
 };
 
 export const getListingPhotos = async (
@@ -76,11 +73,11 @@ export const getListingPhotos = async (
       }
     );
 
-    if (!photosResponse.ok) return [{ id: "default", url: rentHouse }];
+    if (!photosResponse.ok) return [{ id: "default", blob: null }];
 
     const photosData: PhotosResponse = await photosResponse.json();
 
-    if (!photosData.photos?.length) return [{ id: "default", url: rentHouse }];
+    if (!photosData.photos?.length) return [{ id: "default", blob: null }];
 
     const images = await Promise.all(
       photosData.photos.map(async (photoId) => {
@@ -95,16 +92,16 @@ export const getListingPhotos = async (
           }
         );
 
-        if (!imageResponse.ok) return { id: photoId, url: rentHouse };
+        if (!imageResponse.ok) return { id: photoId, blob: null };
 
         const blob = await imageResponse.blob();
-        return { id: photoId, url: URL.createObjectURL(blob) };
+        return { id: photoId, blob };
       })
     );
 
     return images;
   } catch {
-    return [{ id: "default", url: rentHouse }];
+    return [{ id: "default", blob: null }];
   }
 };
 
