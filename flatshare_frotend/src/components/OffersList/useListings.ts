@@ -151,16 +151,7 @@ const fetchFromMatches = async (
     throw new Error("Błąd pobierania ogłoszeń");
   }
 
-  const all = await res.json();
-  await Promise.all(
-    all.content.map(async (item: any) => {
-      item.coverImageUrl = await getListingThumbnail(
-        item.listing.id,
-        token
-      );
-    })
-  );
-  return all;
+  return await res.json();
 };
 
 const fetchListings = async (
