@@ -17,8 +17,6 @@ const ListingGallery = ({ listingId }: { listingId: string }) => {
   const next = () => setActiveIndex((prev) => (prev + 1) % photos.length);
   const prev = () => setActiveIndex((prev) => (prev - 1 + photos.length) % photos.length);
 
-  console.log("photos", photos);
-
   return (
     <div className="listing-detail-hero">
       <img src={photos[activeIndex].url} alt="Listing" />

@@ -22,8 +22,6 @@ export const useListingThumbnail = (listingId: string) => {
     const objectUrl = URL.createObjectURL(blob);
     setImageUrl(objectUrl);
 
-    console.log("Co powinno byc:", objectUrl);
-
     return () => {
       URL.revokeObjectURL(objectUrl);
     };
