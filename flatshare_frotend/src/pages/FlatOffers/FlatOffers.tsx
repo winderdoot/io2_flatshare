@@ -48,7 +48,7 @@ const FlatOffers = () => {
         <div className="flat-offers-container">            
             <SearchFilters></SearchFilters>
             <OffersList></OffersList>
-            <h1 style={{marginBottom: "0rem"}}>Ciekawe oferty</h1>
+            {/* <h1 style={{marginBottom: "0rem"}}>Ciekawe oferty</h1>
             {featuredLoading && (
                 <div className="featured-state">Ładowanie ciekawych ofert…</div>
             )}
@@ -73,11 +73,11 @@ const FlatOffers = () => {
                             location={item.location}
                             currency={item.currency}
                             price={item.price}
-                            image={rentHouse}
+                            image={item.coverImageUrl || rentHouse}
                         />
                     ))}
                 </div>
-            )}
+            )} */}
         </div>
     </>
 }
