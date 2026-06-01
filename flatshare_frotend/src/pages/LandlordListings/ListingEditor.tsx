@@ -508,6 +508,7 @@ export const ListingEditor = () => {
 
           <div className="listing-editor-actions">
             <button
+              data-testid="submit-button"
               type="submit"
               className="listing-editor-submit"
               disabled={!canEdit || saving || !token}
