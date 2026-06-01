@@ -11,5 +11,4 @@ export type FlatOfferProps = {
     price: number;
     area: number;
     currency: string;
-    image: string;
 };

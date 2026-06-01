@@ -1,23 +1,30 @@
 import { Link } from "react-router-dom";
 import "./FlatOffer.css";
 import { FlatOfferProps } from "./FlatOfferProps";
+import rentHouse from "../../assets/rent_house.png";
+import { useListingThumbnail } from "../../hooks/useListingThumbnail.ts";
 
 const FlatOffer = ({
     vertical = true,
     listingId,
-    title,
     description,
-    mail: mail,
+    mail,
     location,
     price,
     area,
     currency,
-    image
+    title
 }: FlatOfferProps) => {
+    const { imageUrl, isLoading } = useListingThumbnail(listingId);
+
     return (
         <div className={`offer-card ${vertical ? "vertical" : "horizontal"}`}>
             <div className="offer-image-wrapper">
-                <img src={image} alt={title} className="offer-image" />
+                <img 
+                    src={isLoading ? rentHouse : (imageUrl || rentHouse)} 
+                    alt={title} 
+                    className={`offer-image ${isLoading ? "loading-pulse" : ""}`} 
+                />
                 <div className="offer-price">
                     {price} {currency}
                 </div>
@@ -40,15 +47,9 @@ const FlatOffer = ({
 
                 <div className="offer-footer">
                     <span className="offer-phone">📧 {mail}</span>
-                    {listingId ? (
-                        <Link className="contact-button" to={`/offer/${listingId}`}>
-                            Więcej
-                        </Link>
-                    ) : (
-                        <button type="button" className="contact-button">
-                            Więcej
-                        </button>
-                    )}
+                    <Link className="contact-button" to={`/offer/${listingId}`}>
+                        Więcej
+                    </Link>
                 </div>
             </div>
         </div>
