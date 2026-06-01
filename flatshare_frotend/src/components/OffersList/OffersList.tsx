@@ -25,7 +25,7 @@ export default function Listings() {
       {isFetching && <div className="offers-state offers-state--muted">Odświeżanie...</div>}
       <div className="offers-list">
         {data?.content.map((item: any) => (
-          <FlatOffer key={item.listing.id} listingId={item.listing.id} vertical={false} title={item.listing.title} area={item.listing.area} description={item.listing.description} mail={item.listing.ownerContact} location={item.listing.location} currency={item.listing.currency} price={item.listing.price} image={item.coverImageUrl || rentHouse}/>
+          <FlatOffer key={item.listing.id} listingId={item.listing.id} vertical={false} title={item.listing.title} area={item.listing.area} description={item.listing.description} mail={item.listing.ownerContact} location={item.listing.location} currency={item.listing.currency} price={item.listing.price}/>
         ))}
       </div>
 
