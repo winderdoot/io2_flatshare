@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { getListingPhotos, ListingPhoto } from "../images_service/ImagesService";
+import { getListingPhotos } from "../images_service/ImagesService";
 
 export const useListingPhotos = (listingId: string) => {
   const token = localStorage.getItem("token") || "";
