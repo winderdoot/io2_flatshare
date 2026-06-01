@@ -23,6 +23,7 @@ public static class DbSeederExtensions
         // Emails used for idempotent checks
         const string tenantEmail = "ewa.nowak@tenant.test";
         const string landlordEmail = "marek.kowalski@landlord.test";
+        const string adminEmail = "adam.adminski@admin.test";
 
         // If tenant missing -> create
         var tenantExists = await db.Users.AnyAsync(u => u.Email == tenantEmail, cancellationToken);
@@ -70,6 +71,23 @@ public static class DbSeederExtensions
             var landlordUser = User.TryCreate(landlordReq);
 
             db.Users.Add(landlordUser);
+            await db.SaveChangesAsync(cancellationToken);
+        }
+
+        var adminExists = await db.Users.AnyAsync(u => u.Email == adminEmail, cancellationToken);
+        if (!adminExists)
+        {
+            var adminReq = new CreateUserRequest(
+                FirstName: "Adam",
+                LastName: "Admiński",
+                Email: adminEmail,
+                Password: "AdminPass123!",
+                Role: CreateUserRequest.Admin
+            );
+
+            var adminUser = User.TryCreate(adminReq);
+
+            db.Users.Add(adminUser);
             await db.SaveChangesAsync(cancellationToken);
         }
 
