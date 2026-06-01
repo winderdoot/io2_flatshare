@@ -6,6 +6,8 @@ import { useListingDetail } from "./useListingDetail";
 import { BookingForm } from "./BookingForm";
 import rentHouse from "../../assets/rent_house.png";
 import "./ListingDetail.css";
+import { useListingThumbnail } from "../../hooks/useListingThumbnail";
+import ListingGallery from "../../components/ListingGallery/ListingGallery";
 
 function formatDate(iso: string): string {
   const d = new Date(iso + "T12:00:00");
@@ -51,12 +53,12 @@ export const ListingDetail = () => {
   const location = useLocation();
   const { user, token } = useAuth();
   const { data: listing, isLoading, isError, error } = useListingDetail(listingId);
-
+  
   const fromMyListings =
-    (location.state as { from?: string } | null)?.from === "/my-listings";
+  (location.state as { from?: string } | null)?.from === "/my-listings";
   const backTo = fromMyListings ? "/my-listings" : "/offer";
   const backLabel = fromMyListings ? "← Wróć do moich ogłoszeń" : "← Wróć do ofert";
-
+  
   if (!listingId) {
     return (
       <div className="listing-detail">
@@ -69,6 +71,8 @@ export const ListingDetail = () => {
       </div>
     );
   }
+
+  const { imageUrl, isLoading: thumbnailLoading } = useListingThumbnail(listingId);
 
   if (isLoading) {
     return (
@@ -103,7 +107,7 @@ export const ListingDetail = () => {
   ].join(", ");
 
   const chips = attributeChips(listing);
-  const imageSrc = listing.coverImageUrl ?? rentHouse;
+  const imageSrc = thumbnailLoading ? rentHouse : imageUrl ?? rentHouse;
 
   return (
     <article className="listing-detail">
@@ -143,7 +147,10 @@ export const ListingDetail = () => {
               </span>
             ))}
           </div>
+
+          <ListingGallery listingId={listingId} />
         </section>
+
 
         <aside className="listing-detail-panel">
           <h2>Najważniejsze</h2>

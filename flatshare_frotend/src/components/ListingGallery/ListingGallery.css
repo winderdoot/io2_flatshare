@@ -1,0 +1,36 @@
+.listing-detail-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.listing-detail-hero img {
+  width: 100%;
+  object-fit: cover;
+}
+
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+
+  animation: none;
+}
+
+.prev { left: 10px; }
+.next { right: 10px; }
+
+.counter {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
