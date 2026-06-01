@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent, type ChangeEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth/AuthContext";
@@ -8,9 +8,11 @@ import {
   type CreateListingBody,
 } from "./LandlordListingsService";
 import "./ListingEditor.css";
-import { getListingPhotos, deleteListingPhoto, uploadListingPhoto } from "../../images_service/ImagesService";
-import rentHouse from "../../assets/rent_house.png";
-import { type ListingPhoto } from "../../images_service/ImagesService";
+
+// Nowe importy:
+import { deleteListingPhoto, uploadListingPhoto } from "../../images_service/ImagesService";
+import { useListingPhotos } from "../../hooks/useListingPhotos";
+import type { ListingDTO, ListingTenantProfile } from "../../models/listing";
 
 function toDateOnly(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -94,8 +96,17 @@ export const ListingEditor = () => {
   const [loadedStatus, setLoadedStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+  
+  // Stan do sygnalizacji wczytywania zdjęć (np. zablokowania przycisku)
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // === NOWE ZARZĄDZANIE ZDJĘCIAMI ===
+  // Podajemy listingId (lub pusty string jeśli to tryb tworzenia),
+  // hook pobiera zdjęcia za nas, a my "kradniemy" od niego refetch, by odświeżyć widok po uploadzie.
+  const { photos, refetch } = useListingPhotos(listingId || "");
 
   const canEdit =
     !isEdit ||
@@ -214,52 +225,13 @@ export const ListingEditor = () => {
     }
   };
 
-  const [images, setImages] = useState<ListingPhoto[]>([]);
-
-  useEffect(() => {
-    return () => {
-      images.forEach((img) => {
-        if (img.url !== rentHouse) {
-          URL.revokeObjectURL(img.url);
-        }
-      });
-    };
-  }, [images]);
-
-  useEffect(() => {
-    if (!isEdit || !listingId || !token) return;
-
-    getListingPhotos(listingId, token)
-      .then((photos) => {
-        if (photos.length === 1 && photos[0].url === rentHouse) return;
-        setImages(photos);
-      })
-      .catch(console.error);
-  }, [isEdit, listingId, token]);
-
-  const loadImages = async () => {
-    if (!listingId || !token) return;
-
-    try {
-      const photos = await getListingPhotos(listingId, token);
-      
-      if (photos.length === 1 && photos[0].url === rentHouse) {
-        setImages([]);
-        return;
-      }
-      
-      setImages(photos);
-    } catch (e: unknown) {
-      console.error(e);
-    }
-  };
-
+  // === ZREFAKTORYZOWANE FUNKCJE ZDJĘĆ ===
   const deleteImage = async (photoId: string) => {
     if (!listingId || !token || photoId === "default") return;
 
     try {
       await deleteListingPhoto(listingId, photoId, token);
-      await loadImages();
+      if (refetch) await refetch(); // Odświeżamy z cache po usunięciu
     } catch (e: unknown) {
       console.error(e);
     }
@@ -268,18 +240,10 @@ export const ListingEditor = () => {
   const uploadImage = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!listingId || !token) return;
 
-    const files: FileList = e.target.files;
+    const files: FileList | null = e.target.files;
     if (!files || files.length === 0) return;
 
-    const localPhotos = Array.from(files).map((file) => ({
-      id: `temp-${Math.random()}`,
-      url: URL.createObjectURL(file),
-    }));
-
-    setImages((prev) => {
-      const current = prev.length === 1 && prev[0].url === rentHouse ? [] : prev;
-      return [...current, ...localPhotos];
-    });
+    setUploadingPhotos(true);
 
     try {
       await Promise.all(
@@ -288,11 +252,12 @@ export const ListingEditor = () => {
         )
       );
 
-      await loadImages();
+      if (refetch) await refetch(); // Odświeżamy z cache po wgraniu nowych
     } catch (err) {
       console.error(err);
     } finally {
-      e.target.value = "";
+      e.target.value = ""; // Czyścimy input by umożliwić wgranie tego samego pliku ponownie
+      setUploadingPhotos(false);
     }
   };
 
@@ -590,42 +555,37 @@ export const ListingEditor = () => {
             </div>
           </section>
 
-         {
-            isEdit && listingId && (
-              <div className="photos-list">
-                {images.map((image) => (
-                  <div key={image.id} className="photo-item">
-                    <img src={image.url} className="photo-preview" alt="Listing" />
-                    <button
-                      type="button"
-                      onClick={() => deleteImage(image.id)}
-                      className="photo-delete-btn"
-                    >
-                      x
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )
-          }
+          {isEdit && listingId && photos && photos.length > 0 && (
+            <div className="photos-list">
+              {photos.map((image) => (
+                <div key={image.id} className="photo-item">
+                  <img src={image.url} className="photo-preview" alt="Listing" />
+                  <button
+                    type="button"
+                    onClick={() => deleteImage(image.id)}
+                    className="photo-delete-btn"
+                  >
+                    x
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
-          {
-            isEdit &&
-            listingId &&
+          {isEdit && listingId && (
             <div className="upload-panel">
               <label className="upload-label">
-                 <input
+                <input
                   type="file"
                   accept="image/*"
                   multiple
                   onChange={uploadImage}
-                /> 
-                <span>
-                  +
-                </span>
-              </label> 
+                  disabled={uploadingPhotos}
+                />
+                <span>{uploadingPhotos ? "Ładowanie..." : "+"}</span>
+              </label>
             </div>
-          } 
+          )}
 
           <div className="listing-editor-actions">
             <button
