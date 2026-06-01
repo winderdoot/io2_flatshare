@@ -557,7 +557,7 @@ export const ListingEditor = () => {
 
           {isEdit && listingId && photos && photos.length > 0 && (
             <div className="photos-list">
-              {photos.map((image) => (
+              {photos[0].url && photos.map((image) => (
                 <div key={image.id} className="photo-item">
                   <img src={image.url} className="photo-preview" alt="Listing" />
                   <button
@@ -569,6 +569,7 @@ export const ListingEditor = () => {
                   </button>
                 </div>
               ))}
+
               <div className="upload-panel">
               <label className="upload-label">
                 <input
