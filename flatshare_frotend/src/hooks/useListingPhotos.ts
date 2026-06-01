@@ -5,7 +5,7 @@ import { getListingPhotos } from "../images_service/ImagesService";
 export const useListingPhotos = (listingId: string) => {
   const token = localStorage.getItem("token") || "";
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["listing-photos", listingId],
     queryFn: () => getListingPhotos(listingId, token),
     enabled: !!listingId,
@@ -31,5 +31,10 @@ export const useListingPhotos = (listingId: string) => {
     };
   }, [data]);
 
-  return { photos: photoUrls, isLoading, isError };
+  return { 
+    photos: photoUrls, 
+    isLoading, 
+    isError, 
+    refetch 
+  };
 };
