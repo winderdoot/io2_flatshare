@@ -41,11 +41,11 @@ const FlatOffer = ({
                 <div className="offer-footer">
                     <span className="offer-phone">📧 {mail}</span>
                     {listingId ? (
-                        <Link className="contact-button" to={`/offer/${listingId}`}>
+                        <Link className="contact-button" to={`/offer/${listingId}`} data-testid="contact-button">
                             Więcej
                         </Link>
                     ) : (
-                        <button type="button" className="contact-button">
+                        <button type="button" className="contact-button" data-testid="contact-button">
                             Więcej
                         </button>
                     )}

@@ -57,6 +57,7 @@ const Navbar = () => {
               type="button"
               onClick={handleLogout}
               className={styles.authBtn}
+              data-testid="logout-button"
             >
               <span className={styles.authBtnUser}>{user.firstName}</span>
               <span className={styles.authBtnLabel}>{t("nav.log_out")}</span>
