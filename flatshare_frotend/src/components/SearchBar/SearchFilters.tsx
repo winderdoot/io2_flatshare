@@ -1,14 +1,17 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./SearchFilters.module.css";
-import { cityOptions, locationConfig } from "./locationConfig";
+import { cityDisplayName, districtDisplayName, locationConfig, type City } from "./locationConfig";
 import FormattedNumberInput from "../FormattedNumberInput/FormattedNumberInput";
-import { City, Filters, Profile, useFiltersStore } from "./FiltersStore";
+import { Filters, Profile, useFiltersStore } from "./FiltersStore";
 import { profileConfig } from "./profileConfig";
 import { useSearchPreferences } from "./useSearchPreferences";
+import { useCurrency } from "../../context/CurrencyContext";
 
 export default function SearchFilters() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { currency } = useCurrency();
+  const priceSuffix = currency === "USD" ? "$" : "zł";
 
   const { filters, setFilter, applyFilters } = useFiltersStore();
   const preferencesReady = useSearchPreferences();
@@ -63,7 +66,7 @@ export default function SearchFilters() {
             <option value="">{t("filters.city")}</option>
             {Object.keys(locationConfig).map((city) => (
               <option key={city} value={city}>
-                {cityOptions[city as keyof typeof cityOptions]}
+                {cityDisplayName(city as City, i18n.language)}
               </option>
             ))}
           </select>
@@ -83,7 +86,7 @@ export default function SearchFilters() {
             {filters.city &&
               locationConfig[filters.city].map((d) => (
                 <option key={d} value={d}>
-                  {d}
+                  {districtDisplayName(filters.city as City, d, i18n.language)}
                 </option>
               ))}
           </select>
@@ -116,13 +119,13 @@ export default function SearchFilters() {
                 value={filters.minPrice}
                 onChange={(val) => setFilter("minPrice", val)}
                 placeholder={t("filters.from")}
-                suffix="zł"
+                suffix={priceSuffix}
               />
             <FormattedNumberInput
               value={filters.maxPrice}
               onChange={(val) => setFilter("maxPrice", val)}
               placeholder={t("filters.to")}
-              suffix="zł"
+              suffix={priceSuffix}
             />
           </div>
         </div>

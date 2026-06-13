@@ -1,4 +1,4 @@
-﻿using flatshare_server.Infrastructure.Model;
+﻿using flatshare_server.Infrastructure.Utils;
 using flatshare_server.Infrastructure.Model.Listings;
 using flatshare_server.Infrastructure.Model.Requests.Matches;
 
@@ -13,7 +13,10 @@ public static class ListingQueryExtensions
 
         /* Apply Address Filters */
         if (!string.IsNullOrWhiteSpace(filter.City))
-            query = query.Where(l => l.Address.City.ToLower() == filter.City.ToLower());
+        {
+            var cityEquivalents = CityNormalizer.GetEquivalents(filter.City).ToList();
+            query = query.Where(l => cityEquivalents.Contains(l.Address.City));
+        }
 
         if (!string.IsNullOrWhiteSpace(filter.District))
             query = query.Where(l => l.Address.District.ToLower() == filter.District.ToLower());

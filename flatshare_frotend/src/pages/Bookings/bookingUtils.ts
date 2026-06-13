@@ -58,3 +58,21 @@ export function canTenantCancel(status: BookingStatus): boolean {
 export function canLandlordAcceptReject(status: BookingStatus): boolean {
   return status === "PendingApproval";
 }
+
+export function bookingStatusLabel(
+  status: string,
+  t: (key: string) => string
+): string {
+  const key = `booking.status.${status}`;
+  const translated = t(key);
+  return translated === key ? status : translated;
+}
+
+export function paymentStatusLabel(
+  paymentStatus: string,
+  t: (key: string) => string
+): string {
+  const key = `booking.paymentStatus.${paymentStatus}`;
+  const translated = t(key);
+  return translated === key ? paymentStatus : translated;
+}

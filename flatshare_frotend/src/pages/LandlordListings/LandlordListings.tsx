@@ -14,6 +14,9 @@ import "./LandlordListings.css";
 type ActionKey = "submit" | "publish" | "hide" | "archive";
 type BusyAction = { id: string; action: ActionKey } | null;
 type Toast = { id: number; message: string; kind: "success" | "error" };
+type RedirectToast = { id: string; message: string; kind: "success" | "error" };
+
+const shownRedirectToastIds = new Set<string>();
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -82,12 +85,18 @@ export const LandlordListings = () => {
   // Must clear state via React Router (not window.history), otherwise Strict Mode /
   // stale location.state can show the same toast twice.
   useEffect(() => {
-    const state = location.state as
-      | { toast?: { message: string; kind: "success" | "error" } }
-      | null;
+    const state = location.state as { toast?: RedirectToast } | null;
     const payload = state?.toast;
-    if (!payload) return;
+    if (!payload?.id) return;
+    if (shownRedirectToastIds.has(payload.id)) {
+      navigate(
+        { pathname: location.pathname, search: location.search, hash: location.hash },
+        { replace: true, state: {} }
+      );
+      return;
+    }
 
+    shownRedirectToastIds.add(payload.id);
     addToast(payload.message, payload.kind);
     navigate(
       { pathname: location.pathname, search: location.search, hash: location.hash },
@@ -331,7 +340,7 @@ export const LandlordListings = () => {
                       row.status === "Draft" || row.status === "Hidden";
                     const priceStr = new Intl.NumberFormat(
                       i18n.language === "en" ? "en-US" : "pl-PL",
-                      { maximumFractionDigits: 2 }
+                      { minimumFractionDigits: 2, maximumFractionDigits: 2 }
                     ).format(row.price);
                     const rowBusy = busyAction?.id === row.id;
 

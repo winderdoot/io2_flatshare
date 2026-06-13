@@ -4,14 +4,18 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../auth/AuthContext";
 import { bookingService } from "./bookingService";
 import { messageForBookingFailure } from "./bookingErrorUtils";
+import { useCurrency } from "../../context/CurrencyContext";
 import {
   formatBookingDate,
   statusClassName,
+  bookingStatusLabel,
+  paymentStatusLabel,
 } from "./bookingUtils";
 import "./Bookings.css";
 
 export const MyBookings = () => {
   const { t, i18n } = useTranslation();
+  const { formatListingPrice } = useCurrency();
   const { user, token } = useAuth();
 
   const { data, isLoading, isError, error } = useQuery({
@@ -73,14 +77,14 @@ export const MyBookings = () => {
                       {formatBookingDate(b.endDate, i18n.language)}
                     </td>
                     <td>
-                      {b.totalPrice} {b.currency}
+                      {formatListingPrice(b.totalPrice, b.currency, i18n.language)}
                     </td>
                     <td>
                       <span className={statusClassName(b.status)}>
-                        {t(`booking.status.${b.status}`)}
+                        {bookingStatusLabel(b.status, t)}
                       </span>
                     </td>
-                    <td>{t(`booking.paymentStatus.${b.paymentStatus}`)}</td>
+                    <td>{paymentStatusLabel(b.paymentStatus, t)}</td>
                     <td>
                       <Link
                         to={`/my-bookings/${b.id}`}

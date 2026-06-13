@@ -1,45 +1,49 @@
 import { API_URL } from "../config.ts";
 
 type PhotosResponse = {
-  listingId: string;
-  photos: string[];
+  listingId?: string;
+  ListingId?: string;
+  photos?: string[];
+  Photos?: string[];
 };
+
+function photoHeaders(token?: string): HeadersInit {
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+function extractPhotoIds(data: PhotosResponse): string[] {
+  const raw = data.photos ?? data.Photos;
+  if (!Array.isArray(raw)) return [];
+  return raw.map(String);
+}
 
 export const getListingThumbnail = async (
   listingId: string,
-  token: string
+  token?: string
 ): Promise<Blob | null> => {
   try {
     const photosResponse = await fetch(
       `${API_URL}/api/v1/listings/${listingId}/photos`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      }
+      { headers: photoHeaders(token) }
     );
-    
+
     if (!photosResponse.ok) {
       return null;
     }
-    
-    const photosData: PhotosResponse = await photosResponse.json();
 
-    const firstPhotoId = photosData.photos?.[0];
-
+    const photosData = (await photosResponse.json()) as PhotosResponse;
+    const firstPhotoId = extractPhotoIds(photosData)[0];
     if (!firstPhotoId) {
       return null;
     }
 
     const imageResponse = await fetch(
       `${API_URL}/api/v1/listings/${listingId}/photos/${firstPhotoId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      }
+      { headers: photoHeaders(token) }
     );
 
     if (!imageResponse.ok) {
@@ -59,36 +63,30 @@ export type ListingPhoto = {
 
 export const getListingPhotos = async (
   listingId: string,
-  token: string
+  token?: string
 ): Promise<ListingPhoto[]> => {
   try {
     const photosResponse = await fetch(
       `${API_URL}/api/v1/listings/${listingId}/photos`,
       {
         cache: "no-store",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
+        headers: photoHeaders(token),
       }
     );
 
-    if (!photosResponse.ok) return [{ id: "default", blob: null }];
+    if (!photosResponse.ok) return [];
 
-    const photosData: PhotosResponse = await photosResponse.json();
-
-    if (!photosData.photos?.length) return [{ id: "default", blob: null }];
+    const photosData = (await photosResponse.json()) as PhotosResponse;
+    const photoIds = extractPhotoIds(photosData);
+    if (!photoIds.length) return [];
 
     const images = await Promise.all(
-      photosData.photos.map(async (photoId) => {
+      photoIds.map(async (photoId) => {
         const imageResponse = await fetch(
           `${API_URL}/api/v1/listings/${listingId}/photos/${photoId}`,
           {
-            cache: "no-store", 
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: "application/json",
-            },
+            cache: "no-store",
+            headers: photoHeaders(token),
           }
         );
 
@@ -99,9 +97,9 @@ export const getListingPhotos = async (
       })
     );
 
-    return images;
+    return images.filter((image) => image.blob !== null);
   } catch {
-    return [{ id: "default", blob: null }];
+    return [];
   }
 };
 
@@ -114,10 +112,7 @@ export const deleteListingPhoto = async (
     `${API_URL}/api/v1/listings/${listingId}/photos/${photoId}`,
     {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
+      headers: photoHeaders(token),
     }
   );
 
@@ -151,6 +146,14 @@ export const uploadListingPhoto = async (
   }
 
   const location = response.headers.get("Location");
+  if (location) {
+    return location.split("/").pop() ?? "";
+  }
 
-  return location ? location.split("/").pop()! : ""; 
+  try {
+    const data = (await response.json()) as { id?: string; Id?: string };
+    return String(data.id ?? data.Id ?? "");
+  } catch {
+    return "";
+  }
 };

@@ -8,10 +8,8 @@ import type { BookingDTO } from "../../models/booking";
 import { landlordListingsService } from "../LandlordListings/LandlordListingsService";
 import { bookingService } from "./bookingService";
 import { messageForBookingFailure } from "./bookingErrorUtils";
-import {
-  formatBookingDate,
-  statusClassName,
-} from "./bookingUtils";
+import { formatBookingDate, statusClassName, bookingStatusLabel } from "./bookingUtils";
+import { useCurrency } from "../../context/CurrencyContext";
 import "./Bookings.css";
 
 type ListingWithBookings = {
@@ -22,6 +20,7 @@ type ListingWithBookings = {
 
 export const LandlordBookingRequests = () => {
   const { t, i18n } = useTranslation();
+  const { formatListingPrice } = useCurrency();
   const { user, token } = useAuth();
   const [listingFilter, setListingFilter] = useState<string>("all");
 
@@ -162,11 +161,11 @@ export const LandlordBookingRequests = () => {
                             {formatBookingDate(b.endDate, i18n.language)}
                           </td>
                           <td>
-                            {b.totalPrice} {b.currency}
+                            {formatListingPrice(b.totalPrice, b.currency, i18n.language)}
                           </td>
                           <td>
                             <span className={statusClassName(b.status)}>
-                              {t(`booking.status.${b.status}`)}
+                              {bookingStatusLabel(b.status, t)}
                             </span>
                           </td>
                           <td>{b.tenantId}</td>

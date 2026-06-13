@@ -155,6 +155,39 @@
       "student": "Student"
     }
   },
+  "offers": {
+    "loading": "Ładowanie ofert…",
+    "error": "Nie udało się pobrać ofert.",
+    "refreshing": "Odświeżanie…",
+    "prevPage": "Poprzednia",
+    "nextPage": "Następna",
+    "more": "Więcej"
+  },
+  "listingDetail": {
+    "perMonth": "/ mies.",
+    "backToOffers": "← Wróć do ofert",
+    "backToMyListings": "← Wróć do moich ogłoszeń",
+    "missingId": "Brak identyfikatora ogłoszenia w adresie URL.",
+    "loading": "Ładowanie ogłoszenia…",
+    "notFound": "Nie znaleziono ogłoszenia.",
+    "description": "Opis",
+    "highlights": "Najważniejsze",
+    "area": "Powierzchnia",
+    "availableSince": "Dostępne od",
+    "availableUntil": "Dostępne do",
+    "ownerContact": "Kontakt właściciela",
+    "attributesAria": "Atrybuty oferty",
+    "profileStudent": "Profil: studenci",
+    "profileTourist": "Profil: turyści / krótki pobyt",
+    "petsAllowed": "Zwierzęta dozwolone",
+    "petsNotAllowed": "Bez zwierząt",
+    "nonSmokingOnly": "Tylko dla niepalących",
+    "closeToShops": "Blisko sklepów",
+    "photosLoading": "Ładowanie zdjęć…",
+    "photoAlt": "Zdjęcie ogłoszenia",
+    "photoPrev": "Poprzednie zdjęcie",
+    "photoNext": "Następne zdjęcie"
+  },
   "adminPanel": {
     "title": "Panel administratora",
     "subtitle": "Moderacja ogłoszeń",
@@ -333,6 +366,9 @@
     "unavailValidationRange": "Data końcowa musi być późniejsza niż data początkowa.",
     "unavailConflict": "Nie można zmienić dostępności — w tym okresie jest aktywna rezerwacja.",
     "unavailErrorDetail": "Operacja nie powiodła się ({{message}}).",
+    "photosTitle": "Zdjęcia",
+    "photoAlt": "Zdjęcie ogłoszenia",
+    "photoDelete": "Usuń zdjęcie",
     "status": {
       "Draft": "Szkic",
       "UnderReview": "W weryfikacji",
@@ -422,7 +458,8 @@
     },
     "paymentStatus": {
       "PENDING": "Oczekuje",
-      "SUCCEEDED": "Opłacona"
+      "SUCCEEDED": "Opłacona",
+      "NOT_APPLICABLE": "—"
     },
     "errors": {
       "sessionExpired": "Sesja wygasła — zaloguj się ponownie.",

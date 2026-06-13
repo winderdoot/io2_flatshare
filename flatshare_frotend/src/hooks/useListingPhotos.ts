@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { getListingPhotos } from "../images_service/ImagesService";
 
 export const useListingPhotos = (listingId: string) => {
-  const token = localStorage.getItem("token") || "";
+  const token = localStorage.getItem("token") || undefined;
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["listing-photos", listingId],
+    queryKey: ["listing-photos", listingId, token ?? "guest"],
     queryFn: () => getListingPhotos(listingId, token),
     enabled: !!listingId,
     staleTime: 1000 * 60 * 10,

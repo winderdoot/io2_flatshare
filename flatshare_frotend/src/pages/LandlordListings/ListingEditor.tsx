@@ -106,7 +106,7 @@ export const ListingEditor = () => {
   // === NOWE ZARZĄDZANIE ZDJĘCIAMI ===
   // Podajemy listingId (lub pusty string jeśli to tryb tworzenia),
   // hook pobiera zdjęcia za nas, a my "kradniemy" od niego refetch, by odświeżyć widok po uploadzie.
-  const { photos, refetch } = useListingPhotos(listingId || "");
+  const { photos, isLoading: photosLoading, refetch } = useListingPhotos(listingId || "");
 
   const canEdit =
     !isEdit ||
@@ -209,13 +209,25 @@ export const ListingEditor = () => {
         await landlordListingsService.update(token, listingId, body);
         navigate("/my-listings", {
           replace: true,
-          state: { toast: { message: t("landlordListings.updated"), kind: "success" } },
+          state: {
+            toast: {
+              id: crypto.randomUUID(),
+              message: t("landlordListings.updated"),
+              kind: "success",
+            },
+          },
         });
       } else {
         await landlordListingsService.create(token, body);
         navigate("/my-listings", {
           replace: true,
-          state: { toast: { message: t("landlordListings.created"), kind: "success" } },
+          state: {
+            toast: {
+              id: crypto.randomUUID(),
+              message: t("landlordListings.created"),
+              kind: "success",
+            },
+          },
         });
       }
     } catch (e: unknown) {
@@ -555,34 +567,40 @@ export const ListingEditor = () => {
             </div>
           </section>
 
-          {isEdit && listingId && photos && photos.length > 0 && (
-            <div className="photos-list">
-              {photos[0].url && photos.map((image) => (
-                <div key={image.id} className="photo-item">
-                  <img src={image.url} className="photo-preview" alt="Listing" />
-                  <button
-                    type="button"
-                    onClick={() => deleteImage(image.id)}
-                    className="photo-delete-btn"
-                  >
-                    x
-                  </button>
-                </div>
-              ))}
+          {isEdit && listingId && !photosLoading && (
+            <section className="listing-editor-panel" aria-labelledby="listing-panel-photos">
+              <h2 id="listing-panel-photos" className="listing-editor-panel-title">
+                {t("landlordListings.photosTitle")}
+              </h2>
+              <div className="photos-list">
+                {photos.filter((image) => image.url).map((image) => (
+                  <div key={image.id} className="photo-item">
+                    <img src={image.url} className="photo-preview" alt={t("landlordListings.photoAlt")} />
+                    <button
+                      type="button"
+                      onClick={() => deleteImage(image.id)}
+                      className="photo-delete-btn"
+                      aria-label={t("landlordListings.photoDelete")}
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
 
-              <div className="upload-panel">
-              <label className="upload-label">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={uploadImage}
-                  disabled={uploadingPhotos}
-                />
-                <span>{"+"}</span>
-              </label>
-            </div>
-            </div>
+                <div className="upload-panel">
+                  <label className="upload-label">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={uploadImage}
+                      disabled={uploadingPhotos}
+                    />
+                    <span>{"+"}</span>
+                  </label>
+                </div>
+              </div>
+            </section>
           )}
 
           <div className="listing-editor-actions">

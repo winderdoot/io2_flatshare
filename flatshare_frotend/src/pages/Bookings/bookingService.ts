@@ -59,7 +59,22 @@ async function readError(res: Response): Promise<BookingRequestError> {
   }
 }
 
+function derivePaymentStatus(status: string): BookingDTO["paymentStatus"] {
+  switch (status) {
+    case "Confirmed":
+      return "SUCCEEDED";
+    case "PendingPayment":
+    case "PaymentFailed":
+      return "PENDING";
+    default:
+      return "NOT_APPLICABLE";
+  }
+}
+
 function normalizeBooking(raw: Record<string, unknown>): BookingDTO {
+  const status = String(raw.status ?? raw.Status ?? "") as BookingDTO["status"];
+  const explicitPaymentStatus = raw.paymentStatus ?? raw.PaymentStatus;
+
   return {
     id: String(raw.id ?? raw.Id ?? ""),
     listingId: String(raw.listingId ?? raw.ListingId ?? ""),
@@ -68,10 +83,11 @@ function normalizeBooking(raw: Record<string, unknown>): BookingDTO {
     endDate: String(raw.endDate ?? raw.EndDate ?? "").slice(0, 10),
     totalPrice: Number(raw.totalPrice ?? raw.TotalPrice ?? 0),
     currency: String(raw.currency ?? raw.Currency ?? ""),
-    status: String(raw.status ?? raw.Status ?? "") as BookingDTO["status"],
-    paymentStatus: String(
-      raw.paymentStatus ?? raw.PaymentStatus ?? ""
-    ) as BookingDTO["paymentStatus"],
+    status,
+    paymentStatus:
+      typeof explicitPaymentStatus === "string" && explicitPaymentStatus !== ""
+        ? (explicitPaymentStatus as BookingDTO["paymentStatus"])
+        : derivePaymentStatus(status),
   };
 }
 

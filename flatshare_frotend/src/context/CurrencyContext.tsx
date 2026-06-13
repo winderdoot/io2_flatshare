@@ -7,9 +7,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { PLN_PER_USD } from "../constants/exchange";
+import type { DisplayCurrency } from "../constants/exchange";
+import { formatListingPrice, formatMoneyAmount, convertToDisplayAmount } from "../utils/formatMoney";
 
-export type DisplayCurrency = "PLN" | "USD";
+export type { DisplayCurrency };
 
 const STORAGE_KEY = "flatshare-currency";
 
@@ -17,6 +18,8 @@ type CurrencyContextValue = {
   currency: DisplayCurrency;
   setCurrency: (c: DisplayCurrency) => void;
   formatRentPln: (amountPln: number) => string;
+  formatListingPrice: (amount: number, sourceCurrency: string, locale?: string) => string;
+  formatPlainInDisplayCurrency: (amountPln: number, locale?: string) => string;
 };
 
 const CurrencyContext = createContext<CurrencyContextValue | null>(null);
@@ -38,27 +41,33 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const formatRentPln = useCallback(
-    (amountPln: number) => {
-      if (currency === "PLN") {
-        return new Intl.NumberFormat(undefined, {
-          style: "currency",
-          currency: "PLN",
-          maximumFractionDigits: 0,
-        }).format(amountPln);
-      }
-      const usd = amountPln / PLN_PER_USD;
-      return new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 0,
-      }).format(usd);
+    (amountPln: number) => formatListingPrice(amountPln, "PLN", currency),
+    [currency]
+  );
+
+  const formatListingPriceForDisplay = useCallback(
+    (amount: number, sourceCurrency: string, locale?: string) =>
+      formatListingPrice(amount, sourceCurrency, currency, locale),
+    [currency]
+  );
+
+  const formatPlainInDisplayCurrency = useCallback(
+    (amountPln: number, locale?: string) => {
+      const converted = convertToDisplayAmount(amountPln, "PLN", currency);
+      return formatMoneyAmount(converted, currency, locale);
     },
     [currency]
   );
 
   const value = useMemo(
-    () => ({ currency, setCurrency, formatRentPln }),
-    [currency, setCurrency, formatRentPln]
+    () => ({
+      currency,
+      setCurrency,
+      formatRentPln,
+      formatListingPrice: formatListingPriceForDisplay,
+      formatPlainInDisplayCurrency,
+    }),
+    [currency, setCurrency, formatRentPln, formatListingPriceForDisplay, formatPlainInDisplayCurrency]
   );
 
   return (
