@@ -25,7 +25,7 @@ git update-index --assume-unchanged *repo_directory*/flatshare_server/.env
 ```
 A wkleić do środka zmodyfikowaną wersję pliku, którą dostaniecie na DM.
 
-## 4. Uruchomienie serwera
+## 4. Uruchomienie serwera i bazy danych
 
 Zostało uruchomienie docker compose'a i samego serwera:
 ```bash
@@ -34,9 +34,16 @@ Zostało uruchomienie docker compose'a i samego serwera:
 cd *repo_dir*/flatshare_server
 docker compose up db azurite stripe-cli -d
 
-# Uruchomienie serwera lokalnie. WAŻNE aby nie zapomnieć o profilu https
+# Następnie trzeba zainicjalizować bazę danych. Ten krok robimy tylko raz przed pierwszym uruchomieniem serwera.
+# Pobranie CLI entity framework
+dotnet tool install --global dotnet-ef
+# Inicjalizacja bazy
 cd *repo_dir*/flatshare_server/flatshare_server
-dotnet run --launch-profile "https"
+dotnet ef database update
+
+# Uruchomienie serwera lokalnie. WAŻNE aby nie zapomnieć o profilu http
+cd *repo_dir*/flatshare_server/flatshare_server
+dotnet run --launch-profile "http"
 ```
 
 ## UWAGA
