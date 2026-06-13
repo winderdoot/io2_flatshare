@@ -1,9 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useFiltersStore } from "../SearchBar/FiltersStore";
 import { API_URL } from "../../config";
-import { cityOptions } from "../SearchBar/locationConfig";
+import {
+  cityApiName,
+  citiesEquivalent,
+  type City,
+} from "../SearchBar/locationConfig";
 import type { ListingDTO } from "../../models/listing";
-import {getListingThumbnail} from "../../images_service/ImagesService";
 
 export interface Listing {
   id: string;
@@ -30,8 +33,7 @@ const readStoredUser = (): StoredUser => {
 
 const resolveCity = (rawCity: unknown): string | null => {
   if (typeof rawCity !== "string" || rawCity === "") return null;
-  const mapped = cityOptions[rawCity as keyof typeof cityOptions];
-  return mapped ?? rawCity;
+  return cityApiName(rawCity as City);
 };
 
 const filterMatchesActiveListing = (
@@ -43,6 +45,14 @@ const filterMatchesActiveListing = (
   const district = filters.district;
   if (typeof district === "string" && district !== "") {
     if (listing.location?.district !== district) return false;
+  }
+
+  const cityFilter = filters.city;
+  if (typeof cityFilter === "string" && cityFilter !== "") {
+    const expectedCity = cityApiName(cityFilter as City);
+    if (!citiesEquivalent(listing.location?.city ?? "", expectedCity)) {
+      return false;
+    }
   }
 
   const minPrice = Number(filters.minPrice);
@@ -82,7 +92,7 @@ const buildMatchesQueryParams = (filters: Record<string, any>, page: number) => 
   Object.entries(filters).forEach(([key, value]) => {
     if (value === "" || value === false) return;
     if (key === "city")
-      params.append("city", cityOptions[value as keyof typeof cityOptions]);
+      params.append("city", cityApiName(value as City));
     else
       params.append(key, String(value));
   });
@@ -151,7 +161,16 @@ const fetchFromMatches = async (
     throw new Error("Błąd pobierania ogłoszeń");
   }
 
-  return await res.json();
+  const pageResponse = await res.json();
+  const content = Array.isArray(pageResponse.content) ? pageResponse.content : [];
+  const filteredContent = content.filter((item: { listing?: ListingDTO }) =>
+    item.listing ? filterMatchesActiveListing(item.listing, filters) : false
+  );
+
+  return {
+    ...pageResponse,
+    content: filteredContent,
+  };
 };
 
 const fetchListings = async (

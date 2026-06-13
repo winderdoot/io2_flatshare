@@ -1,12 +1,12 @@
 import { useListings } from "./useListings";
-import rentHouse from "../../assets/rent_house.png"
 import FlatOffer from "../FlatOffer/FlatOffer";
 import { useFiltersStore } from "../SearchBar/FiltersStore";
+import { useTranslation } from "react-i18next";
 import "./OffersList.css"
 
 export default function Listings() {
+  const { t } = useTranslation();
   const { data, isLoading, isError, isFetching } = useListings();
-
   const { setPage, page } = useFiltersStore();
 
   const nextPage = (maxNumber: number) => {
@@ -17,12 +17,12 @@ export default function Listings() {
     if (page > 0) setPage(page - 1);
   };
 
-  if (isLoading) return <div className="offers-state">Loading...</div>;
-  if (isError) return <div className="offers-state offers-state--error">Błąd</div>;
+  if (isLoading) return <div className="offers-state">{t("offers.loading")}</div>;
+  if (isError) return <div className="offers-state offers-state--error">{t("offers.error")}</div>;
 
   return (
     <div className="offers-wrapper">
-      {isFetching && <div className="offers-state offers-state--muted">Odświeżanie...</div>}
+      {isFetching && <div className="offers-state offers-state--muted">{t("offers.refreshing")}</div>}
       <div className="offers-list">
         {data?.content.map((item: any) => (
           <FlatOffer key={item.listing.id} listingId={item.listing.id} vertical={false} title={item.listing.title} area={item.listing.area} description={item.listing.description} mail={item.listing.ownerContact} location={item.listing.location} currency={item.listing.currency} price={item.listing.price}/>
@@ -30,8 +30,8 @@ export default function Listings() {
       </div>
 
       <div className="pagination">
-        <button className="pagination-btn" onClick={prevPage}>Poprzednia</button>
-        <button className="pagination-btn" onClick={() => nextPage(data.page.totalPages)}>Następna</button>
+        <button className="pagination-btn" onClick={prevPage}>{t("offers.prevPage")}</button>
+        <button className="pagination-btn" onClick={() => nextPage(data.page.totalPages)}>{t("offers.nextPage")}</button>
       </div>
     </div>
   );

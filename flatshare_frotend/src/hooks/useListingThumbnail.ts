@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { getListingThumbnail } from "../images_service/ImagesService";
 
 export const useListingThumbnail = (listingId: string) => {
-  const token = localStorage.getItem("token") || "";
+  const token = localStorage.getItem("token") || undefined;
 
   const { data: blob, isLoading } = useQuery({
-    queryKey: ["listing-thumbnail", listingId],
+    queryKey: ["listing-thumbnail", listingId, token ?? "guest"],
     queryFn: () => getListingThumbnail(listingId, token),
     staleTime: 1000 * 60 * 10,
   });

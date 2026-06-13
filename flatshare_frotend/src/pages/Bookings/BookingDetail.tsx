@@ -8,12 +8,15 @@ import { bookingService } from "./bookingService";
 import { messageForBookingFailure } from "./bookingErrorUtils";
 import { paymentService } from "./paymentService";
 import type { GatewayPaymentStatus } from "../../models/payment";
+import { useCurrency } from "../../context/CurrencyContext";
 import {
   canLandlordAcceptReject,
   canTenantCancel,
   formatBookingDate,
   formatDateTime,
   statusClassName,
+  bookingStatusLabel,
+  paymentStatusLabel,
 } from "./bookingUtils";
 import { compareIso, toIsoDate } from "../../components/AvailabilityCalendar/availabilityCalendarUtils";
 import "./Bookings.css";
@@ -50,6 +53,7 @@ export const BookingDetail = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const { t, i18n } = useTranslation();
+  const { formatListingPrice } = useCurrency();
   const { user, token } = useAuth();
   const queryClient = useQueryClient();
   const returnHandledRef = useRef<string | null>(null);
@@ -313,7 +317,7 @@ export const BookingDetail = () => {
                 <label>{t("booking.colStatus")}</label>
                 <p>
                   <span className={statusClassName(booking.status)}>
-                    {t(`booking.status.${booking.status}`)}
+                    {bookingStatusLabel(booking.status, t)}
                   </span>
                 </p>
               </div>
@@ -327,12 +331,12 @@ export const BookingDetail = () => {
               <div className="bookings-detail-field">
                 <label>{t("booking.colPrice")}</label>
                 <p>
-                  {booking.totalPrice} {booking.currency}
+                  {formatListingPrice(booking.totalPrice, booking.currency, i18n.language)}
                 </p>
               </div>
               <div className="bookings-detail-field">
                 <label>{t("booking.colPayment")}</label>
-                <p>{t(`booking.paymentStatus.${booking.paymentStatus}`)}</p>
+                <p>{paymentStatusLabel(booking.paymentStatus, t)}</p>
               </div>
               {isLandlord && (
                 <div className="bookings-detail-field">

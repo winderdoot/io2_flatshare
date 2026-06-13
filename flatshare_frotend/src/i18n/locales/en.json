@@ -87,7 +87,8 @@
     "passwordPlaceholder": "Enter your password",
     "confirmPasswordLabel": "Confirm password",
     "confirmPasswordPlaceholder": "Confirm your password",
-    "submitReset": "Reset password",
+    "submitPassword": "Change password",
+    "submitPasswordLoading": "Changing password...",
     "passwordChanged": "Password changed",
     "passwordChangedInfo": "Your password has been changed.",
     "serverError": "Server error",
@@ -153,6 +154,39 @@
       "family": "Family",
       "student": "Student"
     }
+  },
+  "offers": {
+    "loading": "Loading offers…",
+    "error": "Could not load offers.",
+    "refreshing": "Refreshing…",
+    "prevPage": "Previous",
+    "nextPage": "Next",
+    "more": "Details"
+  },
+  "listingDetail": {
+    "perMonth": "/ month",
+    "backToOffers": "← Back to offers",
+    "backToMyListings": "← Back to my listings",
+    "missingId": "Missing listing id in the URL.",
+    "loading": "Loading listing…",
+    "notFound": "Listing not found.",
+    "description": "Description",
+    "highlights": "Highlights",
+    "area": "Area",
+    "availableSince": "Available from",
+    "availableUntil": "Available until",
+    "ownerContact": "Owner contact",
+    "attributesAria": "Listing attributes",
+    "profileStudent": "Profile: students",
+    "profileTourist": "Profile: tourists / short stay",
+    "petsAllowed": "Pets allowed",
+    "petsNotAllowed": "No pets",
+    "nonSmokingOnly": "Non-smoking only",
+    "closeToShops": "Close to shops",
+    "photosLoading": "Loading photos…",
+    "photoAlt": "Listing photo",
+    "photoPrev": "Previous photo",
+    "photoNext": "Next photo"
   },
   "adminPanel": {
     "title": "Administrator panel",
@@ -332,6 +366,9 @@
     "unavailValidationRange": "End date must be after the start date.",
     "unavailConflict": "Cannot change availability — there is an active booking in this period.",
     "unavailErrorDetail": "Operation failed ({{message}}).",
+    "photosTitle": "Photos",
+    "photoAlt": "Listing photo",
+    "photoDelete": "Delete photo",
     "status": {
       "Draft": "Draft",
       "UnderReview": "Under review",
@@ -421,7 +458,8 @@
     },
     "paymentStatus": {
       "PENDING": "Pending",
-      "SUCCEEDED": "Paid"
+      "SUCCEEDED": "Paid",
+      "NOT_APPLICABLE": "—"
     },
     "errors": {
       "sessionExpired": "Session expired — please sign in again.",

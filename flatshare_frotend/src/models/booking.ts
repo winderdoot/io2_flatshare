@@ -7,7 +7,7 @@ export type BookingStatus =
   | "PaymentFailed"
   | "Cancelled";
 
-export type BookingPaymentStatus = "SUCCEEDED" | "PENDING";
+export type BookingPaymentStatus = "SUCCEEDED" | "PENDING" | "NOT_APPLICABLE";
 
 export type BookingDTO = {
   id: string;

@@ -71,10 +71,11 @@ public class MatchingService
 
         return filter with
         {
-            MaxPrice = preferences.MaxPrice ?? filter.MaxPrice,
-            PetsAllowed = preferences.PetsAllowed ?? filter.PetsAllowed,
+            /* Explicit search filters take precedence; preferences fill in unset values only */
+            MaxPrice = filter.MaxPrice ?? preferences.MaxPrice,
+            PetsAllowed = filter.PetsAllowed ?? preferences.PetsAllowed,
             /* The attributes NonSmokingOnly and SmokingAllowed don't mean the same thing so we approximate a translation */
-            NonSmokingOnly = (preferences.SmokingAllowed == false) ? true : filter.NonSmokingOnly
+            NonSmokingOnly = filter.NonSmokingOnly ?? (preferences.SmokingAllowed == false ? true : null)
         };
     }
     public async Task<PageResponse<MatchDTO>> GetMatchesAsync(Guid userId, MatchesFilter filter)

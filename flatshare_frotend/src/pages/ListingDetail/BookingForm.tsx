@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import type { ListingDTO } from "../../models/listing";
 import { compareIso } from "../../components/AvailabilityCalendar/availabilityCalendarUtils";
 import { bookingService } from "../Bookings/bookingService";
-import { messageForBookingFailure } from "../Bookings/bookingErrorUtils";
+import { formatPlainAmount } from "../../utils/formatMoney";
 
 type Props = {
   listingId: string;
@@ -14,7 +14,7 @@ type Props = {
 };
 
 export const BookingForm = ({ listingId, listing, token }: Props) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -32,7 +32,7 @@ export const BookingForm = ({ listingId, listing, token }: Props) => {
       setFormError(null);
       setSuccess(
         t("booking.form.created", {
-          price: resp.totalPrice,
+          price: formatPlainAmount(resp.totalPrice, i18n.language),
           currency: resp.currency,
         })
       );

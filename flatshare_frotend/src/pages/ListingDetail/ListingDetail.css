@@ -20,6 +20,15 @@
   color: var(--color-primary);
 }
 
+.listing-detail-hero-wrap {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.listing-detail-hero-wrap .listing-detail-price-pill {
+  z-index: 2;
+}
+
 .listing-detail-hero {
   position: relative;
   border-radius: var(--radius-xl);
