@@ -19,8 +19,8 @@ export const MyBookings = () => {
   const { user, token } = useAuth();
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["bookings", "tenant", user?.id],
-    queryFn: () => bookingService.listForTenant(token!, user!.id),
+    queryKey: ["bookings", "me", user?.id],
+    queryFn: () => bookingService.listForCurrentUser(token!),
     enabled: !!token && !!user && user.role === "TENANT",
     staleTime: 0,
   });

@@ -17,6 +17,9 @@ const authHeaders = (token: string) => ({
   Authorization: `Bearer ${token}`,
 });
 
+/** Backend ignores this segment; any GUID satisfies the route. */
+const ME_BOOKING_ID_PLACEHOLDER = "00000000-0000-0000-0000-000000000000";
+
 export type BookingRequestError = {
   status: number;
   message: string;
@@ -105,31 +108,14 @@ export const bookingService = {
     return res.json();
   },
 
-  listForTenant: async (
-    token: string,
-    tenantId: string,
-    listingId?: string
-  ): Promise<BookingDTO[]> => {
-    const q = new URLSearchParams({ tenantId });
-    if (listingId) q.set("listingId", listingId);
-    const res = await fetch(`${API_URL}/api/v1/bookings?${q}`, {
-      method: "GET",
-      headers: authHeaders(token),
-    });
-    if (!res.ok) throw await readError(res);
-    const data = (await res.json()) as Record<string, unknown>[];
-    return data.map(normalizeBooking);
-  },
-
-  listForListing: async (
-    token: string,
-    listingId: string
-  ): Promise<BookingDTO[]> => {
-    const q = new URLSearchParams({ listingId });
-    const res = await fetch(`${API_URL}/api/v1/bookings?${q}`, {
-      method: "GET",
-      headers: authHeaders(token),
-    });
+  listForCurrentUser: async (token: string): Promise<BookingDTO[]> => {
+    const res = await fetch(
+      `${API_URL}/api/v1/bookings/${ME_BOOKING_ID_PLACEHOLDER}/me`,
+      {
+        method: "GET",
+        headers: authHeaders(token),
+      }
+    );
     if (!res.ok) throw await readError(res);
     const data = (await res.json()) as Record<string, unknown>[];
     return data.map(normalizeBooking);

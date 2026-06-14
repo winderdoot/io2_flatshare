@@ -15,7 +15,6 @@ import "./Bookings.css";
 type ListingWithBookings = {
   listing: ListingDTO;
   bookings: BookingDTO[];
-  error?: string | null;
 };
 
 export const LandlordBookingRequests = () => {
@@ -31,34 +30,30 @@ export const LandlordBookingRequests = () => {
   });
 
   const bookingsQuery = useQuery({
-    queryKey: ["bookings", "landlord", user?.id, listingsQuery.data?.map((l) => l.id)],
-    queryFn: async (): Promise<ListingWithBookings[]> => {
-      const listings = listingsQuery.data!;
-      const results = await Promise.all(
-        listings.map(async (listing) => {
-          try {
-            const bookings = await bookingService.listForListing(token!, listing.id);
-            return { listing, bookings, error: null as string | null };
-          } catch (e) {
-            return {
-              listing,
-              bookings: [] as BookingDTO[],
-              error: messageForBookingFailure(e, t),
-            };
-          }
-        })
-      );
-      return results;
-    },
-    enabled: !!token && !!listingsQuery.data && listingsQuery.data.length > 0,
+    queryKey: ["bookings", "me", user?.id],
+    queryFn: () => bookingService.listForCurrentUser(token!),
+    enabled: !!token && !!user && user.role === "LANDLORD",
     staleTime: 0,
   });
 
+  const groupedByListing = useMemo((): ListingWithBookings[] => {
+    if (!listingsQuery.data) return [];
+    const bookingsByListing = new Map<string, BookingDTO[]>();
+    for (const booking of bookingsQuery.data ?? []) {
+      const existing = bookingsByListing.get(booking.listingId) ?? [];
+      existing.push(booking);
+      bookingsByListing.set(booking.listingId, existing);
+    }
+    return listingsQuery.data.map((listing) => ({
+      listing,
+      bookings: bookingsByListing.get(listing.id) ?? [],
+    }));
+  }, [bookingsQuery.data, listingsQuery.data]);
+
   const filteredGroups = useMemo(() => {
-    if (!bookingsQuery.data) return [];
-    if (listingFilter === "all") return bookingsQuery.data;
-    return bookingsQuery.data.filter((g) => g.listing.id === listingFilter);
-  }, [bookingsQuery.data, listingFilter]);
+    if (listingFilter === "all") return groupedByListing;
+    return groupedByListing.filter((g) => g.listing.id === listingFilter);
+  }, [groupedByListing, listingFilter]);
 
   const totalBookings = useMemo(() => {
     return filteredGroups.reduce((sum, g) => sum + g.bookings.length, 0);
@@ -127,17 +122,7 @@ export const LandlordBookingRequests = () => {
 
         {!isLoading &&
           !isError &&
-          filteredGroups.map(({ listing, bookings, error: listingError }) => {
-            if (listingError) {
-              return (
-                <section key={listing.id} className="bookings-listing-group">
-                  <h2 className="bookings-listing-group-title">{listing.title}</h2>
-                  <p className="bookings-error" role="alert">
-                    {listingError}
-                  </p>
-                </section>
-              );
-            }
+          filteredGroups.map(({ listing, bookings }) => {
             if (bookings.length === 0) return null;
             return (
               <section key={listing.id} className="bookings-listing-group">
