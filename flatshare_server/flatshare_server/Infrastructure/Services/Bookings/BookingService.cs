@@ -96,7 +96,7 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
         if (booking is null)
             throw ErrorResponse.Generate("Booking not found", StatusCodes.Status404NotFound);
 
-        var listing = await listingService.GetByIdAsync(booking.ListingId, attachOwner: true);
+        var listing = await listingService.GetByIdAsync(booking.ListingId);
         if (listing.Owner?.Id != ownerId)
             throw ErrorResponse.Generate("Forbidden", StatusCodes.Status403Forbidden);
 
@@ -138,7 +138,7 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
         if (booking is null)
             throw ErrorResponse.Generate("Booking not found", StatusCodes.Status404NotFound);
 
-        var listing = await listingService.GetByIdAsync(booking.ListingId, attachOwner: true);
+        var listing = await listingService.GetByIdAsync(booking.ListingId);
         if (listing.Owner?.Id != userId)
             throw ErrorResponse.Generate("Forbidden", StatusCodes.Status403Forbidden);
 
@@ -188,7 +188,7 @@ public class BookingService(FlatshareDbContext dbContext, ListingService listing
         if (booking is null)
             throw ErrorResponse.Generate("Booking not found", StatusCodes.Status404NotFound);
 
-        var listing = await listingService.GetByIdAsync(booking.ListingId, attachOwner: true);
+        var listing = await listingService.GetByIdAsync(booking.ListingId);
         bool isOwner = listing.Owner?.Id == userId;
         bool isTenant = booking.TenantId == userId;
 

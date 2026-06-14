@@ -19,7 +19,7 @@ public class ListingsController
 {
     private async Task AssertListingOwner(Guid listingId)
     {
-        var listing = await listingService.GetByIdAsync(listingId, attachOwner: true);
+        var listing = await listingService.GetByIdAsync(listingId);
         if (listing is null)
         {
             throw ErrorResponse.Generate("Listing not found", StatusCodes.Status404NotFound);

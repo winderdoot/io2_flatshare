@@ -101,7 +101,7 @@ public class PaymentService
         if (booking.TenantId == requesterUserId)
             return payment.IntoDTO();
 
-        var listing = await listingService.GetByIdAsync(booking.ListingId, attachOwner: true);
+        var listing = await listingService.GetByIdAsync(booking.ListingId);
         if (listing.Owner is not null && listing.Owner.Id == requesterUserId)
             return payment.IntoDTO();
 
@@ -130,7 +130,7 @@ public class PaymentService
         if (booking.TenantId == requesterUserId)
             return payment.IntoDTO();
 
-        var listing = await listingService.GetByIdAsync(booking.ListingId, attachOwner: true);
+        var listing = await listingService.GetByIdAsync(booking.ListingId);
         if (listing.Owner is not null && listing.Owner.Id == requesterUserId)
             return payment.IntoDTO();
 

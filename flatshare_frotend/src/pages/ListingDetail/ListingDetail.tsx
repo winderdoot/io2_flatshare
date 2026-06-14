@@ -1,5 +1,5 @@
 import { Link, useLocation, useParams } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ListingDTO } from "../../models/listing";
 import { AvailabilityCalendar } from "../../components/AvailabilityCalendar/AvailabilityCalendar";
@@ -16,6 +16,7 @@ import {
 } from "../../components/SearchBar/locationConfig";
 import { ReportForm } from "../../components/ReportForm/ReportForm";
 import "../../components/ReportForm/ReportForm.css";
+import { landlordListingsService } from "../LandlordListings/LandlordListingsService";
 
 function formatDate(iso: string, locale: string): string {
   const d = new Date(iso + "T12:00:00");
@@ -67,13 +68,30 @@ export const ListingDetail = () => {
   const { formatListingPrice } = useCurrency();
   const { data: listing, isLoading, isError, error } = useListingDetail(listingId);
   const [reportOpen, setReportOpen] = useState(false);
+  const [ownsListing, setOwnsListing] = useState(false);
 
   const fromMyListings =
     (location.state as { from?: string } | null)?.from === "/my-listings";
-  const backTo = fromMyListings ? "/my-listings" : "/offer";
-  const backLabel = fromMyListings
-    ? t("listingDetail.backToMyListings")
-    : t("listingDetail.backToOffers");
+
+  useEffect(() => {
+    if (fromMyListings || !listingId || user?.role !== "LANDLORD" || !user.id) {
+      setOwnsListing(false);
+      return;
+    }
+    let cancelled = false;
+    void landlordListingsService.listByOwner(user.id).then((items) => {
+      if (!cancelled) {
+        setOwnsListing(items.some((item) => item.id === listingId));
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [fromMyListings, listingId, user?.id, user?.role]);
+
+  const isOwnListing = fromMyListings || ownsListing;
+  const canReport =
+    !!user && !!token && !!listing && !isOwnListing && listing.status === "Active";
 
   if (!listingId) {
     return (
@@ -81,12 +99,21 @@ export const ListingDetail = () => {
         <div className="listing-detail-empty">
           <p>{t("listingDetail.missingId")}</p>
           <p>
-            <Link to={backTo}>{backLabel}</Link>
+            <Link to={fromMyListings ? "/my-listings" : "/offer"}>
+              {fromMyListings
+                ? t("listingDetail.backToMyListings")
+                : t("listingDetail.backToOffers")}
+            </Link>
           </p>
         </div>
       </div>
     );
   }
+
+  const backTo = fromMyListings ? "/my-listings" : "/offer";
+  const backLabel = fromMyListings
+    ? t("listingDetail.backToMyListings")
+    : t("listingDetail.backToOffers");
 
   if (isLoading) {
     return (
@@ -133,6 +160,22 @@ export const ListingDetail = () => {
         {backLabel}
       </Link>
 
+      {listing.status === "HiddenByModeration" && (
+        <div className="listing-moderation-banner listing-moderation-banner--hidden">
+          <strong>
+            {isOwnListing
+              ? t("listingDetail.hiddenByModerationOwner")
+              : t("listingDetail.hiddenByModeration")}
+          </strong>
+          {!isOwnListing && (
+            <p>{t("listingDetail.hiddenByModerationDesc")}</p>
+          )}
+          {isOwnListing && (
+            <p>{t("listingDetail.hiddenByModerationOwnerDesc")}</p>
+          )}
+        </div>
+      )}
+
       <div className="listing-detail-hero-wrap">
         <ListingGallery
           listingId={listingId}
@@ -169,8 +212,8 @@ export const ListingDetail = () => {
               </span>
             ))}
           </div>
-          {user && token && !fromMyListings && (
-            <>
+          {canReport && (
+            <div className="listing-detail-report-actions">
               <button
                 type="button"
                 className="report-trigger"
@@ -181,12 +224,20 @@ export const ListingDetail = () => {
               <ReportForm
                 open={reportOpen}
                 onClose={() => setReportOpen(false)}
-                token={token}
+                token={token!}
                 type="LISTING"
                 targetId={listingId}
                 title={t("report.reportListingTitle")}
               />
-            </>
+            </div>
+          )}
+          {!user && listing.status === "Active" && !isOwnListing && (
+            <div className="report-login-hint">
+              {t("report.loginToReport")}{" "}
+              <Link to="/login" state={{ from: location.pathname }}>
+                {t("report.loginLink")}
+              </Link>
+            </div>
           )}
         </section>
 

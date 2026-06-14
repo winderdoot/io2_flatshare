@@ -37,6 +37,7 @@ export type Unavailability = {
  */
 export type ListingDTO = {
   id: string;
+  ownerId?: string;
   status: ListingStatus;
   title: string;
   description: string;

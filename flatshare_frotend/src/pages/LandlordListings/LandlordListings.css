@@ -411,6 +411,19 @@
   to   { transform: translateX(0);    opacity: 1; }
 }
 
+@keyframes ll-slide-in {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.ll-row--moderation-hidden {
+  background: color-mix(in srgb, var(--color-accent-strong) 8%, var(--color-surface));
+}
+
+.ll-row--moderation-hidden td:first-child {
+  font-weight: 600;
+}
+
 @media (max-width: 520px) {
   .landlord-listings-head {
     margin-bottom: 1.75rem;
