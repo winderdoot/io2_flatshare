@@ -333,6 +333,26 @@
   border-color: var(--color-accent-strong);
 }
 
+.ap-btn--moderation {
+  background: color-mix(in srgb, var(--color-accent-strong) 22%, transparent);
+  color: var(--color-accent-strong);
+  border-color: color-mix(in srgb, var(--color-accent-strong) 40%, transparent);
+}
+
+.ap-btn--moderation:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-accent-strong) 32%, transparent);
+}
+
+.ap-btn--reinstate {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+.ap-btn--reinstate:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-accent) 28%, transparent);
+}
+
 .ap-btn--ghost {
   background: var(--color-secondary-tint);
   color: var(--color-text-primary);

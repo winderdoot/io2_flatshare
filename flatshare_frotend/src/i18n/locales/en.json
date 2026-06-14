@@ -214,9 +214,13 @@
     "btnApprove": "✓ Approve",
     "btnFixes": "↩ Request fixes",
     "btnArchive": "Archive",
+    "btnModerationHide": "Hide (moderation)",
+    "btnReinstate": "Reinstate",
     "toastApproved": "Listing has been approved.",
     "toastFixes": "Listing has been sent back for fixes.",
     "toastArchived": "Listing has been archived.",
+    "toastModerationHide": "Listing has been hidden by moderation.",
+    "toastReinstate": "Listing has been reinstated as active.",
     "status": {
       "Draft": "Draft",
       "UnderReview": "Under review",
@@ -251,6 +255,8 @@
       "btnApprove": "✓ Approve listing",
       "btnFixes": "↩ Request fixes",
       "btnArchive": "Archive listing",
+      "btnModerationHide": "Hide by moderation",
+      "btnReinstate": "Reinstate listing",
       "btnClose": "Close",
       "busy": "…"
     }

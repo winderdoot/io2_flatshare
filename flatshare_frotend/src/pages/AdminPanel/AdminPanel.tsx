@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth/AuthContext";
 import type { ListingDTO, ListingStatus } from "../../models/listing";
@@ -64,6 +64,8 @@ type ModalProps = {
   pendingId: string | null;
   onApprove: (id: string) => void;
   onRequestFixes: (id: string) => void;
+  onModerationHide: (id: string) => void;
+  onReinstate: (id: string) => void;
   onArchive: (id: string) => void;
   onClose: () => void;
 };
@@ -73,6 +75,8 @@ function ListingModal({
   pendingId,
   onApprove,
   onRequestFixes,
+  onModerationHide,
+  onReinstate,
   onArchive,
   onClose,
 }: ModalProps) {
@@ -245,6 +249,24 @@ function ListingModal({
               </button>
             </>
           )}
+          {listing.status === "Active" && (
+            <button
+              className="ap-btn ap-btn--moderation"
+              disabled={busy}
+              onClick={() => onModerationHide(listing.id)}
+            >
+              {busy ? t(`${m}.busy`) : t(`${m}.btnModerationHide`)}
+            </button>
+          )}
+          {listing.status === "HiddenByModeration" && (
+            <button
+              className="ap-btn ap-btn--reinstate"
+              disabled={busy}
+              onClick={() => onReinstate(listing.id)}
+            >
+              {busy ? t(`${m}.busy`) : t(`${m}.btnReinstate`)}
+            </button>
+          )}
           {["Active", "Hidden", "HiddenByModeration"].includes(
             listing.status
           ) && (
@@ -268,6 +290,12 @@ function ListingModal({
 /* ── Main component ───────────────────────────────────────────── */
 
 type StatusFilter = "UnderReview" | "all";
+type AdminAction =
+  | "approve"
+  | "requestFixes"
+  | "archive"
+  | "moderationHide"
+  | "reinstate";
 
 export const AdminPanel = () => {
   const { t } = useTranslation();
@@ -280,11 +308,21 @@ export const AdminPanel = () => {
   const [selected, setSelected] = useState<ListingDTO | null>(null);
   const { toasts, push } = useToasts();
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     setFetchError(null);
-    adminListingsService
-      .listAll()
+
+    const fetchList =
+      statusFilter === "UnderReview"
+        ? token
+          ? adminListingsService.listUnderReview(token)
+          : Promise.reject({
+              status: 401,
+              message: t("adminPanel.noToken"),
+            } satisfies AdminRequestError)
+        : adminListingsService.listAll();
+
+    fetchList
       .then(setItems)
       .catch((e: unknown) => {
         const msg = isAdminRequestError(e)
@@ -293,9 +331,16 @@ export const AdminPanel = () => {
         setFetchError(msg);
       })
       .finally(() => setLoading(false));
-  };
+  }, [statusFilter, token, t]);
 
-  useEffect(load, []);
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const removeItem = (id: string) => {
+    setItems((prev) => prev.filter((l) => l.id !== id));
+    setSelected((prev) => (prev && prev.id === id ? null : prev));
+  };
 
   const patchItem = (id: string, nextStatus: ListingStatus) => {
     setItems((prev) =>
@@ -306,10 +351,7 @@ export const AdminPanel = () => {
     );
   };
 
-  const handleAction = async (
-    action: "approve" | "requestFixes" | "archive",
-    id: string
-  ) => {
+  const handleAction = async (action: AdminAction, id: string) => {
     if (!token) {
       push("error", t("adminPanel.noToken"));
       return;
@@ -318,12 +360,28 @@ export const AdminPanel = () => {
     try {
       if (action === "approve") {
         await adminListingsService.approve(token, id);
-        patchItem(id, "Active");
+        if (statusFilter === "UnderReview") {
+          removeItem(id);
+        } else {
+          patchItem(id, "Active");
+        }
         push("success", t("adminPanel.toastApproved"));
       } else if (action === "requestFixes") {
         await adminListingsService.requestFixes(token, id);
-        patchItem(id, "Draft");
+        if (statusFilter === "UnderReview") {
+          removeItem(id);
+        } else {
+          patchItem(id, "Draft");
+        }
         push("success", t("adminPanel.toastFixes"));
+      } else if (action === "moderationHide") {
+        await adminListingsService.moderationHide(token, id);
+        patchItem(id, "HiddenByModeration");
+        push("success", t("adminPanel.toastModerationHide"));
+      } else if (action === "reinstate") {
+        await adminListingsService.reinstate(token, id);
+        patchItem(id, "Active");
+        push("success", t("adminPanel.toastReinstate"));
       } else {
         await adminListingsService.archive(token, id);
         patchItem(id, "Archived");
@@ -339,14 +397,12 @@ export const AdminPanel = () => {
     }
   };
 
-  const visible =
-    statusFilter === "all"
-      ? items
-      : items.filter((l) => l.status === statusFilter);
+  const visible = items;
 
-  const underReviewCount = items.filter(
-    (l) => l.status === "UnderReview"
-  ).length;
+  const underReviewCount =
+    statusFilter === "UnderReview"
+      ? items.length
+      : items.filter((l) => l.status === "UnderReview").length;
 
   return (
     <div className="ap-root">
@@ -489,6 +545,26 @@ export const AdminPanel = () => {
                             </button>
                           </>
                         )}
+                        {row.status === "Active" && (
+                          <button
+                            className="ap-btn ap-btn--sm ap-btn--moderation"
+                            disabled={busy}
+                            onClick={() =>
+                              handleAction("moderationHide", row.id)
+                            }
+                          >
+                            {t("adminPanel.btnModerationHide")}
+                          </button>
+                        )}
+                        {row.status === "HiddenByModeration" && (
+                          <button
+                            className="ap-btn ap-btn--sm ap-btn--reinstate"
+                            disabled={busy}
+                            onClick={() => handleAction("reinstate", row.id)}
+                          >
+                            {t("adminPanel.btnReinstate")}
+                          </button>
+                        )}
                         {["Active", "Hidden", "HiddenByModeration"].includes(
                           row.status
                         ) && (
@@ -517,6 +593,8 @@ export const AdminPanel = () => {
           pendingId={pendingId}
           onApprove={(id) => handleAction("approve", id)}
           onRequestFixes={(id) => handleAction("requestFixes", id)}
+          onModerationHide={(id) => handleAction("moderationHide", id)}
+          onReinstate={(id) => handleAction("reinstate", id)}
           onArchive={(id) => handleAction("archive", id)}
           onClose={() => setSelected(null)}
         />

@@ -41,14 +41,15 @@ export const Login = () => {
     setError(null);
 
     try {
-      const {token, loggedInUser} = await authService.login(email, password);
+      const { token, sessionId, expiresIn, loggedInUser } =
+        await authService.login(email, password);
 
-      if (!token || !loggedInUser) {
+      if (!token || !loggedInUser || !sessionId || !expiresIn) {
         setError("Invalid email or password");
         return;
       }
 
-      login(token, loggedInUser);
+      login(token, loggedInUser, { sessionId, expiresIn });
 
       const from = location.state?.from?.pathname;
       navigate(getPostLoginPath(from, loggedInUser.role), {
