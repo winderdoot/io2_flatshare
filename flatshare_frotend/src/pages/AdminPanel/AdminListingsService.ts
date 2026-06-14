@@ -1,5 +1,6 @@
 import { API_URL } from "../../config";
 import type { ListingDTO } from "../../models/listing";
+import { normalizeListingDto } from "../LandlordListings/LandlordListingsService";
 
 const jsonHeaders = (token: string) => ({
   "Content-Type": "application/json",
@@ -16,6 +17,10 @@ async function readErrorMessage(res: Response): Promise<string> {
     /* ignore */
   }
   return res.statusText || `HTTP ${res.status}`;
+}
+
+function normalizeListings(data: Record<string, unknown>[]): ListingDTO[] {
+  return data.map((row) => normalizeListingDto(row));
 }
 
 export type AdminRequestError = {
@@ -35,8 +40,21 @@ export function isAdminRequestError(e: unknown): e is AdminRequestError {
 }
 
 export const adminListingsService = {
+  listUnderReview: async (token: string): Promise<ListingDTO[]> => {
+    const res = await fetch(`${API_URL}/api/v1/listings/under-review`, {
+      method: "GET",
+      headers: jsonHeaders(token),
+    });
+    if (!res.ok) {
+      const message = await readErrorMessage(res);
+      throw { status: res.status, message } satisfies AdminRequestError;
+    }
+    const data = (await res.json()) as Record<string, unknown>[];
+    return normalizeListings(data);
+  },
+
   listAll: async (): Promise<ListingDTO[]> => {
-    const res = await fetch(`${API_URL}/api/v1/Listings`, {
+    const res = await fetch(`${API_URL}/api/v1/listings`, {
       method: "GET",
       headers: { Accept: "application/json" },
     });
@@ -44,11 +62,12 @@ export const adminListingsService = {
       const message = await readErrorMessage(res);
       throw { status: res.status, message } satisfies AdminRequestError;
     }
-    return res.json();
+    const data = (await res.json()) as Record<string, unknown>[];
+    return normalizeListings(data);
   },
 
   approve: async (token: string, id: string): Promise<void> => {
-    const res = await fetch(`${API_URL}/api/v1/Listings/${id}/approve`, {
+    const res = await fetch(`${API_URL}/api/v1/listings/${id}/approve`, {
       method: "PATCH",
       headers: jsonHeaders(token),
     });
@@ -59,7 +78,29 @@ export const adminListingsService = {
   },
 
   requestFixes: async (token: string, id: string): Promise<void> => {
-    const res = await fetch(`${API_URL}/api/v1/Listings/${id}/request-fixes`, {
+    const res = await fetch(`${API_URL}/api/v1/listings/${id}/request-fixes`, {
+      method: "PATCH",
+      headers: jsonHeaders(token),
+    });
+    if (!res.ok) {
+      const message = await readErrorMessage(res);
+      throw { status: res.status, message } satisfies AdminRequestError;
+    }
+  },
+
+  moderationHide: async (token: string, id: string): Promise<void> => {
+    const res = await fetch(`${API_URL}/api/v1/listings/${id}/moderation-hide`, {
+      method: "PATCH",
+      headers: jsonHeaders(token),
+    });
+    if (!res.ok) {
+      const message = await readErrorMessage(res);
+      throw { status: res.status, message } satisfies AdminRequestError;
+    }
+  },
+
+  reinstate: async (token: string, id: string): Promise<void> => {
+    const res = await fetch(`${API_URL}/api/v1/listings/${id}/reinstate`, {
       method: "PATCH",
       headers: jsonHeaders(token),
     });
@@ -70,7 +111,7 @@ export const adminListingsService = {
   },
 
   archive: async (token: string, id: string): Promise<void> => {
-    const res = await fetch(`${API_URL}/api/v1/Listings/${id}/archive`, {
+    const res = await fetch(`${API_URL}/api/v1/listings/${id}/archive`, {
       method: "PATCH",
       headers: jsonHeaders(token),
     });

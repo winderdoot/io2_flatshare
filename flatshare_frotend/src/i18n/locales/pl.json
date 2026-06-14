@@ -214,9 +214,13 @@
     "btnApprove": "✓ Zatwierdź",
     "btnFixes": "↩ Do poprawek",
     "btnArchive": "Archiwizuj",
+    "btnModerationHide": "Ukryj (moderacja)",
+    "btnReinstate": "Przywróć",
     "toastApproved": "Ogłoszenie zostało zatwierdzone.",
     "toastFixes": "Ogłoszenie zostało odesłane do poprawek.",
     "toastArchived": "Ogłoszenie zostało zarchiwizowane.",
+    "toastModerationHide": "Ogłoszenie zostało ukryte przez moderację.",
+    "toastReinstate": "Ogłoszenie zostało przywrócone do statusu aktywnego.",
     "status": {
       "Draft": "Szkic",
       "UnderReview": "Oczekuje na weryfikację",
@@ -251,6 +255,8 @@
       "btnApprove": "✓ Zatwierdź ogłoszenie",
       "btnFixes": "↩ Wyślij do poprawek",
       "btnArchive": "Archiwizuj ogłoszenie",
+      "btnModerationHide": "Ukryj przez moderację",
+      "btnReinstate": "Przywróć ogłoszenie",
       "btnClose": "Zamknij",
       "busy": "…"
     }
