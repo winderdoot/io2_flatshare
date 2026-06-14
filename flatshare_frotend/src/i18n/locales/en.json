@@ -186,7 +186,11 @@
     "photosLoading": "Loading photos…",
     "photoAlt": "Listing photo",
     "photoPrev": "Previous photo",
-    "photoNext": "Next photo"
+    "photoNext": "Next photo",
+    "hiddenByModeration": "This listing has been hidden by moderation.",
+    "hiddenByModerationDesc": "The offer is not publicly visible.",
+    "hiddenByModerationOwner": "Your listing has been hidden by moderation.",
+    "hiddenByModerationOwnerDesc": "Contact the administration if you believe this is a mistake."
   },
   "adminPanel": {
     "title": "Administrator panel",
@@ -265,8 +269,10 @@
     "reports": {
       "tab": "User violation reports",
       "subtitle": "Review reports submitted by users.",
+      "subtitleListings": "Users report listings. You can hide the offer or ban the owner.",
       "openBadge": "{{count}} open",
       "empty": "No violation reports yet.",
+      "emptyListings": "No listing reports yet.",
       "colType": "Type",
       "colTarget": "Target",
       "colListingStatus": "Listing status",
@@ -279,18 +285,26 @@
       "btnOpen": "Take case",
       "btnDismiss": "Dismiss",
       "btnBan": "Ban user",
+      "btnBanOwner": "Ban owner",
+      "listingHiddenBadge": "Listing hidden",
+      "ownerBannedBadge": "Owner banned",
+      "banOwnerUnavailable": "Could not resolve the owner — hide the listing instead.",
       "toastOpened": "Report marked as under review.",
       "toastDismissed": "Report dismissed with no action.",
       "toastBanned": "User has been banned.",
+      "toastBannedOwner": "Listing owner has been banned.",
       "prevPage": "Previous",
       "nextPage": "Next",
       "pageInfo": "Page {{current}} of {{total}}",
       "banModalTitle": "Ban user",
+      "banOwnerModalTitle": "Ban listing owner",
+      "banOwnerModalLead": "The owner account will be banned, active listings hidden, confirmed bookings cancelled and Stripe refunds attempted.",
       "banModalLead": "This will ban the account, hide active listings, cancel confirmed bookings and issue Stripe refunds.",
       "banReasonLabel": "Ban reason",
       "banReasonPlaceholder": "e.g. repeated fraudulent behavior",
       "banCancel": "Cancel",
       "banConfirm": "Ban user",
+      "banOwnerConfirm": "Ban owner",
       "banSubmitting": "Banning…",
       "type": {
         "LISTING": "Listing",
@@ -325,7 +339,9 @@
     "validationReason": "Please provide a reason.",
     "validationDetails": "Please provide details.",
     "submitError": "Could not submit report ({{message}}).",
-    "networkError": "Network error — please try again."
+    "networkError": "Network error — please try again.",
+    "loginToReport": "Sign in to report this listing.",
+    "loginLink": "Sign in"
   },
   "landlordListings": {
     "title": "My listings",

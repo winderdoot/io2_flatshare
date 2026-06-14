@@ -37,22 +37,13 @@ public class ListingService
     }
 
     /* Method is meant to return model entity, not DTO */ 
-    public async Task<Listing> GetByIdAsync(Guid id, bool attachOwner = false)
+    public async Task<Listing> GetByIdAsync(Guid id)
     {
-        Listing? listing;
-        if (attachOwner)
-        {
-            listing = await _context.Listings
-                .Include(l => l.Unavailabilities)
-                .Include(l => l.Owner)
-                .FirstOrDefaultAsync(l => l.Id == id);
-        }
-        else
-        {
-            listing = await _context.Listings
-                .Include(l => l.Unavailabilities)
-                .FirstOrDefaultAsync(l => l.Id == id);
-        }
+        var listing = await _context.Listings
+            .Include(l => l.Unavailabilities)
+            .Include(l => l.Owner)
+            .FirstOrDefaultAsync(l => l.Id == id);
+
         if (listing is null)
         {
             throw ErrorResponse.Generate("Listing not found", StatusCodes.Status404NotFound);
@@ -64,6 +55,7 @@ public class ListingService
     {
         var query = _context.Listings
             .Include(l => l.Unavailabilities)
+            .Include(l => l.Owner)
             .AsQueryable();
 
         if (filter.OwnerId.HasValue)
@@ -168,6 +160,8 @@ public class ListingService
     public async Task<List<ListingDTO>> GetListingsUnderReviewAsync()
     {
         var results = await _context.Listings
+            .Include(l => l.Unavailabilities)
+            .Include(l => l.Owner)
             .Where(l => l.Status == Listing.ListingStatus.UnderReview)
             .ToListAsync();
 

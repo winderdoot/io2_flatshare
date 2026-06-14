@@ -10,6 +10,8 @@ import {
   isAdminRequestError,
 } from "./AdminReportsService";
 import { adminListingsService } from "./AdminListingsService";
+import { isUserBanned, markUserBanned } from "../../utils/moderationStore";
+import { resolveListingOwnerId } from "../../utils/listingOwnerResolver";
 
 const REPORT_STATUS_CLASS: Record<ReportStatus, string> = {
   Open: "badge--open",
@@ -34,6 +36,9 @@ const REPORT_STATUS_ORDER: ReportStatus[] = [
   "ClosedNoAction",
 ];
 
+const FETCH_PAGE_SIZE = 50;
+const GROUPS_PAGE_SIZE = 10;
+
 type ReportGroup = {
   key: string;
   type: ReportType;
@@ -44,6 +49,13 @@ type ReportGroup = {
 type ListingMeta = {
   status: ListingStatus;
   title: string;
+  ownerUserId?: string;
+};
+
+type BanTarget = {
+  reportId: string;
+  userId: string;
+  listingId: string;
 };
 
 function fmt(iso: string): string {
@@ -116,6 +128,19 @@ function countByStatus(reports: ViolationReportDTO[]): Partial<Record<ReportStat
   return counts;
 }
 
+async function fetchAllReports(token: string): Promise<ViolationReportDTO[]> {
+  const all: ViolationReportDTO[] = [];
+  let page = 0;
+  let totalPages = 1;
+  while (page < totalPages) {
+    const res = await adminReportsService.list(token, page, FETCH_PAGE_SIZE);
+    all.push(...res.content);
+    totalPages = Math.max(1, res.page.totalPages);
+    page += 1;
+  }
+  return all;
+}
+
 type AdminReportsSectionProps = {
   pushToast: (type: "success" | "error", text: string) => void;
 };
@@ -124,21 +149,28 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
   const { t } = useTranslation();
   const { token } = useAuth();
   const [page, setPage] = useState(0);
-  const [data, setData] = useState<ViolationReportDTO[]>([]);
-  const [totalPages, setTotalPages] = useState(1);
+  const [allReports, setAllReports] = useState<ViolationReportDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [pendingReportId, setPendingReportId] = useState<string | null>(null);
   const [pendingListingId, setPendingListingId] = useState<string | null>(null);
-  const [banTarget, setBanTarget] = useState<ViolationReportDTO | null>(null);
+  const [banTarget, setBanTarget] = useState<BanTarget | null>(null);
   const [banReason, setBanReason] = useState("");
   const [listingMeta, setListingMeta] = useState<Record<string, ListingMeta | null>>({});
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const banOverlayRef = useRef<HTMLDivElement>(null);
 
-  const pageSize = 20;
+  const tabReports = useMemo(
+    () => allReports.filter((r) => r.type === "LISTING"),
+    [allReports]
+  );
 
-  const groups = useMemo(() => groupReports(data), [data]);
+  const allGroups = useMemo(() => groupReports(tabReports), [tabReports]);
+  const totalPages = Math.max(1, Math.ceil(allGroups.length / GROUPS_PAGE_SIZE));
+  const groups = useMemo(() => {
+    const start = page * GROUPS_PAGE_SIZE;
+    return allGroups.slice(start, start + GROUPS_PAGE_SIZE);
+  }, [allGroups, page]);
 
   const loadListingMeta = useCallback(async (reports: ViolationReportDTO[]) => {
     const ids = [
@@ -154,7 +186,16 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
       ids.map(async (id) => {
         try {
           const listing = await landlordListingsService.getById(id);
-          return [id, { status: listing.status, title: listing.title }] as const;
+          const ownerUserId =
+            listing.ownerId ?? (await resolveListingOwnerId(id, null));
+          return [
+            id,
+            {
+              status: listing.status,
+              title: listing.title,
+              ownerUserId,
+            },
+          ] as const;
         } catch {
           return [id, null] as const;
         }
@@ -171,12 +212,13 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
     }
     setLoading(true);
     setFetchError(null);
-    adminReportsService
-      .list(token, page, pageSize)
-      .then(async (res) => {
-        setData(res.content);
-        setTotalPages(Math.max(1, res.page.totalPages));
-        await loadListingMeta(res.content);
+    fetchAllReports(token)
+      .then(async (reports) => {
+        reports
+          .filter((r) => r.type === "USER" && r.status === "ActionTaken")
+          .forEach((r) => markUserBanned(r.targetId));
+        setAllReports(reports);
+        await loadListingMeta(reports);
       })
       .catch((e: unknown) => {
         const msg = isAdminRequestError(e)
@@ -185,7 +227,7 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
         setFetchError(msg);
       })
       .finally(() => setLoading(false));
-  }, [token, page, t, loadListingMeta]);
+  }, [token, t, loadListingMeta]);
 
   useEffect(() => {
     load();
@@ -193,16 +235,16 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
 
   useEffect(() => {
     if (loading) return;
-    const urgent = groupReports(data)
+    const urgent = allGroups
       .filter((g) =>
         g.reports.some((r) => r.status === "Open" || r.status === "UnderReview")
       )
       .map((g) => g.key);
     setExpandedGroups(new Set(urgent));
-  }, [page, loading]);
+  }, [page, loading, allGroups]);
 
   const patchReport = (id: string, status: ReportStatus) => {
-    setData((prev) =>
+    setAllReports((prev) =>
       prev.map((r) => (r.id === id ? { ...r, status } : r))
     );
   };
@@ -213,7 +255,7 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
     fromStatuses: ReportStatus[],
     toStatus: ReportStatus
   ) => {
-    setData((prev) =>
+    setAllReports((prev) =>
       prev.map((r) =>
         r.targetId === targetId &&
         r.type === type &&
@@ -312,21 +354,23 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
 
   const handleBan = async () => {
     if (!token || !banTarget || !banReason.trim()) return;
-    setPendingReportId(banTarget.id);
+    setPendingReportId(banTarget.reportId);
     try {
       await adminReportsService.banUser(
         token,
-        banTarget.targetId,
-        banTarget.id,
+        banTarget.userId,
+        banTarget.reportId,
         banReason.trim()
       );
       patchReportsInGroup(
-        banTarget.targetId,
-        banTarget.type,
+        banTarget.listingId,
+        "LISTING",
         ["Open", "UnderReview"],
         "ActionTaken"
       );
-      pushToast("success", t("adminPanel.reports.toastBanned"));
+      markUserBanned(banTarget.userId);
+      patchListingStatus(banTarget.listingId, "HiddenByModeration");
+      pushToast("success", t("adminPanel.reports.toastBannedOwner"));
       setBanTarget(null);
       setBanReason("");
     } catch (e: unknown) {
@@ -339,12 +383,28 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
     }
   };
 
-  const openCount = data.filter((r) => r.status === "Open").length;
+  const openBanOwner = (group: ReportGroup) => {
+    const report = group.reports.find((r) => r.status === "UnderReview");
+    const ownerUserId = listingMeta[group.targetId]?.ownerUserId;
+    if (!report) return;
+    if (!ownerUserId) {
+      pushToast("error", t("adminPanel.reports.banOwnerUnavailable"));
+      return;
+    }
+    setBanTarget({
+      reportId: report.id,
+      userId: ownerUserId,
+      listingId: group.targetId,
+    });
+    setBanReason("");
+  };
+
+  const openCount = tabReports.filter((r) => r.status === "Open").length;
 
   return (
     <>
       <p className="ap-subtitle ap-subtitle--section">
-        {t("adminPanel.reports.subtitle")}
+        {t("adminPanel.reports.subtitleListings")}
         {openCount > 0 && (
           <span className="ap-badge-count">
             {t("adminPanel.reports.openBadge", { count: openCount })}
@@ -362,9 +422,9 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
         </div>
       )}
 
-      {!loading && !fetchError && data.length === 0 && (
+      {!loading && !fetchError && tabReports.length === 0 && (
         <div className="ap-empty">
-          <p>{t("adminPanel.reports.empty")}</p>
+          <p>{t("adminPanel.reports.emptyListings")}</p>
         </div>
       )}
 
@@ -374,20 +434,21 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
             {groups.map((group) => {
               const expanded = expandedGroups.has(group.key);
               const listing = listingMeta[group.targetId];
-              const listingStatus =
-                group.type === "LISTING" ? listing?.status ?? null : null;
+              const listingStatus = listing?.status ?? null;
               const listingBusy = pendingListingId === group.targetId;
               const groupBusy =
                 listingBusy ||
                 group.reports.some((r) => pendingReportId === r.id);
               const statusCounts = countByStatus(group.reports);
-              const showListingModeration =
-                group.type === "LISTING" && groupAllowsListingModeration(group.reports);
-              const showHide =
-                showListingModeration && canModerationHide(listingStatus);
-              const showReinstate =
-                showListingModeration && canReinstate(listingStatus);
-              const hasGroupActions = showHide || showReinstate;
+              const showListingModeration = groupAllowsListingModeration(group.reports);
+              const showHide = showListingModeration && canModerationHide(listingStatus);
+              const showReinstate = showListingModeration && canReinstate(listingStatus);
+              const showBanOwner =
+                showListingModeration &&
+                group.reports.some((r) => r.status === "UnderReview");
+              const ownerUserId = listing?.ownerUserId;
+              const ownerBanned = isUserBanned(ownerUserId);
+              const hasGroupActions = showHide || showReinstate || showBanOwner;
 
               return (
                 <section
@@ -416,21 +477,12 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
                         <span className="ap-report-group-type">
                           {t(`adminPanel.reports.type.${group.type}`)}
                         </span>
-                        {group.type === "LISTING" ? (
-                          <Link
-                            to={`/offer/${group.targetId}`}
-                            className="ap-link-btn ap-report-group-target"
-                          >
-                            {listing?.title ?? `${group.targetId.slice(0, 8)}…`}
-                          </Link>
-                        ) : (
-                          <span
-                            className="ap-report-group-target ap-col-target"
-                            title={group.targetId}
-                          >
-                            {group.targetId.slice(0, 8)}…
-                          </span>
-                        )}
+                        <Link
+                          to={`/offer/${group.targetId}`}
+                          className="ap-link-btn ap-report-group-target"
+                        >
+                          {listing?.title ?? `${group.targetId.slice(0, 8)}…`}
+                        </Link>
                         <span className="ap-report-group-count">
                           {t("adminPanel.reports.groupReports", {
                             count: group.reports.length,
@@ -439,18 +491,26 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
                       </div>
 
                       <div className="ap-report-group-badges">
-                        {group.type === "LISTING" && (
-                          <span className="ap-report-group-badge-label">
-                            {t("adminPanel.reports.colListingStatus")}:
-                            {listingStatus ? (
-                              <span
-                                className={`ap-badge ${LISTING_STATUS_CLASS[listingStatus]}`}
-                              >
-                                {t(`adminPanel.status.${listingStatus}`)}
-                              </span>
-                            ) : (
-                              <span className="ap-muted">—</span>
-                            )}
+                        <span className="ap-report-group-badge-label">
+                          {t("adminPanel.reports.colListingStatus")}:
+                          {listingStatus ? (
+                            <span
+                              className={`ap-badge ${LISTING_STATUS_CLASS[listingStatus]}`}
+                            >
+                              {t(`adminPanel.status.${listingStatus}`)}
+                            </span>
+                          ) : (
+                            <span className="ap-muted">—</span>
+                          )}
+                        </span>
+                        {listingStatus === "HiddenByModeration" && (
+                          <span className="ap-badge badge--moderation">
+                            {t("adminPanel.reports.listingHiddenBadge")}
+                          </span>
+                        )}
+                        {ownerBanned && (
+                          <span className="ap-badge badge--banned">
+                            {t("adminPanel.reports.ownerBannedBadge")}
                           </span>
                         )}
                         <span className="ap-report-group-badge-label">
@@ -492,6 +552,15 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
                             {t("adminPanel.btnReinstate")}
                           </button>
                         )}
+                        {showBanOwner && (
+                          <button
+                            className="ap-btn ap-btn--sm ap-btn--ban"
+                            disabled={groupBusy || ownerBanned}
+                            onClick={() => openBanOwner(group)}
+                          >
+                            {t("adminPanel.reports.btnBanOwner")}
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -512,10 +581,7 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
                             const busy = pendingReportId === row.id;
                             const showOpen = row.status === "Open";
                             const showDismiss = row.status === "UnderReview";
-                            const showBan =
-                              row.status === "UnderReview" &&
-                              group.type === "USER";
-                            const hasActions = showOpen || showDismiss || showBan;
+                            const hasActions = showOpen || showDismiss;
 
                             return (
                               <tr
@@ -559,18 +625,6 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
                                           onClick={() => handleDismiss(row.id)}
                                         >
                                           {t("adminPanel.reports.btnDismiss")}
-                                        </button>
-                                      )}
-                                      {showBan && (
-                                        <button
-                                          className="ap-btn ap-btn--sm ap-btn--ban"
-                                          disabled={busy || listingBusy}
-                                          onClick={() => {
-                                            setBanTarget(row);
-                                            setBanReason("");
-                                          }}
-                                        >
-                                          {t("adminPanel.reports.btnBan")}
                                         </button>
                                       )}
                                     </div>
@@ -629,9 +683,9 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
         >
           <div className="ap-modal ap-modal--compact">
             <h3 className="ap-modal-title">
-              {t("adminPanel.reports.banModalTitle")}
+              {t("adminPanel.reports.banOwnerModalTitle")}
             </h3>
-            <p className="ap-modal-desc">{t("adminPanel.reports.banModalLead")}</p>
+            <p className="ap-modal-desc">{t("adminPanel.reports.banOwnerModalLead")}</p>
             <label className="ap-ban-field">
               <span>{t("adminPanel.reports.banReasonLabel")}</span>
               <textarea
@@ -645,18 +699,18 @@ export function AdminReportsSection({ pushToast }: AdminReportsSectionProps) {
               <button
                 className="ap-btn ap-btn--ghost"
                 onClick={() => setBanTarget(null)}
-                disabled={pendingReportId === banTarget.id}
+                disabled={pendingReportId === banTarget.reportId}
               >
                 {t("adminPanel.reports.banCancel")}
               </button>
               <button
                 className="ap-btn ap-btn--ban"
-                disabled={!banReason.trim() || pendingReportId === banTarget.id}
+                disabled={!banReason.trim() || pendingReportId === banTarget.reportId}
                 onClick={handleBan}
               >
-                {pendingReportId === banTarget.id
+                {pendingReportId === banTarget.reportId
                   ? t("adminPanel.reports.banSubmitting")
-                  : t("adminPanel.reports.banConfirm")}
+                  : t("adminPanel.reports.banOwnerConfirm")}
               </button>
             </div>
           </div>

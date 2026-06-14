@@ -98,14 +98,14 @@ public class ListingUnavailabilityIntegrationTests
         await listingService.AddUnavailabilityAsync(listing.Id, unavailability);
 
         // verify persisted on listing
-        var reloaded = await listingService.GetByIdAsync(listing.Id, attachOwner: true);
+        var reloaded = await listingService.GetByIdAsync(listing.Id);
         reloaded.Unavailabilities.Should().ContainSingle(u => u.Since == since && u.Until == until);
 
         // Remove unavailability
         await listingService.RemoveUnavailabilityAsync(listing.Id, new UnavailabilityRange { Since = since, Until = until });
 
         // verify removed
-        var afterRemove = await listingService.GetByIdAsync(listing.Id, attachOwner: true);
+        var afterRemove = await listingService.GetByIdAsync(listing.Id);
         afterRemove.Unavailabilities.Should().NotContain(u => u.Since == since && u.Until == until);
     }
 

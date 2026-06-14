@@ -30,9 +30,11 @@ export function normalizeListingDto(raw: Record<string, unknown>): ListingDTO {
     | undefined;
 
   const base = raw as unknown as ListingDTO;
+  const ownerRaw = raw.ownerId ?? raw.OwnerId;
   return {
     ...base,
     id: String(raw.id ?? raw.Id ?? base.id),
+    ownerId: ownerRaw != null ? String(ownerRaw) : base.ownerId,
     unavailabilities: periods?.map(normalizeUnavailability) ?? [],
   };
 }

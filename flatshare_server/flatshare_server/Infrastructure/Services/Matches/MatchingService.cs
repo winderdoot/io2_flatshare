@@ -51,7 +51,7 @@ public class MatchingService
 
     private async Task<List<ScoredListing>> FetchMatchesAsync(MatchesFilter filter)
     {
-        var baseQuery = dbContext.Listings.AsNoTracking();
+        var baseQuery = dbContext.Listings.AsNoTracking().Include(l => l.Owner);
         var filteredQuery = baseQuery.ApplyMatchesFilter(filter);
         var listings = await filteredQuery.ToListAsync();
 

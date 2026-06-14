@@ -186,7 +186,11 @@
     "photosLoading": "Ładowanie zdjęć…",
     "photoAlt": "Zdjęcie ogłoszenia",
     "photoPrev": "Poprzednie zdjęcie",
-    "photoNext": "Następne zdjęcie"
+    "photoNext": "Następne zdjęcie",
+    "hiddenByModeration": "To ogłoszenie zostało ukryte przez moderację.",
+    "hiddenByModerationDesc": "Oferta nie jest widoczna publicznie.",
+    "hiddenByModerationOwner": "Twoje ogłoszenie zostało ukryte przez moderację.",
+    "hiddenByModerationOwnerDesc": "Skontaktuj się z administracją, jeśli uważasz, że to pomyłka."
   },
   "adminPanel": {
     "title": "Panel administratora",
@@ -265,8 +269,10 @@
     "reports": {
       "tab": "Zgłoszenia naruszeń użytkowników",
       "subtitle": "Przegląd zgłoszeń złożonych przez użytkowników.",
+      "subtitleListings": "Użytkownicy zgłaszają ogłoszenia. Możesz ukryć ofertę lub zbanować właściciela.",
       "openBadge": "{{count}} otwartych",
       "empty": "Brak zgłoszeń naruszeń.",
+      "emptyListings": "Brak zgłoszeń dotyczących ogłoszeń.",
       "colType": "Typ",
       "colTarget": "Cel",
       "colListingStatus": "Status ogłoszenia",
@@ -279,18 +285,26 @@
       "btnOpen": "Przejmij sprawę",
       "btnDismiss": "Odrzuć",
       "btnBan": "Zbanuj użytkownika",
+      "btnBanOwner": "Zbanuj właściciela",
+      "listingHiddenBadge": "Ogłoszenie ukryte",
+      "ownerBannedBadge": "Właściciel zbanowany",
+      "banOwnerUnavailable": "Nie udało się ustalić właściciela — ukryj ogłoszenie.",
       "toastOpened": "Zgłoszenie oznaczone jako w trakcie rozpatrywania.",
       "toastDismissed": "Zgłoszenie zamknięte bez działania.",
       "toastBanned": "Użytkownik został zbanowany.",
+      "toastBannedOwner": "Właściciel ogłoszenia został zbanowany.",
       "prevPage": "Poprzednia",
       "nextPage": "Następna",
       "pageInfo": "Strona {{current}} z {{total}}",
       "banModalTitle": "Ban użytkownika",
+      "banOwnerModalTitle": "Ban właściciela ogłoszenia",
+      "banOwnerModalLead": "Konto właściciela zostanie zbanowane, aktywne ogłoszenia ukryte, potwierdzone rezerwacje anulowane, a płatności zwrócone przez Stripe.",
       "banModalLead": "Konto zostanie zbanowane, aktywne ogłoszenia ukryte, potwierdzone rezerwacje anulowane, a płatności zwrócone przez Stripe.",
       "banReasonLabel": "Powód bana",
       "banReasonPlaceholder": "np. powtarzające się oszustwa",
       "banCancel": "Anuluj",
       "banConfirm": "Zbanuj użytkownika",
+      "banOwnerConfirm": "Zbanuj właściciela",
       "banSubmitting": "Banowanie…",
       "type": {
         "LISTING": "Ogłoszenie",
@@ -325,7 +339,9 @@
     "validationReason": "Podaj powód zgłoszenia.",
     "validationDetails": "Podaj szczegóły zgłoszenia.",
     "submitError": "Nie udało się wysłać zgłoszenia ({{message}}).",
-    "networkError": "Błąd sieci — spróbuj ponownie."
+    "networkError": "Błąd sieci — spróbuj ponownie.",
+    "loginToReport": "Zaloguj się, aby zgłosić ogłoszenie.",
+    "loginLink": "Zaloguj się"
   },
   "landlordListings": {
     "title": "Moje ogłoszenia",

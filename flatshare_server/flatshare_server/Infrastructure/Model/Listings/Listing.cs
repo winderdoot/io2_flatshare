@@ -52,6 +52,8 @@ public class Listing
             Id = Id,
             Location = Address,
             OwnerContact = OwnerContact,
+            OwnerId = Owner?.Id
+                ?? throw new InvalidOperationException("Listing owner is not loaded."),
             Title = Title,
             Unavailabilities = [.. Unavailabilities]
         };

@@ -347,7 +347,14 @@ export const LandlordListings = () => {
                     return (
                       <tr
                         key={row.id}
-                        className={rowBusy ? "ll-row--busy" : undefined}
+                        className={[
+                          rowBusy ? "ll-row--busy" : "",
+                          row.status === "HiddenByModeration"
+                            ? "ll-row--moderation-hidden"
+                            : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ") || undefined}
                       >
                         <td>{row.title}</td>
                         <td>

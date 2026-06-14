@@ -269,6 +269,7 @@
 .badge--active       { background: var(--color-accent-tint); color: var(--color-accent); }
 .badge--hidden       { background: var(--color-primary-tint); color: var(--color-primary); }
 .badge--moderation   { background: color-mix(in srgb, var(--color-accent-strong) 30%, transparent); color: var(--color-accent-strong); }
+.badge--banned       { background: color-mix(in srgb, #c62828 18%, transparent); color: #b71c1c; }
 .badge--archived     { background: color-mix(in srgb, var(--color-text-secondary) 10%, transparent); color: color-mix(in srgb, var(--color-text-secondary) 75%, transparent); }
 
 /* ── Buttons ──────────────────────────────────────────────────── */

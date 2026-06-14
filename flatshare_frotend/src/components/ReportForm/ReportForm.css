@@ -189,6 +189,21 @@
   color: var(--color-on-accent);
 }
 
+.report-login-hint {
+  margin-top: 1rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.report-login-hint a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.listing-detail-report-actions {
+  margin-top: 1rem;
+}
+
 .report-trigger:focus-visible {
   outline: 2px solid var(--color-accent-strong);
   outline-offset: 2px;

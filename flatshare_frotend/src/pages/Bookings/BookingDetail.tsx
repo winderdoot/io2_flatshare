@@ -67,7 +67,7 @@ export const BookingDetail = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [acceptInfo, setAcceptInfo] = useState<string | null>(null);
   const [verifyingPayment, setVerifyingPayment] = useState(false);
-  const [reportUserOpen, setReportUserOpen] = useState(false);
+  const [reportListingOpen, setReportListingOpen] = useState(false);
 
   const isLandlord = user?.role === "LANDLORD";
   const isTenant = user?.role === "TENANT";
@@ -85,6 +85,9 @@ export const BookingDetail = () => {
     queryFn: () => landlordListingsService.getById(booking!.listingId),
     enabled: !!booking?.listingId,
   });
+
+  const canReportListing =
+    isTenant && !!token && !!booking?.listingId && listing?.status === "Active";
 
   const refresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["booking", bookingId] });
@@ -345,28 +348,29 @@ export const BookingDetail = () => {
                 <div className="bookings-detail-field">
                   <label>{t("booking.fieldTenantId")}</label>
                   <p>{booking.tenantId}</p>
-                  {token && (
-                    <>
-                      <button
-                        type="button"
-                        className="report-trigger"
-                        onClick={() => setReportUserOpen(true)}
-                      >
-                        {t("report.reportUser")}
-                      </button>
-                      <ReportForm
-                        open={reportUserOpen}
-                        onClose={() => setReportUserOpen(false)}
-                        token={token}
-                        type="USER"
-                        targetId={booking.tenantId}
-                        title={t("report.reportUserTitle")}
-                      />
-                    </>
-                  )}
                 </div>
               )}
             </div>
+
+            {canReportListing && booking && (
+              <div className="bookings-report-section">
+                <button
+                  type="button"
+                  className="report-trigger"
+                  onClick={() => setReportListingOpen(true)}
+                >
+                  {t("report.reportListing")}
+                </button>
+                <ReportForm
+                  open={reportListingOpen}
+                  onClose={() => setReportListingOpen(false)}
+                  token={token!}
+                  type="LISTING"
+                  targetId={booking.listingId}
+                  title={t("report.reportListingTitle")}
+                />
+              </div>
+            )}
 
             {showPayButton && (
               <div className="bookings-actions bookings-actions--pay">
