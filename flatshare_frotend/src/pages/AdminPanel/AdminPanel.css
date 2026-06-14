@@ -220,10 +220,14 @@
 }
 
 .ap-col-actions {
+  min-width: 200px;
+}
+
+.ap-actions-inner {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  min-width: 240px;
+  align-items: center;
 }
 
 /* ── Link button (title) ──────────────────────────────────────── */
@@ -583,6 +587,284 @@
 }
 
 .ap-unavail-msg {
+  color: var(--color-text-secondary);
+}
+
+.ap-filter-bar--sections {
+  margin-bottom: 1.5rem;
+}
+
+.ap-subtitle--section {
+  margin-bottom: 1.25rem;
+}
+
+.ap-pending-note {
+  margin: 0 0 1rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.ap-col-reason {
+  max-width: 280px;
+  min-width: 160px;
+}
+
+.ap-table--reports th,
+.ap-table--reports td {
+  vertical-align: top;
+}
+
+.ap-table--reports .ap-col-listing-status,
+.ap-table--reports .ap-col-date,
+.ap-table--reports td:not(.ap-col-reason):not(.ap-col-actions) {
+  vertical-align: middle;
+}
+
+.ap-muted {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+/* ── Grouped violation reports ───────────────────────────────── */
+
+.ap-report-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ap-report-group {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.ap-report-group--busy {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.ap-report-group-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 1rem 1.1rem;
+  background: var(--color-surface-2);
+}
+
+.ap-report-group-toggle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0.1rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.ap-report-group-toggle:hover {
+  background: var(--color-secondary-tint);
+  border-color: var(--color-primary);
+}
+
+.ap-report-group-chevron {
+  display: block;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid var(--color-text-secondary);
+  border-bottom: 2px solid var(--color-text-secondary);
+  transform: rotate(-45deg);
+  transition: transform var(--transition);
+}
+
+.ap-report-group-chevron--open {
+  transform: rotate(45deg);
+  margin-top: -0.15rem;
+}
+
+.ap-report-group-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.ap-report-group-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.55rem;
+}
+
+.ap-report-group-type {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+.ap-report-group-target {
+  font-size: 0.95rem;
+  font-weight: 600;
+  max-width: 100%;
+}
+
+.ap-report-group-count {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  background: var(--color-secondary-tint);
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill);
+}
+
+.ap-report-group-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.25rem;
+  align-items: center;
+}
+
+.ap-report-group-badge-label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.ap-report-group-status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.ap-report-group-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.ap-report-group-body {
+  padding: 0.5rem 1rem 1rem;
+  border-top: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+}
+
+.ap-table--nested {
+  font-size: 0.88rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+}
+
+.ap-table--nested thead tr {
+  background: var(--color-surface-2);
+}
+
+.ap-table--nested th,
+.ap-table--nested td {
+  padding: 0.75rem 0.9rem;
+}
+
+@media (max-width: 720px) {
+  .ap-report-group-header {
+    flex-wrap: wrap;
+  }
+
+  .ap-report-group-actions {
+    width: 100%;
+    padding-left: 2.65rem;
+  }
+}
+
+.ap-reason-details {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  font-weight: 400;
+}
+
+.ap-col-target {
+  font-family: ui-monospace, monospace;
+  font-size: 0.82rem;
+}
+
+.ap-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.ap-pagination-label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.ap-modal--compact {
+  max-width: 420px;
+  padding: 1.5rem;
+}
+
+.ap-modal-desc {
+  margin: 0 0 1rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.ap-ban-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ap-ban-field textarea {
+  font: inherit;
+  font-weight: 400;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 0.75rem;
+  resize: vertical;
+}
+
+.ap-btn--ban {
+  background: #7f1d1d;
+  color: #fff;
+  border-color: transparent;
+}
+
+.ap-btn--ban:hover:not(:disabled) {
+  background: #991b1b;
+}
+
+.badge--open {
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
+}
+
+.badge--action {
+  background: color-mix(in srgb, var(--color-accent-strong) 15%, transparent);
+  color: var(--color-accent-strong);
+}
+
+.badge--closed {
+  background: var(--color-secondary-tint);
   color: var(--color-text-secondary);
 }
 

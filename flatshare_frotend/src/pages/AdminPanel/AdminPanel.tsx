@@ -6,6 +6,7 @@ import {
   adminListingsService,
   isAdminRequestError,
 } from "./AdminListingsService";
+import { AdminReportsSection } from "./AdminReportsSection";
 import "./AdminPanel.css";
 
 /* ── Status badge CSS classes ─────────────────────────────────── */
@@ -290,6 +291,7 @@ function ListingModal({
 /* ── Main component ───────────────────────────────────────────── */
 
 type StatusFilter = "UnderReview" | "all";
+type PanelSection = "listings" | "reports";
 type AdminAction =
   | "approve"
   | "requestFixes"
@@ -300,30 +302,34 @@ type AdminAction =
 export const AdminPanel = () => {
   const { t } = useTranslation();
   const { token } = useAuth();
-  const [items, setItems] = useState<ListingDTO[]>([]);
+  const [pendingItems, setPendingItems] = useState<ListingDTO[]>([]);
+  const [allItems, setAllItems] = useState<ListingDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("UnderReview");
+  const [panelSection, setPanelSection] = useState<PanelSection>("listings");
+  const [reportsRefreshKey, setReportsRefreshKey] = useState(0);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [selected, setSelected] = useState<ListingDTO | null>(null);
   const { toasts, push } = useToasts();
 
   const load = useCallback(() => {
+    if (!token) {
+      setFetchError(t("adminPanel.noToken"));
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setFetchError(null);
 
-    const fetchList =
-      statusFilter === "UnderReview"
-        ? token
-          ? adminListingsService.listUnderReview(token)
-          : Promise.reject({
-              status: 401,
-              message: t("adminPanel.noToken"),
-            } satisfies AdminRequestError)
-        : adminListingsService.listAll();
-
-    fetchList
-      .then(setItems)
+    Promise.all([
+      adminListingsService.listUnderReview(token),
+      adminListingsService.listAll(),
+    ])
+      .then(([pending, all]) => {
+        setPendingItems(pending);
+        setAllItems(all);
+      })
       .catch((e: unknown) => {
         const msg = isAdminRequestError(e)
           ? t("adminPanel.fetchError", { status: e.status, message: e.message })
@@ -331,25 +337,40 @@ export const AdminPanel = () => {
         setFetchError(msg);
       })
       .finally(() => setLoading(false));
-  }, [statusFilter, token, t]);
+  }, [token, t]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    if (panelSection === "listings") {
+      load();
+    }
+  }, [load, panelSection]);
 
-  const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((l) => l.id !== id));
-    setSelected((prev) => (prev && prev.id === id ? null : prev));
+  const handleRefresh = () => {
+    if (panelSection === "listings") {
+      load();
+    } else {
+      setReportsRefreshKey((k) => k + 1);
+    }
   };
 
-  const patchItem = (id: string, nextStatus: ListingStatus) => {
-    setItems((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, status: nextStatus } : l))
-    );
+  const removeFromPending = (id: string) => {
+    setPendingItems((prev) => prev.filter((l) => l.id !== id));
+  };
+
+  const patchListing = (id: string, nextStatus: ListingStatus) => {
+    const patch = (list: ListingDTO[]) =>
+      list.map((l) => (l.id === id ? { ...l, status: nextStatus } : l));
+    setPendingItems(patch);
+    setAllItems(patch);
     setSelected((prev) =>
       prev && prev.id === id ? { ...prev, status: nextStatus } : prev
     );
   };
+
+  const items =
+    statusFilter === "UnderReview" ? pendingItems : allItems;
+  const pendingCount = pendingItems.length;
+  const allCount = allItems.length;
 
   const handleAction = async (action: AdminAction, id: string) => {
     if (!token) {
@@ -360,31 +381,25 @@ export const AdminPanel = () => {
     try {
       if (action === "approve") {
         await adminListingsService.approve(token, id);
-        if (statusFilter === "UnderReview") {
-          removeItem(id);
-        } else {
-          patchItem(id, "Active");
-        }
+        removeFromPending(id);
+        patchListing(id, "Active");
         push("success", t("adminPanel.toastApproved"));
       } else if (action === "requestFixes") {
         await adminListingsService.requestFixes(token, id);
-        if (statusFilter === "UnderReview") {
-          removeItem(id);
-        } else {
-          patchItem(id, "Draft");
-        }
+        removeFromPending(id);
+        patchListing(id, "Draft");
         push("success", t("adminPanel.toastFixes"));
       } else if (action === "moderationHide") {
         await adminListingsService.moderationHide(token, id);
-        patchItem(id, "HiddenByModeration");
+        patchListing(id, "HiddenByModeration");
         push("success", t("adminPanel.toastModerationHide"));
       } else if (action === "reinstate") {
         await adminListingsService.reinstate(token, id);
-        patchItem(id, "Active");
+        patchListing(id, "Active");
         push("success", t("adminPanel.toastReinstate"));
       } else {
         await adminListingsService.archive(token, id);
-        patchItem(id, "Archived");
+        patchListing(id, "Archived");
         push("success", t("adminPanel.toastArchived"));
       }
     } catch (e: unknown) {
@@ -396,13 +411,6 @@ export const AdminPanel = () => {
       setPendingId(null);
     }
   };
-
-  const visible = items;
-
-  const underReviewCount =
-    statusFilter === "UnderReview"
-      ? items.length
-      : items.filter((l) => l.status === "UnderReview").length;
 
   return (
     <div className="ap-root">
@@ -421,22 +429,48 @@ export const AdminPanel = () => {
           <div>
             <h1 className="ap-title">{t("adminPanel.title")}</h1>
             <p className="ap-subtitle">
-              {t("adminPanel.subtitle")}
-              {underReviewCount > 0 && (
-                <span className="ap-badge-count">
-                  {t("adminPanel.pendingBadge", { count: underReviewCount })}
-                </span>
-              )}
+              {panelSection === "listings"
+                ? t("adminPanel.subtitle")
+                : t("adminPanel.reports.tab")}
             </p>
           </div>
           <button
             className="ap-btn ap-btn--ghost ap-btn--sm"
-            onClick={load}
-            disabled={loading}
+            onClick={handleRefresh}
+            disabled={loading && panelSection === "listings"}
           >
-            {loading ? t("adminPanel.refreshing") : t("adminPanel.refresh")}
+            {loading && panelSection === "listings"
+              ? t("adminPanel.refreshing")
+              : t("adminPanel.refresh")}
           </button>
         </header>
+
+        <div className="ap-filter-bar ap-filter-bar--sections">
+          {(["listings", "reports"] as PanelSection[]).map((section) => (
+            <button
+              key={section}
+              className={`ap-filter-btn ${panelSection === section ? "ap-filter-btn--active" : ""}`}
+              onClick={() => setPanelSection(section)}
+            >
+              {section === "listings"
+                ? t("adminPanel.tabListings")
+                : t("adminPanel.tabReports")}
+            </button>
+          ))}
+        </div>
+
+        {panelSection === "reports" ? (
+          <AdminReportsSection
+            key={reportsRefreshKey}
+            pushToast={push}
+          />
+        ) : (
+          <>
+        {pendingCount > 0 && statusFilter === "UnderReview" && (
+          <p className="ap-pending-note">
+            {t("adminPanel.pendingBadge", { count: pendingCount })}
+          </p>
+        )}
 
         {/* Filter bar */}
         <div className="ap-filter-bar">
@@ -447,8 +481,8 @@ export const AdminPanel = () => {
               onClick={() => setStatusFilter(f)}
             >
               {f === "UnderReview"
-                ? t("adminPanel.filterPending", { count: underReviewCount })
-                : t("adminPanel.filterAll", { count: items.length })}
+                ? t("adminPanel.filterPending", { count: pendingCount })
+                : t("adminPanel.filterAll", { count: allCount })}
             </button>
           ))}
         </div>
@@ -468,7 +502,7 @@ export const AdminPanel = () => {
         )}
 
         {/* Empty state */}
-        {!loading && !fetchError && visible.length === 0 && (
+        {!loading && !fetchError && items.length === 0 && (
           <div className="ap-empty">
             <p>
               {statusFilter === "UnderReview"
@@ -479,7 +513,7 @@ export const AdminPanel = () => {
         )}
 
         {/* Table */}
-        {!loading && visible.length > 0 && (
+        {!loading && items.length > 0 && (
           <div className="ap-table-wrap">
             <table className="ap-table">
               <thead>
@@ -493,7 +527,7 @@ export const AdminPanel = () => {
                 </tr>
               </thead>
               <tbody>
-                {visible.map((row) => {
+                {items.map((row) => {
                   const busy = pendingId === row.id;
                   return (
                     <tr key={row.id} className={busy ? "ap-row--busy" : ""}>
@@ -519,63 +553,65 @@ export const AdminPanel = () => {
                           : t("adminPanel.noDate")}
                       </td>
                       <td className="ap-col-actions">
-                        <button
-                          className="ap-btn ap-btn--sm ap-btn--ghost"
-                          onClick={() => setSelected(row)}
-                        >
-                          {t("adminPanel.btnDetails")}
-                        </button>
-                        {row.status === "UnderReview" && (
-                          <>
+                        <div className="ap-actions-inner">
+                          <button
+                            className="ap-btn ap-btn--sm ap-btn--ghost"
+                            onClick={() => setSelected(row)}
+                          >
+                            {t("adminPanel.btnDetails")}
+                          </button>
+                          {row.status === "UnderReview" && (
+                            <>
+                              <button
+                                className="ap-btn ap-btn--sm ap-btn--approve"
+                                disabled={busy}
+                                onClick={() => handleAction("approve", row.id)}
+                              >
+                                {t("adminPanel.btnApprove")}
+                              </button>
+                              <button
+                                className="ap-btn ap-btn--sm ap-btn--fixes"
+                                disabled={busy}
+                                onClick={() =>
+                                  handleAction("requestFixes", row.id)
+                                }
+                              >
+                                {t("adminPanel.btnFixes")}
+                              </button>
+                            </>
+                          )}
+                          {row.status === "Active" && (
                             <button
-                              className="ap-btn ap-btn--sm ap-btn--approve"
-                              disabled={busy}
-                              onClick={() => handleAction("approve", row.id)}
-                            >
-                              {t("adminPanel.btnApprove")}
-                            </button>
-                            <button
-                              className="ap-btn ap-btn--sm ap-btn--fixes"
+                              className="ap-btn ap-btn--sm ap-btn--moderation"
                               disabled={busy}
                               onClick={() =>
-                                handleAction("requestFixes", row.id)
+                                handleAction("moderationHide", row.id)
                               }
                             >
-                              {t("adminPanel.btnFixes")}
+                              {t("adminPanel.btnModerationHide")}
                             </button>
-                          </>
-                        )}
-                        {row.status === "Active" && (
-                          <button
-                            className="ap-btn ap-btn--sm ap-btn--moderation"
-                            disabled={busy}
-                            onClick={() =>
-                              handleAction("moderationHide", row.id)
-                            }
-                          >
-                            {t("adminPanel.btnModerationHide")}
-                          </button>
-                        )}
-                        {row.status === "HiddenByModeration" && (
-                          <button
-                            className="ap-btn ap-btn--sm ap-btn--reinstate"
-                            disabled={busy}
-                            onClick={() => handleAction("reinstate", row.id)}
-                          >
-                            {t("adminPanel.btnReinstate")}
-                          </button>
-                        )}
-                        {["Active", "Hidden", "HiddenByModeration"].includes(
-                          row.status
-                        ) && (
-                          <button
-                            className="ap-btn ap-btn--sm ap-btn--archive"
-                            disabled={busy}
-                            onClick={() => handleAction("archive", row.id)}
-                          >
-                            {t("adminPanel.btnArchive")}
-                          </button>
-                        )}
+                          )}
+                          {row.status === "HiddenByModeration" && (
+                            <button
+                              className="ap-btn ap-btn--sm ap-btn--reinstate"
+                              disabled={busy}
+                              onClick={() => handleAction("reinstate", row.id)}
+                            >
+                              {t("adminPanel.btnReinstate")}
+                            </button>
+                          )}
+                          {["Active", "Hidden", "HiddenByModeration"].includes(
+                            row.status
+                          ) && (
+                            <button
+                              className="ap-btn ap-btn--sm ap-btn--archive"
+                              disabled={busy}
+                              onClick={() => handleAction("archive", row.id)}
+                            >
+                              {t("adminPanel.btnArchive")}
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -583,6 +619,8 @@ export const AdminPanel = () => {
               </tbody>
             </table>
           </div>
+        )}
+          </>
         )}
       </div>
 

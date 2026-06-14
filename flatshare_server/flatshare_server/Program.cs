@@ -70,6 +70,7 @@ builder.Services.AddScoped<MatchingService>();
 builder.Services.AddScoped<IMatchScoreCalculator, MatchScoreCalculatorV1>();
 builder.Services.AddScoped<BookingService>();
 builder.Services.AddScoped<PaymentService>();
+builder.Services.AddScoped<ReportService>();
 builder.Services.AddSingleton<StripeWebhookSecretProvider>();
 builder.Services.AddScoped<WebhookService>();
 
