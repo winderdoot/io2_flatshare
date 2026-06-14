@@ -4,7 +4,11 @@ import { landlordListingsService } from "../LandlordListings/LandlordListingsSer
 export const useListingDetail = (listingId: string | undefined) => {
   return useQuery({
     queryKey: ["listing", listingId],
-    queryFn: () => landlordListingsService.getById(listingId!),
+    queryFn: () =>
+      landlordListingsService.getById(
+        listingId!,
+        localStorage.getItem("token")
+      ),
     enabled: !!listingId,
     staleTime: 0,
     retry: 1,

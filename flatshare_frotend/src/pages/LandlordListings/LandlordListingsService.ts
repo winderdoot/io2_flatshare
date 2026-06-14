@@ -1,4 +1,5 @@
-import { API_URL } from "../../config";
+import { API_URL, BACKEND_TYPE } from "../../config";
+import { adaptTeam2Listing, adaptCreateListingBodyForTeam2 } from "../../api/adapters";
 import type {
   ListingAttributes,
   ListingDTO,
@@ -23,8 +24,17 @@ function normalizeUnavailability(raw: RawUnavailability): Unavailability {
   };
 }
 
-/** Normalizuje odpowiedź API (camelCase / PascalCase, daty). */
+/**
+ * Normalizuje odpowiedź API do formatu ListingDTO.
+ * Obsługuje:
+ * - team1: camelCase / PascalCase, statusy PascalCase
+ * - team2: pola availableFrom/availableSince, statusy SCREAMING_SNAKE
+ */
 export function normalizeListingDto(raw: Record<string, unknown>): ListingDTO {
+  if (BACKEND_TYPE === "team2") {
+    return adaptTeam2Listing(raw);
+  }
+
   const periods = (raw.unavailabilities ?? raw.Unavailabilities) as
     | RawUnavailability[]
     | undefined;
@@ -107,12 +117,24 @@ export type ListingCreatedResponse = {
   createdAt: string;
 };
 
+/**
+ * Dla team2 wszystkie endpointy GET wymagają autoryzacji.
+ * Jeśli token nie jest podany jawnie, próbujemy odczytać go z localStorage.
+ */
+const optionalAuthHeaders = (token?: string | null): Record<string, string> => {
+  const headers: Record<string, string> = { Accept: "application/json" };
+  const effectiveToken =
+    token ?? (BACKEND_TYPE === "team2" ? localStorage.getItem("token") : null);
+  if (effectiveToken) headers.Authorization = `Bearer ${effectiveToken}`;
+  return headers;
+};
+
 export const landlordListingsService = {
-  listByOwner: async (ownerId: string): Promise<ListingDTO[]> => {
+  listByOwner: async (ownerId: string, token?: string | null): Promise<ListingDTO[]> => {
     const q = new URLSearchParams({ ownerId });
     const res = await fetch(`${API_URL}/api/v1/listings?${q}`, {
       method: "GET",
-      headers: { Accept: "application/json" },
+      headers: optionalAuthHeaders(token),
     });
     if (!res.ok) {
       const message = await readErrorMessage(res);
@@ -122,10 +144,10 @@ export const landlordListingsService = {
     return data.map((row) => normalizeListingDto(row));
   },
 
-  getById: async (id: string): Promise<ListingDTO> => {
+  getById: async (id: string, token?: string | null): Promise<ListingDTO> => {
     const res = await fetch(`${API_URL}/api/v1/listings/${id}`, {
       method: "GET",
-      headers: { Accept: "application/json" },
+      headers: optionalAuthHeaders(token),
     });
     if (!res.ok) {
       const message = await readErrorMessage(res);
@@ -139,10 +161,14 @@ export const landlordListingsService = {
     token: string,
     body: CreateListingBody
   ): Promise<ListingCreatedResponse> => {
+    const payload =
+      BACKEND_TYPE === "team2"
+        ? adaptCreateListingBodyForTeam2(body as unknown as Record<string, unknown>)
+        : body;
     const res = await fetch(`${API_URL}/api/v1/listings`, {
       method: "POST",
       headers: authHeaders(token),
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       const message = await readErrorMessage(res);
@@ -156,10 +182,14 @@ export const landlordListingsService = {
     id: string,
     body: UpdateListingBody
   ): Promise<ListingDTO> => {
+    const payload =
+      BACKEND_TYPE === "team2"
+        ? adaptCreateListingBodyForTeam2(body as unknown as Record<string, unknown>)
+        : body;
     const res = await fetch(`${API_URL}/api/v1/listings/${id}`, {
       method: "PATCH",
       headers: authHeaders(token),
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       const message = await readErrorMessage(res);
@@ -233,6 +263,13 @@ export const landlordListingsService = {
     id: string,
     body: UnavailabilityRangeBody
   ): Promise<void> => {
+    if (BACKEND_TYPE === "team2") {
+      throw {
+        status: 501,
+        message:
+          "Usuwanie okresu niedostępności nie jest obsługiwane przez backend drugiego zespołu.",
+      } satisfies ListingRequestError;
+    }
     const res = await fetch(`${API_URL}/api/v1/listings/${id}/unavailability`, {
       method: "DELETE",
       headers: authHeaders(token),

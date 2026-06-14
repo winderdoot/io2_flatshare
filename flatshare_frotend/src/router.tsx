@@ -21,6 +21,8 @@ import { AdminRoute } from "./auth/AdminRoute";
 import { MyBookings } from "./pages/Bookings/MyBookings";
 import { BookingDetail } from "./pages/Bookings/BookingDetail";
 import { LandlordBookingRequests } from "./pages/Bookings/LandlordBookingRequests";
+import { PaymentSuccess } from "./pages/Payments/PaymentSuccess";
+import { PaymentCancel } from "./pages/Payments/PaymentCancel";
 
 export const router = createBrowserRouter([
   {
@@ -124,6 +126,22 @@ export const router = createBrowserRouter([
           <AdminRoute>
             <AdminPanel />
           </AdminRoute>
+        ),
+      },
+      {
+        path: "/payments/success",
+        element: (
+          <PrivateRoute>
+            <PaymentSuccess />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/payments/cancel",
+        element: (
+          <PrivateRoute>
+            <PaymentCancel />
+          </PrivateRoute>
         ),
       },
     ],

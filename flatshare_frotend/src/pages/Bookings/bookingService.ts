@@ -1,4 +1,5 @@
-import { API_URL } from "../../config";
+import { API_URL, BACKEND_TYPE } from "../../config";
+import { adaptTeam2Booking } from "../../api/adapters";
 import type {
   AcceptBookingResponse,
   BookingCreatedResponse,
@@ -75,6 +76,10 @@ function derivePaymentStatus(status: string): BookingDTO["paymentStatus"] {
 }
 
 function normalizeBooking(raw: Record<string, unknown>): BookingDTO {
+  if (BACKEND_TYPE === "team2") {
+    return adaptTeam2Booking(raw);
+  }
+
   const status = String(raw.status ?? raw.Status ?? "") as BookingDTO["status"];
   const explicitPaymentStatus = raw.paymentStatus ?? raw.PaymentStatus;
 
@@ -109,13 +114,14 @@ export const bookingService = {
   },
 
   listForCurrentUser: async (token: string): Promise<BookingDTO[]> => {
-    const res = await fetch(
-      `${API_URL}/api/v1/bookings/${ME_BOOKING_ID_PLACEHOLDER}/me`,
-      {
-        method: "GET",
-        headers: authHeaders(token),
-      }
-    );
+    const url =
+      BACKEND_TYPE === "team2"
+        ? `${API_URL}/api/v1/bookings/me`
+        : `${API_URL}/api/v1/bookings/${ME_BOOKING_ID_PLACEHOLDER}/me`;
+    const res = await fetch(url, {
+      method: "GET",
+      headers: authHeaders(token),
+    });
     if (!res.ok) throw await readError(res);
     const data = (await res.json()) as Record<string, unknown>[];
     return data.map(normalizeBooking);
@@ -140,7 +146,17 @@ export const bookingService = {
       headers: authHeaders(token),
     });
     if (!res.ok) throw await readError(res);
-    return res.json();
+    // Team2 zwraca 200 OK z pustym ciałem — obsługujemy oba przypadki
+    const text = await res.text();
+    if (!text) {
+      return {
+        bookingId,
+        status: "PendingPayment",
+        acceptedAt: new Date().toISOString(),
+        paymentRequiredUntil: "",
+      };
+    }
+    return JSON.parse(text) as AcceptBookingResponse;
   },
 
   reject: async (
@@ -176,10 +192,11 @@ export const bookingService = {
     bookingId: string,
     body: PayBookingBody
   ): Promise<PaymentInitiatedResponse> => {
+    // Team2 nie oczekuje ciała — wysyłamy je tylko dla team1
     const res = await fetch(`${API_URL}/api/v1/bookings/${bookingId}/pay`, {
       method: "POST",
       headers: authHeaders(token),
-      body: JSON.stringify(body),
+      body: BACKEND_TYPE === "team2" ? undefined : JSON.stringify(body),
     });
     if (!res.ok) throw await readError(res);
     const data = (await res.json()) as Record<string, unknown>;
@@ -187,7 +204,11 @@ export const bookingService = {
       paymentId: String(data.paymentId ?? data.PaymentId ?? ""),
       bookingId: String(data.bookingId ?? data.BookingId ?? ""),
       status: String(data.status ?? data.Status ?? ""),
-      redirectUrl: String(data.redirectUrl ?? data.RedirectUrl ?? ""),
+      // Team2 zwraca checkoutUrl zamiast redirectUrl
+      redirectUrl: String(
+        data.redirectUrl ?? data.RedirectUrl ??
+        data.checkoutUrl ?? data.CheckoutUrl ?? ""
+      ),
       amount: Number(data.amount ?? data.Amount ?? 0),
       currency: String(data.currency ?? data.Currency ?? ""),
     };

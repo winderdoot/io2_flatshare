@@ -1,4 +1,5 @@
-import { API_URL } from "../../config";
+import { API_URL, BACKEND_TYPE } from "../../config";
+import { TEAM2_REPORT_STATUS } from "../../api/adapters";
 import type { PageResponse, ViolationReportDTO } from "../../models/report";
 import { isAdminRequestError, type AdminRequestError } from "./AdminListingsService";
 
@@ -67,7 +68,23 @@ export const adminReportsService = {
     return normalizePage(data);
   },
 
+  /**
+   * P1: PATCH /admin/reports/{id}/open
+   * P2: PATCH /admin/reports/{id}/status z body "UnderReview"
+   */
   openCase: async (token: string, id: string): Promise<void> => {
+    if (BACKEND_TYPE === "team2") {
+      const res = await fetch(`${API_URL}/api/v1/admin/reports/${id}/status`, {
+        method: "PATCH",
+        headers: jsonHeaders(token),
+        body: JSON.stringify(TEAM2_REPORT_STATUS.underReview),
+      });
+      if (!res.ok) {
+        const message = await readErrorMessage(res);
+        throw { status: res.status, message } satisfies AdminRequestError;
+      }
+      return;
+    }
     const res = await fetch(`${API_URL}/api/v1/admin/reports/${id}/open`, {
       method: "PATCH",
       headers: jsonHeaders(token),
@@ -78,7 +95,23 @@ export const adminReportsService = {
     }
   },
 
+  /**
+   * P1: PATCH /admin/reports/{id}/dismiss
+   * P2: PATCH /admin/reports/{id}/status z body "ClosedNoAction"
+   */
   dismiss: async (token: string, id: string): Promise<void> => {
+    if (BACKEND_TYPE === "team2") {
+      const res = await fetch(`${API_URL}/api/v1/admin/reports/${id}/status`, {
+        method: "PATCH",
+        headers: jsonHeaders(token),
+        body: JSON.stringify(TEAM2_REPORT_STATUS.closedNoAction),
+      });
+      if (!res.ok) {
+        const message = await readErrorMessage(res);
+        throw { status: res.status, message } satisfies AdminRequestError;
+      }
+      return;
+    }
     const res = await fetch(`${API_URL}/api/v1/admin/reports/${id}/dismiss`, {
       method: "PATCH",
       headers: jsonHeaders(token),
@@ -89,12 +122,28 @@ export const adminReportsService = {
     }
   },
 
+  /**
+   * P1: POST /admin/users/{userId}/ban?reportId={reportId}  (reportId wymagany)
+   * P2: POST /admin/users/{userId}/ban  z body { reason }   (brak reportId)
+   */
   banUser: async (
     token: string,
     userId: string,
     reportId: string,
     reason: string
   ): Promise<void> => {
+    if (BACKEND_TYPE === "team2") {
+      const res = await fetch(`${API_URL}/api/v1/admin/users/${userId}/ban`, {
+        method: "POST",
+        headers: jsonHeaders(token),
+        body: JSON.stringify({ reason }),
+      });
+      if (!res.ok) {
+        const message = await readErrorMessage(res);
+        throw { status: res.status, message } satisfies AdminRequestError;
+      }
+      return;
+    }
     const q = new URLSearchParams({ reportId });
     const res = await fetch(
       `${API_URL}/api/v1/admin/users/${userId}/ban?${q}`,

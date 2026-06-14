@@ -565,5 +565,12 @@
       "detail": "Operacja nie powiodła się ({{message}}).",
       "network": "Błąd sieci lub serwer nie odpowiada."
     }
+  },
+  "payment": {
+    "successTitle": "Płatność zakończona pomyślnie!",
+    "successDesc": "Twoja rezerwacja została opłacona. Status zostanie zaktualizowany wkrótce.",
+    "cancelTitle": "Płatność anulowana",
+    "cancelDesc": "Płatność nie została zrealizowana. Możesz spróbować ponownie z poziomu rezerwacji.",
+    "redirecting": "Za chwilę zostaniesz przekierowany do rezerwacji…"
   }
 }

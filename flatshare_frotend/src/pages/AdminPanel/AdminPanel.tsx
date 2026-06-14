@@ -324,7 +324,7 @@ export const AdminPanel = () => {
 
     Promise.all([
       adminListingsService.listUnderReview(token),
-      adminListingsService.listAll(),
+      adminListingsService.listAll(token),
     ])
       .then(([pending, all]) => {
         setPendingItems(pending);

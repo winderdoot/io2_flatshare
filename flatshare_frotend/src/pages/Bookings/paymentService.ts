@@ -1,4 +1,5 @@
-import { API_URL } from "../../config";
+import { API_URL, BACKEND_TYPE } from "../../config";
+import { adaptTeam2Payment } from "../../api/adapters";
 import type { PaymentDTO } from "../../models/payment";
 import { isBookingRequestError, type BookingRequestError } from "./bookingService";
 
@@ -42,28 +43,39 @@ function normalizePayment(raw: Record<string, unknown>): PaymentDTO {
 
 export { isBookingRequestError };
 
+/**
+ * P1: /api/payment  (brak prefiksu v1)
+ * P2: /api/v1/payments
+ */
+const paymentBase = () =>
+  BACKEND_TYPE === "team2" ? `${API_URL}/api/v1/payments` : `${API_URL}/api/payment`;
+
+function selectNormalizer(raw: Record<string, unknown>): PaymentDTO {
+  return BACKEND_TYPE === "team2" ? adaptTeam2Payment(raw) : normalizePayment(raw);
+}
+
 export const paymentService = {
   getByBookingId: async (
     token: string,
     bookingId: string
   ): Promise<PaymentDTO> => {
     const q = new URLSearchParams({ bookingId });
-    const res = await fetch(`${API_URL}/api/payment?${q}`, {
+    const res = await fetch(`${paymentBase()}?${q}`, {
       method: "GET",
       headers: authHeaders(token),
     });
     if (!res.ok) throw await readError(res);
     const data = (await res.json()) as Record<string, unknown>;
-    return normalizePayment(data);
+    return selectNormalizer(data);
   },
 
   getById: async (token: string, paymentId: string): Promise<PaymentDTO> => {
-    const res = await fetch(`${API_URL}/api/payment/${paymentId}`, {
+    const res = await fetch(`${paymentBase()}/${paymentId}`, {
       method: "GET",
       headers: authHeaders(token),
     });
     if (!res.ok) throw await readError(res);
     const data = (await res.json()) as Record<string, unknown>;
-    return normalizePayment(data);
+    return selectNormalizer(data);
   },
 };

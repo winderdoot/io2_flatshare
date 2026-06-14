@@ -565,5 +565,12 @@
       "detail": "Operation failed ({{message}}).",
       "network": "Network error or server unavailable."
     }
+  },
+  "payment": {
+    "successTitle": "Payment successful!",
+    "successDesc": "Your booking has been paid. The status will be updated shortly.",
+    "cancelTitle": "Payment cancelled",
+    "cancelDesc": "The payment was not completed. You can try again from your booking.",
+    "redirecting": "You will be redirected to your bookings shortly…"
   }
 }

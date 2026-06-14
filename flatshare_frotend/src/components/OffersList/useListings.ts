@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useFiltersStore } from "../SearchBar/FiltersStore";
-import { API_URL } from "../../config";
+import { API_URL, BACKEND_TYPE } from "../../config";
+import { normalizeListingDto } from "../../pages/LandlordListings/LandlordListingsService";
 import {
   cityApiName,
   citiesEquivalent,
@@ -118,7 +119,11 @@ const wrapAsPage = (filtered: ListingDTO[], page: number) => {
   };
 };
 
-const fetchFromListings = async (filters: Record<string, any>, page: number) => {
+const fetchFromListings = async (
+  filters: Record<string, any>,
+  page: number,
+  token?: string | null
+) => {
   const params = new URLSearchParams();
   const city = resolveCity(filters.city);
   if (city) params.append("city", city);
@@ -130,15 +135,22 @@ const fetchFromListings = async (filters: Record<string, any>, page: number) => 
     ? `${API_URL}/api/v1/listings?${params.toString()}`
     : `${API_URL}/api/v1/listings`;
 
-  const res = await fetch(url, {
-    method: "GET",
-    headers: { Accept: "application/json" },
-  });
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const res = await fetch(url, { method: "GET", headers });
+
+  if (res.status === 401) {
+    throw new Error("UNAUTHORIZED");
+  }
   if (!res.ok) {
     throw new Error("Błąd pobierania ogłoszeń");
   }
 
-  const all = (await res.json()) as ListingDTO[];
+  const rawAll = (await res.json()) as Record<string, unknown>[];
+  const all = rawAll.map((item) => normalizeListingDto(item));
   const filtered = all.filter((item) => filterMatchesActiveListing(item, filters));
   return wrapAsPage(filtered, page);
 };
@@ -163,8 +175,15 @@ const fetchFromMatches = async (
 
   const pageResponse = await res.json();
   const content = Array.isArray(pageResponse.content) ? pageResponse.content : [];
-  const filteredContent = content.filter((item: { listing?: ListingDTO }) =>
-    item.listing ? filterMatchesActiveListing(item.listing, filters) : false
+  const normalizedContent = content.map(
+    (item: { listing?: Record<string, unknown>; matchScore?: number }) => ({
+      ...item,
+      listing: item.listing ? normalizeListingDto(item.listing) : undefined,
+    })
+  );
+  const filteredContent = normalizedContent.filter(
+    (item: { listing?: ListingDTO }) =>
+      item.listing ? filterMatchesActiveListing(item.listing, filters) : false
   );
 
   return {
@@ -184,7 +203,14 @@ const fetchListings = async (
   if (isTenant) {
     return fetchFromMatches(filters, page, token!);
   }
-  return fetchFromListings(filters, page);
+
+  // Backend team2 wymaga autoryzacji nawet do przeglądania ogłoszeń.
+  // Jeśli użytkownik nie jest zalogowany, zwracamy pustą stronę z informacją.
+  if (BACKEND_TYPE === "team2" && !token) {
+    return wrapAsPage([], page);
+  }
+
+  return fetchFromListings(filters, page, token);
 };
 
 

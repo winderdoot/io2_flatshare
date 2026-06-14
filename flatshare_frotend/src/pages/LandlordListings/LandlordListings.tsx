@@ -125,7 +125,7 @@ export const LandlordListings = () => {
       setLoading(true);
       setError(null);
       try {
-        const list = await landlordListingsService.listByOwner(user.id);
+        const list = await landlordListingsService.listByOwner(user.id, token);
         if (!cancelled) setItems(list);
       } catch (e: unknown) {
         if (!cancelled) setError(messageForListFailure(e, t));
