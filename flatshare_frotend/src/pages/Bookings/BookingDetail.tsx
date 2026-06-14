@@ -3,6 +3,8 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../auth/AuthContext";
+import { ReportForm } from "../../components/ReportForm/ReportForm";
+import "../../components/ReportForm/ReportForm.css";
 import { landlordListingsService } from "../LandlordListings/LandlordListingsService";
 import { bookingService } from "./bookingService";
 import { messageForBookingFailure } from "./bookingErrorUtils";
@@ -65,6 +67,7 @@ export const BookingDetail = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [acceptInfo, setAcceptInfo] = useState<string | null>(null);
   const [verifyingPayment, setVerifyingPayment] = useState(false);
+  const [reportUserOpen, setReportUserOpen] = useState(false);
 
   const isLandlord = user?.role === "LANDLORD";
   const isTenant = user?.role === "TENANT";
@@ -342,6 +345,25 @@ export const BookingDetail = () => {
                 <div className="bookings-detail-field">
                   <label>{t("booking.fieldTenantId")}</label>
                   <p>{booking.tenantId}</p>
+                  {token && (
+                    <>
+                      <button
+                        type="button"
+                        className="report-trigger"
+                        onClick={() => setReportUserOpen(true)}
+                      >
+                        {t("report.reportUser")}
+                      </button>
+                      <ReportForm
+                        open={reportUserOpen}
+                        onClose={() => setReportUserOpen(false)}
+                        token={token}
+                        type="USER"
+                        targetId={booking.tenantId}
+                        title={t("report.reportUserTitle")}
+                      />
+                    </>
+                  )}
                 </div>
               )}
             </div>

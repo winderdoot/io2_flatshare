@@ -1,4 +1,5 @@
 import { Link, useLocation, useParams } from "react-router-dom";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ListingDTO } from "../../models/listing";
 import { AvailabilityCalendar } from "../../components/AvailabilityCalendar/AvailabilityCalendar";
@@ -13,6 +14,8 @@ import {
   formatLocationCity,
   formatLocationDistrict,
 } from "../../components/SearchBar/locationConfig";
+import { ReportForm } from "../../components/ReportForm/ReportForm";
+import "../../components/ReportForm/ReportForm.css";
 
 function formatDate(iso: string, locale: string): string {
   const d = new Date(iso + "T12:00:00");
@@ -63,6 +66,7 @@ export const ListingDetail = () => {
   const { t, i18n } = useTranslation();
   const { formatListingPrice } = useCurrency();
   const { data: listing, isLoading, isError, error } = useListingDetail(listingId);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const fromMyListings =
     (location.state as { from?: string } | null)?.from === "/my-listings";
@@ -165,6 +169,25 @@ export const ListingDetail = () => {
               </span>
             ))}
           </div>
+          {user && token && !fromMyListings && (
+            <>
+              <button
+                type="button"
+                className="report-trigger"
+                onClick={() => setReportOpen(true)}
+              >
+                {t("report.reportListing")}
+              </button>
+              <ReportForm
+                open={reportOpen}
+                onClose={() => setReportOpen(false)}
+                token={token}
+                type="LISTING"
+                targetId={listingId}
+                title={t("report.reportListingTitle")}
+              />
+            </>
+          )}
         </section>
 
         <aside className="listing-detail-panel">
