@@ -23,7 +23,10 @@ async function readErrorMessage(res: Response): Promise<string> {
 function normalizeReport(raw: Record<string, unknown>): ViolationReportDTO {
   return {
     id: String(raw.id ?? raw.Id ?? ""),
-    type: String(raw.type ?? raw.Type ?? "") as ViolationReportDTO["type"],
+    // team2 używa "targetType" zamiast "type"
+    type: String(
+      raw.type ?? raw.Type ?? raw.targetType ?? raw.TargetType ?? ""
+    ) as ViolationReportDTO["type"],
     targetId: String(raw.targetId ?? raw.TargetId ?? ""),
     reason: String(raw.reason ?? raw.Reason ?? ""),
     details: String(raw.details ?? raw.Details ?? ""),
@@ -32,7 +35,21 @@ function normalizeReport(raw: Record<string, unknown>): ViolationReportDTO {
   };
 }
 
-function normalizePage(raw: Record<string, unknown>): PageResponse<ViolationReportDTO> {
+function normalizePage(
+  raw: Record<string, unknown> | Record<string, unknown>[]
+): PageResponse<ViolationReportDTO> {
+  // team2 zwraca tablicę zamiast obiektu paginowanego
+  if (Array.isArray(raw)) {
+    return {
+      content: raw.map(normalizeReport),
+      page: {
+        size: raw.length,
+        number: 0,
+        totalElements: raw.length,
+        totalPages: 1,
+      },
+    };
+  }
   const contentRaw = (raw.content ?? raw.Content ?? []) as Record<string, unknown>[];
   const pageRaw = (raw.page ?? raw.Page ?? {}) as Record<string, unknown>;
   return {
@@ -64,7 +81,9 @@ export const adminReportsService = {
       const message = await readErrorMessage(res);
       throw { status: res.status, message } satisfies AdminRequestError;
     }
-    const data = (await res.json()) as Record<string, unknown>;
+    const data = (await res.json()) as
+      | Record<string, unknown>
+      | Record<string, unknown>[];
     return normalizePage(data);
   },
 

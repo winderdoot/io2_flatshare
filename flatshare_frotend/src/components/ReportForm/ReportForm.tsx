@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import type { CreateReportBody, ReportType } from "../../models/report";
 import { isReportRequestError, reportService } from "../../pages/Reports/reportService";
+import { BACKEND_TYPE } from "../../config";
 import "./ReportForm.css";
 
 type ReportFormProps = {
@@ -160,7 +161,7 @@ export function ReportForm({
               onChange={(e) => setReason(e.target.value)}
               placeholder={t("report.reasonPlaceholder")}
               disabled={submitting}
-              maxLength={200}
+              maxLength={BACKEND_TYPE === "team2" ? 100 : 200}
             />
           </label>
 
@@ -172,7 +173,7 @@ export function ReportForm({
               placeholder={t("report.detailsPlaceholder")}
               disabled={submitting}
               rows={5}
-              maxLength={2000}
+              maxLength={BACKEND_TYPE === "team2" ? 1000 : 2000}
             />
           </label>
 
