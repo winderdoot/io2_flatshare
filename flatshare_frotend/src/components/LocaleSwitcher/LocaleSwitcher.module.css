@@ -1,0 +1,76 @@
+.wrap {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.group {
+  display: inline-flex;
+  align-items: stretch;
+  padding: 3px;
+  gap: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--color-secondary-tint);
+  border: 1px solid var(--color-border-subtle);
+}
+
+:global([data-theme="light"]) .group {
+  background: #ffffff;
+  border-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.group button {
+  font-size: 0.72rem;
+  padding: 0.32rem 0.65rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  box-shadow: none;
+  transition: background var(--transition), color var(--transition);
+}
+
+.group button:hover {
+  color: var(--color-text-primary);
+  background: transparent;
+}
+
+.group button:hover:not(.active) {
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+
+.group button.active {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary) 50%, transparent);
+}
+
+.group button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  .group button {
+    padding: 0.28rem 0.5rem;
+    font-size: 0.68rem;
+  }
+}

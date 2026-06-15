@@ -1,0 +1,42 @@
+name: .NET CI with Docker DB -- build
+
+on:
+  push:
+    branches: 
+      - "*"
+      - "!main"
+      - "!develop"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    env:
+      DOCKER_COMPOSE_DIR: ./flatshare_server/flatshare_server
+      DOTNET_SLN_DIR: ./flatshare_server
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Start Dependencies (Docker Compose)
+      run: docker compose up -d
+      working-directory: ${{ env.DOCKER_COMPOSE_DIR }}
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: ${{ env.DOTNET_SLN_DIR }}
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+      working-directory: ${{ env.DOTNET_SLN_DIR }}
+
+    - name: Stop Containers
+      if: always()
+      run: docker compose down
+      working-directory: ${{ env.DOCKER_COMPOSE_DIR }}

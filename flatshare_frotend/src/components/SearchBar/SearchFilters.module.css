@@ -1,0 +1,122 @@
+.container {
+    padding: 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.row {
+    display: flex;
+    align-items: end;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+}
+
+.col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.col label {
+    font-size: 0.82rem;
+    color: color-mix(in srgb, var(--color-text-secondary) 80%, transparent);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+.input,
+.select {
+    flex: 1;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface-2);
+    color: var(--color-text-primary);
+    font: inherit;
+    min-width: 0;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.input:focus,
+.select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.checkboxGroup {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface-2);
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition);
+    user-select: none;
+}
+
+.checkboxGroup:hover {
+    border-color: var(--color-primary);
+}
+
+.checkboxGroup input[type="checkbox"] {
+    accent-color: var(--color-primary);
+    margin: 0;
+}
+
+.button {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+    padding: 0.75rem 1.65rem;
+    border: none;
+    border-radius: var(--radius-button);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+    box-shadow:
+      0 2px 10px color-mix(in srgb, var(--color-accent) 28%, transparent),
+      var(--shadow-sm);
+}
+
+.button:hover {
+    background: color-mix(in srgb, var(--color-accent) 88%, var(--color-text-primary) 12%);
+    box-shadow:
+      0 4px 14px color-mix(in srgb, var(--color-accent) 36%, transparent),
+      var(--shadow-sm);
+}
+
+.button:active {
+    transform: translateY(1px);
+}
+
+.button:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--color-accent) 42%, transparent),
+      0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+}
+
+@media (max-width: 640px) {
+    .container {
+        padding: 1.15rem;
+    }
+
+    .button {
+        width: 100%;
+        text-align: center;
+    }
+}

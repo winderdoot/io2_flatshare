@@ -1,0 +1,210 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--navbar-height);
+  z-index: 100;
+
+  display: flex;
+  justify-content: center;
+
+  background: color-mix(in srgb, var(--color-bg) 78%, transparent);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+:global([data-theme="light"]) .navbar {
+  background: color-mix(in srgb, #ffffff 94%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.inner {
+  width: 100%;
+  max-width: var(--max-width);
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: 1.5rem;
+
+  padding: 0 var(--container-pad);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brandMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 50%, var(--color-accent) 50%));
+  color: var(--color-on-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: var(--shadow-primary);
+}
+
+.brandText {
+  font-size: 1.1rem;
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-button);
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color var(--transition), background var(--transition);
+}
+
+.link:hover {
+  color: var(--color-text-primary);
+  background: var(--color-secondary-tint);
+}
+
+:global([data-theme="light"]) .link:hover {
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.linkActive {
+  color: var(--color-text-primary);
+  background: var(--color-primary-tint);
+}
+
+.linkActive:hover {
+  background: var(--color-primary-tint);
+}
+
+:global([data-theme="light"]) .linkActive {
+  background: color-mix(in srgb, var(--color-accent-strong) 22%, transparent);
+  color: var(--color-text-primary);
+}
+
+:global([data-theme="light"]) .linkActive:hover {
+  background: color-mix(in srgb, var(--color-accent-strong) 30%, transparent);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-shrink: 0;
+  justify-self: end;
+}
+
+.authBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.05rem;
+  border-radius: var(--radius-button);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  background: var(--color-secondary-tint);
+  border: 1px solid var(--color-border-subtle);
+  transition: background var(--transition), border-color var(--transition);
+}
+
+:global([data-theme="light"]) .authBtn:not(.authBtnWarm):not(.authBtnPrimary) {
+  background: #ffffff;
+  border-color: color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+.authBtn:hover {
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.authBtnPrimary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.authBtnPrimary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: var(--color-on-primary);
+}
+
+/* Drugi styl CTA w pasku — żółty akcent */
+.authBtnWarm {
+  background: var(--color-accent-strong);
+  border-color: color-mix(in srgb, var(--color-accent-strong) 85%, var(--color-text-primary) 15%);
+  color: var(--color-on-accent);
+}
+
+.authBtnWarm:hover {
+  background: color-mix(in srgb, var(--color-accent-strong) 92%, var(--color-text-primary) 8%);
+  border-color: var(--color-accent-strong);
+  color: var(--color-on-accent);
+}
+
+.authBtnUser {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.authBtnLabel {
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 860px) {
+  .inner {
+    column-gap: 0.75rem;
+  }
+
+  .brandText {
+    display: none;
+  }
+
+  .link {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.82rem;
+  }
+
+  .authBtnUser {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .links {
+    gap: 0;
+  }
+
+  .link {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.78rem;
+  }
+}

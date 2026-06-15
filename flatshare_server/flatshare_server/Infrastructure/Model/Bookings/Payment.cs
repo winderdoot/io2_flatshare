@@ -1,0 +1,78 @@
+﻿using flatshare_server.Infrastructure.Model.Responses.Booking;
+
+namespace flatshare_server.Infrastructure.Model.Bookings;
+
+public class Payment
+{
+    public enum PaymentStatus
+    {
+        Initiated,
+        Redirected,
+        Succeeded,
+        Failed,
+        Cancelled
+    }
+    public Guid PaymentId { get; init; }
+    public Guid BookingId { get; init; }
+    public Money Amount { get; init; }
+    private PaymentStatus _status = PaymentStatus.Initiated;
+    public PaymentStatus Status { get => _status; init => _status = value; }
+    public string? StripePaymentIntentId { get; private set; }
+    private Payment() { }
+    public PaymentDTO IntoDTO()
+    {
+        return new PaymentDTO 
+        { 
+            BookingId = BookingId, 
+            PaymentId = PaymentId, 
+            TotalValue = Amount.Value, 
+            Currency = Amount.CurrencyStr(), 
+            Status = Status
+        };
+    }
+
+    public Payment(Guid bookingId, Money amount)
+    {
+        PaymentId = Guid.NewGuid();
+        BookingId = bookingId;
+        Amount = amount;
+        Status = PaymentStatus.Initiated;
+    }
+
+    public void RedirectToGateway()
+    {
+        if (Status != PaymentStatus.Initiated)
+            throw new InvalidOperationException($"Cannot redirect from status {Status}");
+        _status = PaymentStatus.Redirected;
+    }
+
+    public void GatewayConfirmed(string paymentIntentId)
+    {
+        if (Status != PaymentStatus.Redirected)
+            throw new InvalidOperationException($"Cannot confirm gateway from status {Status}");
+
+        _status = PaymentStatus.Succeeded;
+        StripePaymentIntentId = paymentIntentId;
+    }
+
+    public void GatewayFailed()
+    {
+        if (Status != PaymentStatus.Redirected)
+            throw new InvalidOperationException($"Cannot fail gateway from status {Status}");
+        _status = PaymentStatus.Failed;
+    }
+
+    public void UserAborted()
+    {
+        if (Status != PaymentStatus.Redirected)
+            throw new InvalidOperationException($"Cannot abort from status {Status}");
+        _status = PaymentStatus.Cancelled;
+    }
+
+    public void Retry()
+    {
+        if (Status != PaymentStatus.Failed)
+            throw new InvalidOperationException($"Cannot retry from status {Status}");
+        _status = PaymentStatus.Initiated;
+    }
+}

@@ -1,0 +1,83 @@
+﻿services:
+  # Service 1: Main PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: flatshare-db-ct
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: NieMaDowoduŻeWiedział
+      POSTGRES_DB: flatshare_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - flatshare_db:/var/lib/postgresql/data
+    restart: always
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: flatshare-azurite-ct
+    ports:
+      - "10000:10000" # Blob service
+      - "10001:10001" # Queue service
+      - "10002:10002" # Table service
+    volumes:
+      - flatshare_azurite:/data
+    command: "azurite --skipApiVersionCheck --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --location /data --debug /data/debug.log"
+    restart: always
+
+  # Service 2: Flatshare server
+  # flatshare-server:
+  #   build:
+  #     context: . # Where the docker-compose.yaml is
+  #     dockerfile: ./flatshare_server/Dockerfile
+  #   container_name: flatshare-server-ct
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     # This overrides the connection string in your appsettings.json
+  #     - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=flatshare_db;Username=postgres;Password=MyPassword
+  #   depends_on:
+  #     - db
+
+  # Service 3: stripe-cli to tunnel webhook events to local/dockerized server
+
+  # Keep trying to send the POST request until it succeeds (returns HTTP 200 OK)
+  # OLD
+  #  wget -q -O /dev/null --post-data=\"\\\"$$SECRET\\\"\" --header=\"Content-Type: application/json\" --header=\"X-Init-Key: $${APP_INIT_KEY}\" --no-check-certificate https://host.docker.internal:7047/api/v1/webhook/init-secret
+  # NEW
+  # wget --post-data="\"$$SECRET\"" --header="Content-Type: application/json" --header="X-Init-Key: $${APP_INIT_KEY}" --no-check-certificate https://host.docker.internal:7047/api/v1/webhook/init-secret
+
+  stripe-cli:
+    image: stripe/stripe-cli:latest
+    # Crazy custom setup to make running stripe-cli locally simple with docker
+
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo 'Starting Stripe CLI...';
+        touch /tmp/stripe.log;
+        
+        stripe listen --api-key $$STRIPE_SECRET_KEY --forward-to https://host.docker.internal:7047/api/v1/webhooks --events checkout.session.completed,checkout.session.expired --skip-verify 2>&1 | tee /tmp/stripe.log &
+        
+        while ! grep -q 'whsec_' /tmp/stripe.log; do sleep 1; done;
+        SECRET=$$(grep -o 'whsec_[a-zA-Z0-9]*' /tmp/stripe.log | head -n 1);
+        
+        echo 'Secret generated! Waiting for ASP.NET server to wake up...';
+        until wget -O /dev/null --post-data="{\"secret\": \"$$SECRET\"}" --header="Content-Type: application/json" --header="X-Init-Key: $$APP_INIT_KEY" --no-check-certificate https://host.docker.internal:7047/api/v1/webhooks/init-secret; do
+            echo 'ASP.NET app not ready yet. Retrying in 2 seconds...';
+            sleep 2;
+        done;
+        
+        echo 'Successfully configured flatshare server with dynamic webhook secret.';
+        tail -f /tmp/stripe.log
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    restart: unless-stopped
+
+volumes:
+    flatshare_db:
+    flatshare_azurite:

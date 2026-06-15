@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist-ts",
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "include": [
+    "src",
+    "*.ts",
+    "*.config.*"
+  ]
+}
